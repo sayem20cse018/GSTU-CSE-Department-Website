@@ -6,92 +6,67 @@ import { usePathname } from 'next/navigation';
 import { NAV_LINKS, SITE } from '@/constants';
 import { cn } from '@/lib/utils/cn';
 
-type NavLink = typeof NAV_LINKS[number];
+type NavLink   = typeof NAV_LINKS[number];
 type ChildLink = { label: string; href: string };
 
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen]       = useState(false);
-  const [scrolled, setScrolled]           = useState(false);
-  const [openDropdown, setOpenDropdown]   = useState<string | null>(null);
-  const pathname = usePathname();
+  const [mobileOpen,   setMobileOpen]   = useState(false);
+  const [scrolled,     setScrolled]     = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const pathname    = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // ── Scroll shadow ────────────────────────────────────────────────────────
+  // scroll detection
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const fn = () => setScrolled(window.scrollY > 4);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  // ── Close dropdown on outside click ─────────────────────────────────────
+  // close dropdown on outside click
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+    const fn = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node))
         setOpenDropdown(null);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    };
+    document.addEventListener('mousedown', fn);
+    return () => document.removeEventListener('mousedown', fn);
   }, []);
 
-  // ── Close mobile menu on route change ───────────────────────────────────
+  // close on navigation
   useEffect(() => { setMobileOpen(false); setOpenDropdown(null); }, [pathname]);
 
-  const hasChildren = (link: NavLink): link is NavLink & { children: readonly ChildLink[] } =>
-    'children' in link && Array.isArray((link as { children?: unknown }).children);
+  const hasChildren = (l: NavLink): l is NavLink & { children: readonly ChildLink[] } =>
+    'children' in l && Array.isArray((l as { children?: unknown }).children);
 
   return (
-    <header
+    <nav
       className={cn(
-        'fixed top-0 inset-x-0 z-50 transition-all duration-300',
+        'sticky top-0 z-40 transition-all duration-300',
         scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/80'
-          : 'bg-white border-b border-transparent',
+          ? 'bg-[#1e3a5f]/98 backdrop-blur-md shadow-lg shadow-slate-900/20'
+          : 'bg-[#1e3a5f]',
       )}
+      aria-label="Main navigation"
     >
-      {/* ── University strip ────────────────────────────────────────────── */}
-      <div className="bg-[#1e3a5f] text-white hidden md:block">
-        <div className="container-custom flex items-center justify-between py-1.5">
-          <span className="text-xs font-medium tracking-wide opacity-90">
-            {SITE.university}
-          </span>
-          <div className="flex items-center gap-4 text-xs opacity-80">
-            <a href={`mailto:${SITE.email}`} className="hover:opacity-100 transition">
-              {SITE.email}
-            </a>
-            <span className="text-white/30">|</span>
-            <a href={`tel:${SITE.phone}`} className="hover:opacity-100 transition">
-              {SITE.phone}
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Main nav bar ────────────────────────────────────────────────── */}
       <div className="container-custom" ref={dropdownRef}>
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
 
-          {/* ── Logo ──────────────────────────────────────────────────── */}
-          <Link href="/" className="flex items-center gap-3 group" aria-label="GSTU CSE Home">
-            {/* Shield icon */}
-            <div className="w-9 h-9 rounded-lg bg-blue-700 flex items-center justify-center shrink-0 shadow">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          {/* ── Mobile logo (hidden on desktop — desktop logo is in SiteHeader) */}
+          <Link href="/" className="flex lg:hidden items-center gap-2 group" aria-label="GSTU CSE Home">
+            <div className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                <path d="M20 4L6 12v9c0 7.18 5.927 13.905 14 15.354C28.073 34.905 34 28.18 34 21v-9L20 4z"
+                  fill="none" stroke="white" strokeWidth="3" strokeLinejoin="round"/>
+                <path d="M14 21l4 4 8-8" stroke="#93c5fd" strokeWidth="2.5"
+                  strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <div className="leading-tight">
-              <p className="text-sm font-bold text-slate-900 group-hover:text-blue-700 transition">
-                Dept. of CSE
-              </p>
-              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
-                {SITE.universityShort}
-              </p>
-            </div>
+            <span className="text-sm font-bold text-white">{SITE.shortName}</span>
           </Link>
 
-          {/* ── Desktop nav ───────────────────────────────────────────── */}
-          <nav className="hidden lg:flex items-center gap-0.5" aria-label="Main navigation">
+          {/* ── Desktop nav links ──────────────────────────────────────────── */}
+          <div className="hidden lg:flex items-center gap-0.5 flex-1">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href ||
                 (link.href !== '/' && pathname.startsWith(link.href));
@@ -105,33 +80,37 @@ export default function Navbar() {
                       aria-expanded={isOpen}
                       aria-haspopup="true"
                       className={cn(
-                        'flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                        isActive ? 'text-blue-700' : 'text-slate-700 hover:text-blue-700 hover:bg-blue-50',
+                        'flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-all',
+                        isActive
+                          ? 'text-white bg-white/15'
+                          : 'text-blue-100 hover:text-white hover:bg-white/10',
                       )}
                     >
                       {link.label}
                       <svg
-                        className={cn('w-3.5 h-3.5 transition-transform', isOpen && 'rotate-180')}
+                        className={cn('w-3.5 h-3.5 transition-transform duration-200', isOpen && 'rotate-180')}
                         fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
                       </svg>
                     </button>
 
-                    {/* Dropdown */}
+                    {/* Dropdown panel */}
                     {isOpen && (
-                      <div className="absolute top-full left-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50">
+                      <div className="absolute top-[calc(100%+4px)] left-0 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-50
+                                      animate-[fadeIn_0.15s_ease]">
                         {link.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              'block px-4 py-2 text-sm transition-colors',
+                              'flex items-center gap-2 px-4 py-2.5 text-sm transition-colors',
                               pathname === child.href
-                                ? 'text-blue-700 bg-blue-50 font-medium'
+                                ? 'text-blue-700 bg-blue-50 font-semibold'
                                 : 'text-slate-700 hover:text-blue-700 hover:bg-slate-50',
                             )}
                           >
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" aria-hidden="true"/>
                             {child.label}
                           </Link>
                         ))}
@@ -147,57 +126,65 @@ export default function Navbar() {
                   href={link.href}
                   aria-current={pathname === link.href ? 'page' : undefined}
                   className={cn(
-                    'px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                    'px-3 py-2 text-sm font-medium rounded-md transition-all',
                     isActive
-                      ? 'text-blue-700 bg-blue-50'
-                      : 'text-slate-700 hover:text-blue-700 hover:bg-blue-50',
+                      ? 'text-white bg-white/15 font-semibold'
+                      : 'text-blue-100 hover:text-white hover:bg-white/10',
                   )}
                 >
                   {link.label}
                 </Link>
               );
             })}
-          </nav>
+          </div>
 
-          {/* ── Desktop CTA ───────────────────────────────────────────── */}
-          <div className="hidden lg:flex items-center gap-2">
+          {/* ── Desktop right: Apply Now ────────────────────────────────────── */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
             <Link
               href="/admissions"
-              className="text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition shadow-sm"
+              className="text-sm font-bold text-[#1e3a5f] bg-white hover:bg-blue-50 px-4 py-1.5 rounded-lg transition shadow-sm"
             >
               Apply Now
             </Link>
           </div>
 
-          {/* ── Mobile hamburger ──────────────────────────────────────── */}
+          {/* ── Mobile hamburger ──────────────────────────────────────────── */}
           <button
-            className="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition"
-            onClick={() => setMobileOpen((v) => !v)}
+            className="lg:hidden p-2 rounded-lg text-blue-100 hover:bg-white/10 transition"
+            onClick={() => setMobileOpen(v => !v)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
           >
             {mobileOpen ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
               </svg>
             ) : (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
               </svg>
             )}
           </button>
         </div>
       </div>
 
-      {/* ── Mobile menu ─────────────────────────────────────────────────── */}
+      {/* ── Mobile menu ─────────────────────────────────────────────────────── */}
       {mobileOpen && (
-        <div className="lg:hidden bg-white border-t border-slate-100 shadow-lg">
-          <nav className="container-custom py-3 space-y-0.5" aria-label="Mobile navigation">
+        <div id="mobile-menu" className="lg:hidden bg-[#16304f] border-t border-white/10">
+          <div className="container-custom py-3 space-y-0.5">
+
+            {/* Mobile header identity */}
+            <div className="px-3 py-2 mb-2">
+              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest">{SITE.shortName}</p>
+              <p className="text-[10px] text-blue-300/60">{SITE.university}</p>
+            </div>
+
             {NAV_LINKS.map((link) => {
               if (hasChildren(link)) {
                 return (
                   <div key={link.label}>
-                    <p className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mt-3 first:mt-0">
+                    <p className="px-3 pt-3 pb-1 text-[10px] font-bold text-blue-400 uppercase tracking-widest">
                       {link.label}
                     </p>
                     {link.children.map((child) => (
@@ -205,12 +192,13 @@ export default function Navbar() {
                         key={child.href}
                         href={child.href}
                         className={cn(
-                          'block px-5 py-2 text-sm rounded-lg transition-colors',
+                          'flex items-center gap-2 px-5 py-2 text-sm rounded-lg transition-colors',
                           pathname === child.href
-                            ? 'text-blue-700 font-medium bg-blue-50'
-                            : 'text-slate-700 hover:text-blue-700 hover:bg-slate-50',
+                            ? 'text-white bg-white/15 font-semibold'
+                            : 'text-blue-100 hover:text-white hover:bg-white/10',
                         )}
                       >
+                        <span className="w-1 h-1 rounded-full bg-blue-400 shrink-0" aria-hidden="true"/>
                         {child.label}
                       </Link>
                     ))}
@@ -224,25 +212,33 @@ export default function Navbar() {
                   className={cn(
                     'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
                     pathname === link.href
-                      ? 'text-blue-700 bg-blue-50'
-                      : 'text-slate-700 hover:text-blue-700 hover:bg-slate-50',
+                      ? 'text-white bg-white/15 font-semibold'
+                      : 'text-blue-100 hover:text-white hover:bg-white/10',
                   )}
                 >
                   {link.label}
                 </Link>
               );
             })}
-            <div className="pt-3 pb-2 border-t border-slate-100 mt-2">
-              <Link
-                href="/admissions"
-                className="block text-center text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 px-4 py-2.5 rounded-lg transition"
-              >
+
+            {/* Mobile bottom actions */}
+            <div className="flex gap-2 pt-3 pb-2 border-t border-white/10 mt-2">
+              <Link href="/admissions"
+                className="flex-1 text-center text-sm font-bold text-[#1e3a5f] bg-white hover:bg-blue-50 py-2.5 rounded-lg transition">
                 Apply Now
               </Link>
+              <a href="https://moodle.gstu.edu.bd" target="_blank" rel="noopener noreferrer"
+                className="flex-1 text-center text-sm font-semibold text-blue-100 border border-white/20 hover:bg-white/10 py-2.5 rounded-lg transition">
+                Moodle
+              </a>
+              <Link href="/admin/login"
+                className="flex-1 text-center text-sm font-semibold text-blue-100 border border-white/20 hover:bg-white/10 py-2.5 rounded-lg transition">
+                Login
+              </Link>
             </div>
-          </nav>
+          </div>
         </div>
       )}
-    </header>
+    </nav>
   );
 }
