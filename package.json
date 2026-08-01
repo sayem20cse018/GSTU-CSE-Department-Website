@@ -1,0 +1,14 @@
+{
+  "name": "cse-department-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for the CSE Department Website — Next.js frontend + NestJS backend",
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run start:dev --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "install:all": "npm install --prefix frontend && npm install --prefix backend",
+    "type-check": "npm run type-check --prefix frontend & npx tsc --noEmit --prefix backend"
+  }
+}
