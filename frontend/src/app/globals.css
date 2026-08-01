@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
+/* ─── CSS custom properties ─────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette */
+  --brand-primary:   #1d4ed8;   /* blue-700  */
+  --brand-dark:      #1e3a5f;   /* deep navy */
+  --brand-accent:    #f59e0b;   /* amber-500 */
+
+  --bg-base:         #ffffff;
+  --text-base:       #0f172a;   /* slate-900 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ─── Base styles ────────────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-base);
+  font-family: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
 }
+
+/* ─── Focus ring ─────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* ─── Scrollbar (Webkit) ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+
+/* ─── Utility: section spacing ───────────────────────────────────────────────── */
+.section-py { padding-top: 5rem; padding-bottom: 5rem; }
+@media (min-width: 1024px) { .section-py { padding-top: 6rem; padding-bottom: 6rem; } }
+
+/* ─── Utility: container ─────────────────────────────────────────────────────── */
+.container-custom {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+@media (min-width: 640px) {
+  .container-custom { padding-left: 2rem; padding-right: 2rem; }
+}
+@media (min-width: 1024px) {
+  .container-custom { padding-left: 3rem; padding-right: 3rem; }
+}
+
+/* ─── Animated underline for nav links ───────────────────────────────────────── */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--brand-primary);
+  transition: width 0.25s ease;
+}
+.nav-underline:hover::after,
+.nav-underline[aria-current="page"]::after { width: 100%; }
