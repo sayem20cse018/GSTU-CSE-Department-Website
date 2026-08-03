@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,8 +22,9 @@ const loginSchema = z.object({
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function LoginForm() {
-  const { login } = useAuth();
-  const router = useRouter();
+  const { login }  = useAuth();
+  const router     = useRouter();
+  const params     = useSearchParams();
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -37,7 +38,18 @@ export default function LoginForm() {
     setServerError(null);
     try {
       await login(values.email, values.password);
-      router.push('/admin/dashboard');
+
+      // Redirect to callbackUrl if present, else dashboard
+      const raw      = params.get('callbackUrl');
+      const safePath = raw
+        ? decodeURIComponent(raw).replace(/[^\w\-/]/g, '')
+        : '/admin/dashboard';
+      const destination =
+        safePath.startsWith('/admin') && !safePath.startsWith('/admin/login')
+          ? safePath
+          : '/admin/dashboard';
+
+      router.push(destination);
       router.refresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Something went wrong. Try again.';
