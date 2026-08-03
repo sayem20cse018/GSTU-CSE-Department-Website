@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { HERO_SLIDES, type Slide } from '@/config/slides';
-import { STATS } from '@/constants';
 import { cn } from '@/lib/utils/cn';
 
 const AUTOPLAY_MS = 5500;
@@ -20,13 +18,12 @@ function SlideBackground({ slide, active }: { slide: Slide; active: boolean }) {
       aria-hidden={!active}
     >
       {slide.imageUrl ? (
-        <Image
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={slide.imageUrl}
           alt=""
-          fill
-          className="object-cover object-center"
-          priority={slide.id === HERO_SLIDES[0].id}
-          sizes="100vw"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          aria-hidden="true"
         />
       ) : (
         /* Gradient fallback */
@@ -176,20 +173,6 @@ export default function HeroSlider() {
         </div>
       </div>
 
-      {/* ── Stats bar (bottom overlay) ────────────────────────────────────── */}
-      <div className="absolute bottom-0 inset-x-0 z-[3] hidden lg:block">
-        <div className="bg-black/40 backdrop-blur-sm border-t border-white/10">
-          <div className="container-custom py-4 grid grid-cols-4 divide-x divide-white/10">
-            {STATS.map((s) => (
-              <div key={s.label} className="flex flex-col items-center px-6 first:pl-0 last:pr-0">
-                <span className="text-2xl font-extrabold text-white leading-none">{s.value}</span>
-                <span className="text-xs text-slate-400 mt-1">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* ── Left arrow ────────────────────────────────────────────────────── */}
       <button
         onClick={prev}
@@ -220,8 +203,7 @@ export default function HeroSlider() {
 
       {/* ── Dot indicators ───────────────────────────────────────────────── */}
       <div
-        className="absolute bottom-20 lg:bottom-24 left-1/2 -translate-x-1/2 z-[4]
-                   flex items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4] flex items-center gap-2"
         role="tablist"
         aria-label="Slide indicators"
       >

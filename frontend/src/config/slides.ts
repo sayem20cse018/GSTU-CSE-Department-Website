@@ -31,14 +31,14 @@ export const HERO_SLIDES: Slide[] = [
   },
   {
     id: 'slide-2',
-    imageUrl: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=1600&q=80',
+   imageUrl: "/ACADEMIC.JPG",
     overlayOpacity: 60,
-    tag: 'World-Class Research',
-    title: 'Pushing the Boundaries of Computing',
+    tag: 'ACADEMIC BUILDING',
+    title: 'ACADEMIC BUILDING',
     subtitle: 'Our faculty and students are engaged in cutting-edge research in AI, Machine Learning, Cybersecurity, IoT and more.',
     primaryBtn:   { label: 'View Research', href: '/research' },
     secondaryBtn: { label: 'Faculty Members', href: '/faculty' },
-    align: 'center',
+    align: 'left',
   },
   {
     id: 'slide-3',

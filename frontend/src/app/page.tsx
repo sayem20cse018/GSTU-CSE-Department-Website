@@ -4,6 +4,7 @@ import Navbar      from '@/components/layout/Navbar';
 import Footer      from '@/components/layout/Footer';
 import HeroSlider  from '@/components/sections/HeroSlider';
 import AboutSection from '@/components/sections/AboutSection';
+import ChairmanMessage from '@/components/sections/ChairmanMessage';
 import NoticesSection   from '@/components/sections/NoticesSection';
 import NewsSection      from '@/components/sections/NewsSection';
 import FacultyPreview   from '@/components/sections/FacultyPreview';
@@ -30,13 +31,16 @@ export default function HomePage() {
       {/* 2. Sticky nav bar */}
       <Navbar />
 
-      {/* 3. Hero slider — flush against navbar, no gap */}
+      {/* 3. Hero slider */}
       <HeroSlider />
 
       {/* 4. About us */}
       <AboutSection />
 
-      {/* 5. Notices */}
+      {/* 5. Chairman's Message */}
+      <ChairmanMessage />
+
+      {/* 6. Notices */}
       <NoticesSection />
 
       {/* 6. News */}
