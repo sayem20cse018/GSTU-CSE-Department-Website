@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
@@ -7,7 +7,17 @@ const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
+  fallback: ['system-ui', 'arial', 'sans-serif'],
+  preload: true,
+  adjustFontFallback: true,
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
+  subsets: ['latin'],
+  display: 'swap',
+  fallback: ['Courier New', 'monospace'],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -20,8 +30,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth`}>
-      <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased">
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}>
+      <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased"
+        style={{ fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif' }}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

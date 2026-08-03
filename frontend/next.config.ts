@@ -1,14 +1,54 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // ── Image optimization ────────────────────────────────────────────────────
   images: {
     remotePatterns: [
-      // Unsplash (placeholder images during development)
       { protocol: 'https', hostname: 'images.unsplash.com' },
-      // Add your CDN/S3/Cloudinary domains here when ready:
-      // { protocol: 'https', hostname: 'res.cloudinary.com' },
-      // { protocol: 'https', hostname: 'your-s3-bucket.s3.amazonaws.com' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: '*.amazonaws.com' },
+      { protocol: 'https', hostname: '*.googleusercontent.com' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
+    formats: ['image/avif', 'image/webp'],
+  },
+
+  // ── Production output ─────────────────────────────────────────────────────
+  // Vercel handles this automatically — no need to set output: 'export'
+  // which would break dynamic routes and API routes
+
+  // ── Environment ───────────────────────────────────────────────────────────
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api',
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+  },
+
+  // ── Performance ────────────────────────────────────────────────────────────
+  compress: true,
+  poweredByHeader: false,
+
+  // ── Headers for security ───────────────────────────────────────────────────
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options',    value: 'nosniff' },
+          { key: 'X-Frame-Options',           value: 'DENY' },
+          { key: 'X-XSS-Protection',          value: '1; mode=block' },
+          { key: 'Referrer-Policy',           value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy',        value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ];
+  },
+
+  // ── Redirects ──────────────────────────────────────────────────────────────
+  async redirects() {
+    return [
+      // Legacy URL support
+      { source: '/home', destination: '/', permanent: true },
+    ];
   },
 };
 

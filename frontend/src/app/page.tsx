@@ -24,13 +24,13 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      {/* 1. Top header bar — logo, name, contact, moodle, login */}
+      {/* 1. Top header bar */}
       <SiteHeader />
 
-      {/* 2. Sticky nav bar — menu items */}
+      {/* 2. Sticky nav bar */}
       <Navbar />
 
-      {/* 3. Hero slider */}
+      {/* 3. Hero slider — flush against navbar, no gap */}
       <HeroSlider />
 
       {/* 4. About us */}

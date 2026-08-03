@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-const ADMIN_PREFIX  = '/admin';
 const LOGIN_PATH    = '/admin/login';
 const DASHBOARD     = '/admin/dashboard';
 const ACCESS_COOKIE = 'cse_access';
@@ -9,26 +8,25 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only intercept /admin/* routes
-  if (!pathname.startsWith(ADMIN_PREFIX)) return NextResponse.next();
+  if (!pathname.startsWith('/admin')) return NextResponse.next();
 
   const hasToken = request.cookies.has(ACCESS_COOKIE);
 
-  // ── On login page ──────────────────────────────────────────────────────────
+  // ── Login page ─────────────────────────────────────────────────────────────
+  // pathname.startsWith handles /admin/login?callbackUrl=... as well
   if (pathname === LOGIN_PATH) {
-    // Already authenticated → go straight to dashboard
     if (hasToken) {
+      // Already logged in → skip login page
       return NextResponse.redirect(new URL(DASHBOARD, request.url));
     }
-    // Not authenticated → show login, no redirect
     return NextResponse.next();
   }
 
-  // ── Every other /admin/* page ──────────────────────────────────────────────
+  // ── Every other /admin/* route ─────────────────────────────────────────────
   if (!hasToken) {
-    // Build login URL with callbackUrl so we can redirect back after login
-    const loginUrl = new URL(LOGIN_PATH, request.url);
-    loginUrl.searchParams.set('callbackUrl', encodeURIComponent(pathname));
-    return NextResponse.redirect(loginUrl);
+    const url = new URL(LOGIN_PATH, request.url);
+    url.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

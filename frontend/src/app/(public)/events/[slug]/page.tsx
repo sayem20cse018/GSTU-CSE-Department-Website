@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import SiteHeader from '@/components/layout/SiteHeader';
-import Navbar     from '@/components/layout/Navbar';
-import Footer     from '@/components/layout/Footer';
 import { cn }     from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
 
@@ -35,7 +32,6 @@ export default async function EventDetailPage({params}:{params:Promise<{slug:str
 
   return (
     <>
-      <SiteHeader/><Navbar/>
       <main className="bg-slate-50 min-h-screen">
         {/* Hero */}
         <div className="bg-[#0d1b2e] pt-24 pb-12">
@@ -127,7 +123,6 @@ export default async function EventDetailPage({params}:{params:Promise<{slug:str
           </div>
         </div>
       </main>
-      <Footer/>
     </>
   );
 }

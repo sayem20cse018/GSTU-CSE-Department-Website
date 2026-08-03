@@ -1,8 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import SiteHeader  from '@/components/layout/SiteHeader';
-import Navbar      from '@/components/layout/Navbar';
-import Footer      from '@/components/layout/Footer';
 import SectionHero from '@/components/academics/SectionHero';
 import { cn }      from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
@@ -37,8 +34,6 @@ export default async function EventsPage() {
 
   return (
     <>
-      <SiteHeader/>
-      <Navbar/>
       <SectionHero tag="Department Events" title="Events & Programs"
         description="Stay informed about upcoming seminars, workshops, competitions and cultural programs."
         breadcrumbs={[{label:'Home',href:'/'},{label:'Events'}]}/>
@@ -71,7 +66,6 @@ export default async function EventsPage() {
             </div>)}
         </div>
       </main>
-      <Footer/>
     </>
   );
 }

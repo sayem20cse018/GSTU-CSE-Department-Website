@@ -2,9 +2,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
-import SiteHeader from '@/components/layout/SiteHeader';
-import Navbar     from '@/components/layout/Navbar';
-import Footer     from '@/components/layout/Footer';
 import SectionHero from '@/components/academics/SectionHero';
 import { cn }     from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
@@ -49,8 +46,6 @@ function NoticesContent() {
 
   return (
     <>
-      <SiteHeader />
-      <Navbar />
       <SectionHero tag="Department" title="Official Notices"
         description="Stay updated with all official notices, announcements and circulars from the department."
         breadcrumbs={[{label:'Home',href:'/'},{label:'Notices'}]}/>
@@ -99,7 +94,6 @@ function NoticesContent() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

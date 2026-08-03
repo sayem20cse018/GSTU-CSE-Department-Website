@@ -17,8 +17,13 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--bg-base);
   color: var(--text-base);
-  font-family: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+               BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+               sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
 }
 
 /* ─── Focus ring ─────────────────────────────────────────────────────────────── */
@@ -90,7 +95,13 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Slider progress bar ────────────────────────────────────────────────────── */
+/* ─── Navbar sliding underline ───────────────────────────────────────────────── */
+@keyframes underline-slide {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+/* after:transition-transform already handles it via Tailwind */
+
 @keyframes progress-bar-grow {
   from { width: 0; }
   to   { width: 100%; }

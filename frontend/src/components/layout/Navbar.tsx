@@ -1,25 +1,132 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { createPortal } from 'react-dom';
 import { NAV_LINKS, SITE } from '@/constants';
 import { cn } from '@/lib/utils/cn';
 
 type NavLink   = typeof NAV_LINKS[number];
 type ChildLink = { label: string; href: string };
 
-// How many children before we split into 2 columns in the dropdown
-const TWO_COL_THRESHOLD = 6;
+interface DropdownState {
+  label: string;
+  left: number;
+  top: number;
+  twoCol: boolean;
+  children: readonly ChildLink[];
+}
 
+// ─── Portal Dropdown ─────────────────────────────────────────────────────────
+function DropdownPortal({
+  state, pathname, onClose,
+}: { state: DropdownState; pathname: string; onClose: () => void }) {
+  const panelWidth  = state.twoCol ? 480 : 230;
+  const viewportW   = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const left        = Math.min(state.left, viewportW - panelWidth - 12);
+
+  return createPortal(
+    <div
+      id="nav-dropdown-portal"
+      style={{ position: 'fixed', top: state.top, left, width: panelWidth, zIndex: 99999 }}
+      className="animate-[fadeIn_0.15s_ease]"
+    >
+      {/* Dropdown card */}
+      <div className="overflow-hidden rounded-xl shadow-2xl"
+        style={{
+          background: 'linear-gradient(160deg, #0f2d18 0%, #0e3d22 50%, #0a2e1a 100%)',
+          border: '1px solid rgba(134,239,172,0.18)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.05)',
+        }}>
+
+        {/* Thin gold top line */}
+        <div className="h-[2px] w-full"
+          style={{ background: 'linear-gradient(90deg,transparent,#fbbf24,transparent)' }}
+        />
+
+        <div className={cn('py-1.5', state.twoCol && 'grid grid-cols-2')}>
+          {state.children.map((child) => {
+            const active = pathname === child.href;
+            return (
+              <Link
+                key={child.href}
+                href={child.href}
+                onClick={onClose}
+                className="group flex items-center gap-2.5 px-5 py-2.5 transition-all duration-200"
+                style={{ color: active ? '#fbbf24' : 'rgba(220,252,231,0.85)' }}
+                onMouseEnter={e => {
+                  if (!active) {
+                    e.currentTarget.style.color = '#4ade80';
+                    // animate the dot
+                    const dot = e.currentTarget.querySelector('.nav-dot') as HTMLElement;
+                    if (dot) dot.style.background = '#4ade80';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!active) {
+                    e.currentTarget.style.color = 'rgba(220,252,231,0.85)';
+                    const dot = e.currentTarget.querySelector('.nav-dot') as HTMLElement;
+                    if (dot) dot.style.background = 'rgba(134,239,172,0.5)';
+                  }
+                }}
+              >
+                {/* Animated left indicator */}
+                <span
+                  className="nav-dot shrink-0 rounded-full transition-all duration-200"
+                  style={{
+                    width: active ? '6px' : '5px',
+                    height: active ? '6px' : '5px',
+                    background: active ? '#fbbf24' : 'rgba(134,239,172,0.5)',
+                  }}
+                  aria-hidden="true"
+                />
+                <span className="text-[0.81rem] font-medium">{child.label}</span>
+                {/* Arrow that slides in on hover */}
+                <svg
+                  className="ml-auto w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  style={{ color: '#4ade80' }}
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
+                </svg>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ─── NavItem classes ──────────────────────────────────────────────────────────
+// No box on hover — just color + underline slide
+const ITEM_BASE = [
+  'relative flex items-center gap-1',
+  'px-3 h-[3.25rem]',           // full nav height
+  'text-[0.8rem] font-semibold whitespace-nowrap',
+  'transition-colors duration-200',
+  // Sliding underline
+  'after:absolute after:bottom-0 after:left-0 after:h-[2.5px] after:w-full',
+  'after:scale-x-0 after:origin-left after:transition-transform after:duration-250',
+  'hover:after:scale-x-100',
+].join(' ');
+
+// ─── Main Navbar ─────────────────────────────────────────────────────────────
 export default function Navbar() {
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [dropdown,     setDropdown]     = useState<DropdownState | null>(null);
   const [mobileExpand, setMobileExpand] = useState<string | null>(null);
+  const [mounted,      setMounted]      = useState(false);
 
-  const pathname    = usePathname();
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const navRef   = useRef<HTMLElement>(null);
+  const btnRefs  = useRef<Map<string, HTMLButtonElement>>(new Map());
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 4);
@@ -29,68 +136,108 @@ export default function Navbar() {
 
   useEffect(() => {
     const fn = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node))
-        setOpenDropdown(null);
+      const target    = e.target as Node;
+      const inNav     = navRef.current?.contains(target);
+      const inPortal  = document.getElementById('nav-dropdown-portal')?.contains(target);
+      if (!inNav && !inPortal) setDropdown(null);
     };
     document.addEventListener('mousedown', fn);
     return () => document.removeEventListener('mousedown', fn);
   }, []);
 
   useEffect(() => {
-    setMobileOpen(false);
-    setOpenDropdown(null);
-    setMobileExpand(null);
+    setMobileOpen(false); setDropdown(null); setMobileExpand(null);
   }, [pathname]);
+
+  useEffect(() => {
+    const fn = () => setDropdown(null);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
 
   const hasChildren = (l: NavLink): l is NavLink & { children: readonly ChildLink[] } =>
     'children' in l && Array.isArray((l as { children?: unknown }).children);
 
+  const openDropdown = useCallback((label: string) => {
+    const btn = btnRefs.current.get(label);
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const link = NAV_LINKS.find(l => l.label === label);
+    if (!link || !hasChildren(link)) return;
+    setDropdown(prev =>
+      prev?.label === label ? null : {
+        label, left: rect.left, top: rect.bottom + 2,
+        twoCol: link.children.length > 6, children: link.children,
+      }
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Shared styles ────────────────────────────────────────────────────────
+  // Active: gold underline + bright white text
+  // Hover:  green text + green underline slides in
+  function itemStyle(isActive: boolean, isOpen = false): React.CSSProperties {
+    if (isActive || isOpen) return { color: '#fde68a' };  // gold when active
+    return { color: 'rgba(220,252,231,0.80)' };           // soft green-white
+  }
+
   return (
-    <nav
-      className={cn(
-        'sticky top-0 z-40 transition-all duration-300',
-        scrolled
-          ? 'bg-[#002244]/98 backdrop-blur-md shadow-lg shadow-black/20 border-b border-white/10'
-          : 'bg-[#002244]',
-      )}
-      aria-label="Main navigation"
-    >
-      <div className="container-custom" ref={dropdownRef}>
-        <div className="flex items-center justify-between h-[3.25rem]">
+    <>
+      <nav
+        ref={navRef}
+        className="sticky top-0 z-[9999] transition-all duration-300"
+        style={{
+          background: scrolled
+            ? 'rgba(11,45,30,0.97)'
+            : 'linear-gradient(180deg, #0b3d1f 0%, #0d4423 100%)',
+          backdropFilter: scrolled ? 'blur(12px)' : undefined,
+          borderBottom: '1px solid rgba(74,222,128,0.12)',
+          boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.35)' : '0 1px 0 rgba(74,222,128,0.08)',
+        }}
+        aria-label="Main navigation"
+      >
+        <div className="container-custom">
+          <div className="flex items-center justify-between h-[3.25rem]">
 
-          {/* ── Mobile logo ───────────────────────────────────────────────── */}
-          <Link href="/" className="flex lg:hidden items-center gap-2" aria-label="GSTU CSE Home">
-            <div className="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                <path d="M20 4L6 12v9c0 7.18 5.927 13.905 14 15.354C28.073 34.905 34 28.18 34 21v-9L20 4z"
-                  fill="none" stroke="white" strokeWidth="3" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <span className="text-sm font-bold text-white">{SITE.shortName}</span>
-          </Link>
+            {/* Mobile logo */}
+            <Link href="/" className="flex lg:hidden items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-white/10 border border-green-400/30
+                              flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                  <path d="M20 4L6 12v9c0 7.18 5.927 13.905 14 15.354C28.073 34.905 34 28.18 34 21v-9L20 4z"
+                    fill="none" stroke="white" strokeWidth="3" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <span className="text-sm font-bold text-white">{SITE.shortName}</span>
+            </Link>
 
-          {/* ── Desktop nav ──────────────────────────────────────────────── */}
-          <div className="hidden lg:flex items-center gap-0 flex-1 overflow-x-auto">
-            {NAV_LINKS.map((link) => {
-              const isActive = pathname === link.href ||
-                (link.href !== '/' && pathname.startsWith(link.href));
+            {/* Desktop nav */}
+            <div className="hidden lg:flex items-center flex-1 h-full">
+              {NAV_LINKS.map((link) => {
+                const isActive = pathname === link.href ||
+                  (link.href !== '/' && pathname.startsWith(link.href));
+                const isOpen = dropdown?.label === link.label;
 
-              if (hasChildren(link)) {
-                const isOpen    = openDropdown === link.label;
-                const twoCol    = link.children.length > TWO_COL_THRESHOLD;
+                const commonCls = cn(
+                  ITEM_BASE,
+                  // underline colour
+                  isActive || isOpen
+                    ? 'after:bg-[#fbbf24] after:scale-x-100'   // gold, always visible
+                    : 'after:bg-[#4ade80]',                     // green, slides in on hover
+                );
 
-                return (
-                  <div key={link.label} className="relative">
+                if (hasChildren(link)) {
+                  return (
                     <button
-                      onClick={() => setOpenDropdown(isOpen ? null : link.label)}
+                      key={link.label}
+                      ref={el => { if (el) btnRefs.current.set(link.label, el); }}
+                      onClick={() => openDropdown(link.label)}
                       aria-expanded={isOpen}
                       aria-haspopup="true"
-                      className={cn(
-                        'flex items-center gap-1 px-3 py-2 text-[0.8rem] font-semibold whitespace-nowrap rounded-md transition-all',
-                        isActive || isOpen
-                          ? 'text-white bg-white/15'
-                          : 'text-blue-100 hover:text-white hover:bg-white/10',
-                      )}
+                      style={itemStyle(isActive, isOpen)}
+                      className={cn(commonCls, 'group')}
+                      onMouseEnter={e => { if (!isActive && !isOpen) e.currentTarget.style.color = '#4ade80'; }}
+                      onMouseLeave={e => { if (!isActive && !isOpen) e.currentTarget.style.color = 'rgba(220,252,231,0.80)'; }}
                     >
                       {link.label}
                       <svg
@@ -100,172 +247,148 @@ export default function Navbar() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
                       </svg>
                     </button>
+                  );
+                }
 
-                    {/* Dropdown */}
-                    {isOpen && (
-                      <div
-                        className={cn(
-                          'absolute top-[calc(100%+2px)] left-0 bg-white rounded-xl shadow-2xl border border-slate-100 py-2 z-50',
-                          'animate-[fadeIn_0.15s_ease]',
-                          twoCol ? 'w-[26rem]' : 'w-52',
-                        )}
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={pathname === link.href ? 'page' : undefined}
+                    style={itemStyle(isActive)}
+                    className={commonCls}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = '#4ade80'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(220,252,231,0.80)'; }}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              className="lg:hidden p-2 rounded-lg transition"
+              style={{ color: 'rgba(220,252,231,0.85)' }}
+              onClick={() => setMobileOpen(v => !v)}
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-menu"
+            >
+              {mobileOpen
+                ? <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+                : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        {/* ── Mobile menu ──────────────────────────────────────────────── */}
+        {mobileOpen && (
+          <div id="mobile-menu"
+            className="lg:hidden border-t max-h-[80vh] overflow-y-auto"
+            style={{ background: '#061a0d', borderColor: 'rgba(74,222,128,0.12)' }}
+          >
+            <div className="container-custom py-3 space-y-0.5">
+              <div className="px-3 py-2 mb-2 border-b" style={{ borderColor: 'rgba(74,222,128,0.12)' }}>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#86efac' }}>{SITE.shortName}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: 'rgba(134,239,172,0.5)' }}>{SITE.university}</p>
+              </div>
+
+              {NAV_LINKS.map((link) => {
+                if (hasChildren(link)) {
+                  const expanded = mobileExpand === link.label;
+                  return (
+                    <div key={link.label}>
+                      <button
+                        onClick={() => setMobileExpand(expanded ? null : link.label)}
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors"
+                        style={{ color: 'rgba(220,252,231,0.85)' }}
+                        aria-expanded={expanded}
+                        onMouseEnter={e => (e.currentTarget.style.color = '#4ade80')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(220,252,231,0.85)')}
                       >
-                        {/* Two-column layout for large menus */}
-                        <div className={cn(twoCol && 'columns-2 gap-0')}>
+                        {link.label}
+                        <svg className={cn('w-4 h-4 transition-transform', expanded && 'rotate-180')}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
+                        </svg>
+                      </button>
+                      {expanded && (
+                        <div className="ml-3 pl-3 border-l space-y-0.5 mb-1"
+                          style={{ borderColor: 'rgba(74,222,128,0.15)' }}>
                           {link.children.map((child) => (
                             <Link
                               key={child.href}
                               href={child.href}
-                              className={cn(
-                                'flex items-center gap-2 px-4 py-2 text-[0.8rem] transition-colors break-inside-avoid',
-                                pathname === child.href
-                                  ? 'text-blue-700 bg-blue-50 font-semibold'
-                                  : 'text-slate-700 hover:text-blue-700 hover:bg-slate-50',
-                              )}
+                              className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+                              style={{
+                                color: pathname === child.href
+                                  ? '#fbbf24'
+                                  : 'rgba(187,247,208,0.75)',
+                              }}
+                              onMouseEnter={e => (e.currentTarget.style.color = '#4ade80')}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.color = pathname === child.href ? '#fbbf24' : 'rgba(187,247,208,0.75)';
+                              }}
                             >
-                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" aria-hidden="true"/>
+                              <span className="w-1 h-1 rounded-full shrink-0"
+                                style={{ background: '#4ade80' }} aria-hidden="true"/>
                               {child.label}
                             </Link>
                           ))}
                         </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  aria-current={pathname === link.href ? 'page' : undefined}
-                  className={cn(
-                    'px-3 py-2 text-[0.8rem] font-semibold whitespace-nowrap rounded-md transition-all',
-                    isActive
-                      ? 'text-white bg-white/15'
-                      : 'text-blue-100 hover:text-white hover:bg-white/10',
-                  )}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* ── Desktop right: Admin ─────────────────────────────────────── */}
-          <div className="hidden lg:flex items-center shrink-0 ml-2">
-            <Link
-              href="/admin/login"
-              className="text-[11px] font-semibold text-blue-200 hover:text-white
-                         border border-white/20 hover:border-white/40 px-3 py-1.5 rounded-lg transition"
-            >
-              Admin
-            </Link>
-          </div>
-
-          {/* ── Mobile hamburger ─────────────────────────────────────────── */}
-          <button
-            className="lg:hidden p-2 rounded-lg text-blue-100 hover:bg-white/10 transition"
-            onClick={() => setMobileOpen(v => !v)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-menu"
-          >
-            {mobileOpen ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Mobile menu ──────────────────────────────────────────────────── */}
-      {mobileOpen && (
-        <div id="mobile-menu" className="lg:hidden bg-[#001a33] border-t border-white/10 max-h-[80vh] overflow-y-auto">
-          <div className="container-custom py-3 space-y-0.5">
-
-            <div className="px-3 py-2 mb-2 border-b border-white/10">
-              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest">{SITE.shortName}</p>
-              <p className="text-[10px] text-blue-300/60 mt-0.5">{SITE.university}</p>
-            </div>
-
-            {NAV_LINKS.map((link) => {
-              if (hasChildren(link)) {
-                const expanded = mobileExpand === link.label;
+                      )}
+                    </div>
+                  );
+                }
                 return (
-                  <div key={link.label}>
-                    <button
-                      onClick={() => setMobileExpand(expanded ? null : link.label)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition"
-                      aria-expanded={expanded}
-                    >
-                      {link.label}
-                      <svg className={cn('w-4 h-4 transition-transform', expanded && 'rotate-180')}
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
-                      </svg>
-                    </button>
-                    {expanded && (
-                      <div className="ml-3 pl-3 border-l border-white/10 space-y-0.5 mb-1">
-                        {link.children.map((child) => (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            className={cn(
-                              'flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors',
-                              pathname === child.href
-                                ? 'text-white bg-white/15 font-semibold'
-                                : 'text-blue-200 hover:text-white hover:bg-white/10',
-                            )}
-                          >
-                            <span className="w-1 h-1 rounded-full bg-blue-400 shrink-0" aria-hidden="true"/>
-                            {child.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors"
+                    style={{ color: pathname === link.href ? '#fbbf24' : 'rgba(220,252,231,0.85)' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#4ade80')}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.color = pathname === link.href ? '#fbbf24' : 'rgba(220,252,231,0.85)';
+                    }}
+                  >
+                    {link.label}
+                  </Link>
                 );
-              }
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    'block px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors',
-                    pathname === link.href
-                      ? 'text-white bg-white/15'
-                      : 'text-blue-100 hover:text-white hover:bg-white/10',
-                  )}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
+              })}
 
-            {/* Bottom actions */}
-            <div className="flex gap-2 pt-3 pb-2 border-t border-white/10 mt-3">
-              <Link href="/student/login"
-                className="flex-1 text-center text-sm font-bold text-white border border-white/30 hover:bg-white/10 py-2.5 rounded-lg transition">
-                Student Login
-              </Link>
-              <Link href="/admissions"
-                className="flex-1 text-center text-sm font-bold text-white bg-blue-500 hover:bg-blue-400 py-2.5 rounded-lg transition">
-                Register
-              </Link>
-              <a href="https://moodle.gstu.edu.bd" target="_blank" rel="noopener noreferrer"
-                className="flex-1 text-center text-sm font-semibold text-blue-100 border border-white/20 hover:bg-white/10 py-2.5 rounded-lg transition">
-                Moodle
-              </a>
+              <div className="flex gap-2 pt-3 pb-2 mt-3 border-t"
+                style={{ borderColor: 'rgba(74,222,128,0.12)' }}>
+                <Link href="/student/login"
+                  className="flex-1 text-center text-sm font-bold py-2.5 rounded-lg transition"
+                  style={{ color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>
+                  Student Login
+                </Link>
+                <Link href="/admissions"
+                  className="flex-1 text-center text-sm font-extrabold py-2.5 rounded-lg transition"
+                  style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)', color: '#1a1a1a' }}>
+                  Register
+                </Link>
+                <a href="https://moodle.gstu.edu.bd" target="_blank" rel="noopener noreferrer"
+                  className="flex-1 text-center text-sm font-semibold py-2.5 rounded-lg transition"
+                  style={{ color: 'rgba(187,247,208,0.8)', border: '1px solid rgba(74,222,128,0.15)' }}>
+                  Moodle
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+      </nav>
+
+      {/* Portal dropdown */}
+      {mounted && dropdown && (
+        <DropdownPortal
+          state={dropdown}
+          pathname={pathname}
+          onClose={() => setDropdown(null)}
+        />
       )}
-    </nav>
+    </>
   );
 }

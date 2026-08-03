@@ -1,8 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import SiteHeader  from '@/components/layout/SiteHeader';
-import Navbar      from '@/components/layout/Navbar';
-import Footer      from '@/components/layout/Footer';
 import SectionHero from '@/components/academics/SectionHero';
 import { cn }      from '@/lib/utils/cn';
 import { formatDate, truncate } from '@/lib/utils/format';
@@ -39,8 +36,6 @@ export default async function NewsPage() {
 
   return (
     <>
-      <SiteHeader/>
-      <Navbar/>
       <SectionHero tag="Department News" title="News & Updates"
         description="Latest news, achievements, research highlights and announcements from the CSE Department."
         breadcrumbs={[{label:'Home',href:'/'},{label:'News'}]}/>
@@ -90,7 +85,6 @@ export default async function NewsPage() {
           </div>
         </div>
       </main>
-      <Footer/>
     </>
   );
 }

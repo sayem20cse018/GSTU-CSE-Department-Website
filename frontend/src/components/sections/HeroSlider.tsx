@@ -146,8 +146,8 @@ export default function HeroSlider() {
 
   return (
     <section
-      className="relative overflow-hidden bg-[#0d1b2e]"
-      style={{ height: 'calc(100vh - 56px)', minHeight: '560px', maxHeight: '900px' }}
+      className="relative overflow-hidden bg-[#0d1b2e] z-0"
+      style={{ height: '100vh', minHeight: '580px', maxHeight: '960px' }}
       aria-label="Hero slider"
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}
