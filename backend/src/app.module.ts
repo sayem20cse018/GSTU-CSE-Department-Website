@@ -16,6 +16,7 @@ import { GalleryModule } from './modules/gallery/gallery.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
 import { ClubsModule }        from './modules/clubs/clubs.module';
 import { StatisticsModule }   from './modules/statistics/statistics.module';
+import { SettingsModule }     from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { StatisticsModule }   from './modules/statistics/statistics.module';
     AchievementsModule,
     ClubsModule,
     StatisticsModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

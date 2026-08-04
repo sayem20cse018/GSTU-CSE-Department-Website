@@ -13,13 +13,10 @@ export default function DashboardPage() {
       <AdminPageTitle title="Dashboard" />
 
       {/* Welcome banner */}
-      <div className="bg-gradient-to-r from-blue-600/20 to-violet-600/10 border border-blue-600/20 rounded-xl px-6 py-5">
-        <h2 className="text-lg font-bold text-white">
-          Welcome to GSTU CSE Admin Panel
-        </h2>
-        <p className="text-slate-400 text-sm mt-1">
-          Manage faculty, notices, news, events and gallery from here.
-        </p>
+      <div className="rounded-2xl px-6 py-5"
+        style={{ background:'linear-gradient(135deg,rgba(22,101,52,0.25),rgba(21,128,61,0.12))', border:'1px solid rgba(22,101,52,0.3)' }}>
+        <h2 className="text-lg font-bold text-white">Welcome to GSTU CSE Admin Panel</h2>
+        <p className="text-slate-400 text-sm mt-1">Manage all content, settings and configurations for the public website.</p>
       </div>
 
       {/* Stats grid */}
