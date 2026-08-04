@@ -13,6 +13,9 @@ import { ResearchModule } from './modules/research/research.module';
 import { AcademicsModule } from './modules/academics/academics.module';
 import { AlumniModule } from './modules/alumni/alumni.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
+import { AchievementsModule } from './modules/achievements/achievements.module';
+import { ClubsModule }        from './modules/clubs/clubs.module';
+import { StatisticsModule }   from './modules/statistics/statistics.module';
 
 @Module({
   imports: [
@@ -43,6 +46,9 @@ import { GalleryModule } from './modules/gallery/gallery.module';
     AcademicsModule,
     AlumniModule,
     GalleryModule,
+    AchievementsModule,
+    ClubsModule,
+    StatisticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

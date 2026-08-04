@@ -1,20 +1,23 @@
 import type { Metadata } from 'next';
-import SiteHeader  from '@/components/layout/SiteHeader';
-import Navbar      from '@/components/layout/Navbar';
-import Footer      from '@/components/layout/Footer';
-import HeroSlider  from '@/components/sections/HeroSlider';
-import AboutSection from '@/components/sections/AboutSection';
-import ChairmanMessage from '@/components/sections/ChairmanMessage';
-import NoticesSection   from '@/components/sections/NoticesSection';
-import NewsSection      from '@/components/sections/NewsSection';
-import FacultyPreview   from '@/components/sections/FacultyPreview';
+import SiteHeader         from '@/components/layout/SiteHeader';
+import Navbar             from '@/components/layout/Navbar';
+import Footer             from '@/components/layout/Footer';
+import HeroSlider         from '@/components/sections/HeroSlider';
+import AboutSection       from '@/components/sections/AboutSection';
+import ChairmanMessage    from '@/components/sections/ChairmanMessage';
+import DepartmentStats    from '@/components/sections/DepartmentStats';
+import NoticesSection     from '@/components/sections/NoticesSection';
+import NewsSection        from '@/components/sections/NewsSection';
+import AchievementsSection from '@/components/sections/AchievementsSection';
+import ClubsSection       from '@/components/sections/ClubsSection';
+import FacultyPreview     from '@/components/sections/FacultyPreview';
 import ResearchHighlights from '@/components/sections/ResearchHighlights';
 
 export const metadata: Metadata = {
   title: 'Department of Computer Science & Engineering — GSTU',
   description:
-    'Official website of the Department of Computer Science & Engineering, Gopalganj Science & Technology University. Explore programs, research, faculty, and more.',
-  keywords: ['GSTU', 'CSE', 'Computer Science', 'Engineering', 'Bangladesh', 'University'],
+    'Official website of the Department of Computer Science & Engineering, Gopalganj Science & Technology University.',
+  keywords: ['GSTU', 'CSE', 'Computer Science', 'Engineering', 'Bangladesh'],
   openGraph: {
     title: 'Dept. of CSE — GSTU',
     description: 'Advancing Computing, Shaping the Future.',
@@ -25,34 +28,41 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      {/* 1. Top header bar */}
+      {/* ── Header & Nav ─────────────────────────────────────────────────── */}
       <SiteHeader />
-
-      {/* 2. Sticky nav bar */}
       <Navbar />
 
-      {/* 3. Hero slider */}
+      {/* ── 1. Hero Slider ───────────────────────────────────────────────── */}
       <HeroSlider />
 
-      {/* 4. About us */}
+      {/* ── 2. About Department ──────────────────────────────────────────── */}
       <AboutSection />
 
-      {/* 5. Chairman's Message */}
+      {/* ── 3. Chairman's Message ────────────────────────────────────────── */}
       <ChairmanMessage />
 
-      {/* 6. Notices */}
+      {/* ── 4. Department Statistics (admin-controlled) ──────────────────── */}
+      <DepartmentStats />
+
+      {/* ── 5. Latest Notices ────────────────────────────────────────────── */}
       <NoticesSection />
 
-      {/* 6. News */}
+      {/* ── 6. Latest News ───────────────────────────────────────────────── */}
       <NewsSection />
 
-      {/* 7. Faculty preview */}
+      {/* ── 7. Recent Achievements ───────────────────────────────────────── */}
+      <AchievementsSection />
+
+      {/* ── 8. Department Clubs ──────────────────────────────────────────── */}
+      <ClubsSection />
+
+      {/* ── 9. Faculty Preview ───────────────────────────────────────────── */}
       <FacultyPreview />
 
-      {/* 8. Research highlights */}
+      {/* ── 10. Research & Labs ──────────────────────────────────────────── */}
       <ResearchHighlights />
 
-      {/* 9. Footer */}
+      {/* ── Footer ───────────────────────────────────────────────────────── */}
       <Footer />
     </>
   );
