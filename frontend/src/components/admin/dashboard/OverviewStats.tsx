@@ -1,110 +1,71 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-import StatCard from '../ui/StatCard';
+import Link from 'next/link';
 
-interface Stats {
-  faculty: number;
-  news: number;
-  events: number;
-  notices: number;
-}
-
-function FacultyIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75} className="w-full h-full" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round"
-        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-  );
-}
-
-function NewsIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75} className="w-full h-full" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round"
-        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-    </svg>
-  );
-}
-
-function EventIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75} className="w-full h-full" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round"
-        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  );
-}
-
-function NoticeIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75} className="w-full h-full" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round"
-        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-    </svg>
-  );
-}
+interface Stat { label: string; value: string | number; icon: string; href: string; color: string }
 
 export default function OverviewStats() {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-        const [facultyRes, newsRes, eventsRes] = await Promise.allSettled([
-          fetch(`${apiUrl}/faculty`),
-          fetch(`${apiUrl}/news?limit=1`),
-          fetch(`${apiUrl}/events?limit=1`),
-        ]);
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    Promise.allSettled([
+      fetch(`${api}/faculty`),
+      fetch(`${api}/news?limit=1`),
+      fetch(`${api}/events?limit=1`),
+      fetch(`${api}/notices?limit=1`),
+      fetch(`${api}/achievements?limit=1`),
+      fetch(`${api}/clubs`),
+    ]).then(async results => {
+      const get = async (r: PromiseSettledResult<Response>, path: string) => {
+        if (r.status !== 'fulfilled' || !r.value.ok) return 0;
+        try {
+          const d = await r.value.json() as Record<string, unknown>;
+          if (path === 'faculty' || path === 'clubs' || path === 'achievements') {
+            return Array.isArray(d.data) ? (d.data as unknown[]).length : 0;
+          }
+          const inner = d.data as Record<string,unknown>;
+          return (inner?.pagination as {total:number})?.total ?? 0;
+        } catch { return 0; }
+      };
 
-        const faculty = facultyRes.status === 'fulfilled' && facultyRes.value.ok
-          ? ((await facultyRes.value.json()) as { data: unknown[] }).data?.length ?? 0
-          : 0;
+      const [f, n, e, no, ac, cl] = await Promise.all([
+        get(results[0],'faculty'), get(results[1],'news'),
+        get(results[2],'events'), get(results[3],'notices'),
+        get(results[4],'achievements'), get(results[5],'clubs'),
+      ]);
 
-        const newsTotal = newsRes.status === 'fulfilled' && newsRes.value.ok
-          ? ((await newsRes.value.json()) as { data: { pagination: { total: number } } })
-              .data?.pagination?.total ?? 0
-          : 0;
-
-        const eventsTotal = eventsRes.status === 'fulfilled' && eventsRes.value.ok
-          ? ((await eventsRes.value.json()) as { data: { pagination: { total: number } } })
-              .data?.pagination?.total ?? 0
-          : 0;
-
-        setStats({ faculty, news: newsTotal, events: eventsTotal, notices: 0 });
-      } catch {
-        setStats({ faculty: 0, news: 0, events: 0, notices: 0 });
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchStats();
+      setStats([
+        { label:'Faculty',      value:f,  icon:'👨‍🏫', href:'/admin/faculty',      color:'from-blue-600 to-indigo-700' },
+        { label:'News',         value:n,  icon:'📰', href:'/admin/news',          color:'from-emerald-600 to-teal-700' },
+        { label:'Events',       value:e,  icon:'📅', href:'/admin/events',        color:'from-violet-600 to-purple-700' },
+        { label:'Notices',      value:no, icon:'🔔', href:'/admin/notices',       color:'from-amber-600 to-orange-700' },
+        { label:'Achievements', value:ac, icon:'🏆', href:'/admin/achievements',  color:'from-rose-600 to-pink-700' },
+        { label:'Clubs',        value:cl, icon:'🏫', href:'/admin/clubs',         color:'from-cyan-600 to-blue-700' },
+      ]);
+    }).finally(() => setLoading(false));
   }, []);
 
-  const cards = [
-    { label: 'Faculty Members', value: stats?.faculty ?? '—', icon: <FacultyIcon />, color: 'blue' as const },
-    { label: 'Published News', value: stats?.news ?? '—', icon: <NewsIcon />, color: 'emerald' as const },
-    { label: 'Total Events', value: stats?.events ?? '—', icon: <EventIcon />, color: 'violet' as const },
-    { label: 'Active Notices', value: stats?.notices ?? '—', icon: <NoticeIcon />, color: 'amber' as const },
-  ];
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-slate-900 border border-white/10 rounded-xl p-5 h-24 animate-pulse" />
-        ))}
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {[1,2,3,4,5,6].map(i => (
+        <div key={i} className="h-24 rounded-2xl animate-pulse" style={{ background:'rgba(255,255,255,0.05)' }}/>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      {cards.map((card) => (
-        <StatCard key={card.label} {...card} />
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {stats.map(s => (
+        <Link key={s.label} href={s.href}
+          className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${s.color} p-4 hover:scale-[1.03] transition-all`}
+          style={{ boxShadow:'0 4px 20px rgba(0,0,0,0.25)' }}>
+          <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-white/10 blur-xl" aria-hidden="true"/>
+          <p className="text-2xl mb-2" aria-hidden="true">{s.icon}</p>
+          <p className="text-2xl font-black text-white leading-none">{s.value}</p>
+          <p className="text-xs font-medium mt-1.5 text-white/75">{s.label}</p>
+        </Link>
       ))}
     </div>
   );

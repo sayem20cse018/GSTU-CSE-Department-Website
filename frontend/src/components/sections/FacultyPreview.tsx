@@ -1,213 +1,151 @@
-import Link from "next/link";
-import { cn } from "@/lib/utils/cn";
+import Link from 'next/link';
 
 interface FacultyMember {
-  _id: string;
-  name: string;
-  designation: string;
-  title?: string;
-  photo?: string;
-  email: string;
-  slug?: string;
+  _id: string; name: string; designation: string; title?: string;
+  photo?: string; email: string; slug?: string; researchInterests?: string[];
 }
 
 async function fetchFaculty(): Promise<FacultyMember[]> {
   try {
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
-
-    const res = await fetch(`${apiUrl}/faculty`, {
-      next: { revalidate: 3600 },
-    });
-
-    if (!res.ok) return MOCK_FACULTY;
-
-    const json = (await res.json()) as { data: FacultyMember[] };
-
-    return json.data?.length ? json.data.slice(0, 6) : MOCK_FACULTY;
-  } catch {
-    return MOCK_FACULTY;
-  }
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const res = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
+    if (!res.ok) return MOCK;
+    const json = await res.json() as { data: FacultyMember[] };
+    return json.data?.length ? json.data.slice(0, 6) : MOCK;
+  } catch { return MOCK; }
 }
 
-const MOCK_FACULTY: FacultyMember[] = [
-  {
-    _id: "1",
-    name: "Dr. Mohammad Rahman",
-    designation: "Professor",
-    title: "Dr.",
-    email: "mrahman@gstu.edu.bd",
-    slug: "dr-mohammad-rahman",
-  },
-  {
-    _id: "2",
-    name: "Dr. Fatima Khatun",
-    designation: "Associate Professor",
-    title: "Dr.",
-    email: "fkhatun@gstu.edu.bd",
-    slug: "dr-fatima-khatun",
-  },
-  {
-    _id: "3",
-    name: "Dr. Karim Hossain",
-    designation: "Associate Professor",
-    title: "Dr.",
-    email: "khossain@gstu.edu.bd",
-    slug: "dr-karim-hossain",
-  },
-  {
-    _id: "4",
-    name: "Mr. Arif Ahmed",
-    designation: "Assistant Professor",
-    email: "aahmed@gstu.edu.bd",
-    slug: "mr-arif-ahmed",
-  },
-  {
-    _id: "5",
-    name: "Ms. Nadia Islam",
-    designation: "Assistant Professor",
-    email: "nislam@gstu.edu.bd",
-    slug: "ms-nadia-islam",
-  },
-  {
-    _id: "6",
-    name: "Mr. Tanvir Hasan",
-    designation: "Lecturer",
-    email: "thasan@gstu.edu.bd",
-    slug: "mr-tanvir-hasan",
-  },
+const MOCK: FacultyMember[] = [
+  { _id:'1', name:'Mrinal Kanti Baowaly', title:'Dr.', designation:'Professor', email:'baowaly@gstu.edu.bd', slug:'dr-mrinal-kanti-baowaly', researchInterests:['Machine Learning','Computer Vision'] },
+  { _id:'2', name:'Mohammad Rahman',       title:'Dr.', designation:'Professor', email:'mrahman@gstu.edu.bd', slug:'dr-mohammad-rahman', researchInterests:['Deep Learning','NLP'] },
+  { _id:'3', name:'Fatima Khatun',         title:'Dr.', designation:'Associate Professor', email:'fkhatun@gstu.edu.bd', researchInterests:['Cybersecurity','Networks'] },
+  { _id:'4', name:'Karim Hossain',         title:'Dr.', designation:'Associate Professor', email:'khossain@gstu.edu.bd', researchInterests:['IoT','Embedded Systems'] },
+  { _id:'5', name:'Nadia Islam',           title:'Ms.', designation:'Assistant Professor', email:'nislam@gstu.edu.bd', researchInterests:['Software Engineering'] },
+  { _id:'6', name:'Arif Ahmed',            title:'Mr.', designation:'Assistant Professor', email:'aahmed@gstu.edu.bd', researchInterests:['Algorithms','Theory'] },
+];
+
+const DESIG_STYLE: Record<string,{bg:string;text:string}> = {
+  'Professor':           { bg:'rgba(22,101,52,0.12)',  text:'#166534' },
+  'Associate Professor': { bg:'rgba(109,40,217,0.10)', text:'#6d28d9' },
+  'Assistant Professor': { bg:'rgba(29,78,216,0.10)',  text:'#1d4ed8' },
+  'Lecturer':            { bg:'rgba(180,83,9,0.10)',   text:'#b45309' },
+  'Senior Lecturer':     { bg:'rgba(15,118,110,0.10)', text:'#0f766e' },
+};
+
+const AVATAR_BKGS = [
+  'linear-gradient(135deg,#166534,#052e16)',
+  'linear-gradient(135deg,#1d4ed8,#1e3a8a)',
+  'linear-gradient(135deg,#6d28d9,#3b0764)',
+  'linear-gradient(135deg,#b45309,#78350f)',
+  'linear-gradient(135deg,#0f766e,#134e4a)',
+  'linear-gradient(135deg,#9f1239,#4c0519)',
 ];
 
 function getInitials(name: string) {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((item) => item[0])
-    .join("")
-    .toUpperCase();
+  return name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
 }
-
-const AVATAR_COLORS = [
-  "bg-blue-600",
-  "bg-violet-600",
-  "bg-emerald-600",
-  "bg-rose-600",
-  "bg-amber-600",
-  "bg-teal-600",
-];
-
-const DESIGNATION_BADGE: Record<string, string> = {
-  Professor: "bg-blue-50 text-blue-700",
-  "Associate Professor": "bg-purple-50 text-purple-700",
-  "Assistant Professor": "bg-emerald-50 text-emerald-700",
-  Lecturer: "bg-orange-50 text-orange-700",
-};
 
 export default async function FacultyPreview() {
   const faculty = await fetchFaculty();
 
   return (
-    <section className="section-py bg-slate-50">
+    <section className="section-py bg-white">
       <div className="container-custom">
+
         {/* Header */}
-
-        <div className="text-center mb-12">
-          <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">
-            Our People
-          </p>
-
-          <h2 className="mt-3 text-4xl font-extrabold text-slate-900">
-            Faculty Members
-          </h2>
-
-          <p className="mt-4 max-w-xl mx-auto text-slate-500">
-            Meet our experienced faculty members dedicated to teaching, research
-            and innovation.
-          </p>
-        </div>
-
-        {/* Faculty Cards */}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {faculty.map((member, index) => (
-            <article
-              key={member._id}
-              className="group bg-white rounded-3xl border border-slate-200 p-6 text-center hover:-translate-y-2 hover:shadow-xl transition-all duration-300"
-            >
-              {/* Image */}
-
-              <div className="flex justify-center">
-                <div
-                  className={cn(
-                    "w-32 h-32 rounded-2xl overflow-hidden flex items-center justify-center text-white text-3xl font-bold shadow-lg ring-4 ring-slate-100",
-                    member.photo
-                      ? ""
-                      : AVATAR_COLORS[index % AVATAR_COLORS.length],
-                  )}
-                >
-                  {member.photo ? (
-                    <img
-                      src={member.photo}
-                      alt={member.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    getInitials(member.name)
-                  )}
-                </div>
-              </div>
-
-              {/* Name */}
-
-              <h3 className="mt-6 text-xl font-bold text-slate-900 group-hover:text-blue-700 transition">
-                <Link href={`/faculty/${member.slug ?? member._id}`}>
-                  {member.title} {member.name}
-                </Link>
-              </h3>
-
-              {/* Designation */}
-
-              <span
-                className={cn(
-                  "inline-block mt-3 px-4 py-1 rounded-full text-xs font-semibold",
-                  DESIGNATION_BADGE[member.designation] ??
-                    "bg-slate-100 text-slate-600",
-                )}
-              >
-                {member.designation}
-              </span>
-
-              {/* Email */}
-
-              <a
-                href={`mailto:${member.email}`}
-                className="mt-5 flex justify-center items-center gap-2 text-sm text-slate-500 hover:text-blue-600 transition"
-              >
-                ✉{member.email}
-              </a>
-
-              {/* Profile Button */}
-
-              <Link
-                href={`/faculty/${member.slug ?? member._id}`}
-                className="mt-6 inline-flex w-full justify-center items-center py-3 rounded-xl bg-blue-700 text-white font-semibold hover:bg-blue-800 transition"
-              >
-                View Profile →
-              </Link>
-            </article>
-          ))}
-        </div>
-
-        {/* All Faculty */}
-
-        <div className="text-center mt-12">
-          <Link
-            href="/faculty"
-            className="inline-flex px-8 py-3 rounded-xl border border-blue-700 text-blue-700 font-semibold hover:bg-blue-700 hover:text-white transition"
-          >
-            View All Faculty
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <div>
+            <span className="inline-block text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3"
+              style={{ color:'#166534', background:'rgba(22,101,52,0.08)', border:'1px solid rgba(22,101,52,0.15)' }}>
+              Our People
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Faculty Members</h2>
+            <p className="text-slate-500 text-sm mt-2 max-w-lg">
+              Experienced educators and researchers dedicated to excellence in computing.
+            </p>
+          </div>
+          <Link href="/faculty"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl border transition hover:shadow-sm shrink-0"
+            style={{ color:'#166534', borderColor:'rgba(22,101,52,0.3)' }}>
+            All Faculty
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
           </Link>
         </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {faculty.map((member, i) => {
+            const desig = DESIG_STYLE[member.designation] ?? DESIG_STYLE.Lecturer;
+            return (
+              <article key={member._id}
+                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-green-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+
+                {/* Top strip */}
+                <div className="h-1.5 w-full" style={{ background:'linear-gradient(90deg,#166534,#4ade80,#166534)' }} aria-hidden="true"/>
+
+                <div className="p-5">
+                  <div className="flex items-start gap-4">
+                    {/* Avatar */}
+                    <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center text-white font-bold text-xl shadow-md"
+                      style={{ background: member.photo ? 'transparent' : AVATAR_BKGS[i % AVATAR_BKGS.length] }}>
+                      {member.photo
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={member.photo} alt={member.name} className="w-full h-full object-cover object-top"/>
+                        : getInitials(member.name)
+                      }
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-slate-900 group-hover:text-green-700 transition leading-tight">
+                        <Link href={`/faculty/${member.slug ?? member._id}`}>
+                          {member.title} {member.name}
+                        </Link>
+                      </h3>
+                      <span className="inline-block mt-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                        style={{ background: desig.bg, color: desig.text }}>
+                        {member.designation}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Research interests */}
+                  {member.researchInterests && member.researchInterests.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {member.researchInterests.slice(0,3).map(r => (
+                        <span key={r} className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Email */}
+                  <a href={`mailto:${member.email}`}
+                    className="mt-3 flex items-center gap-1.5 text-xs text-slate-400 hover:text-green-700 transition truncate">
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span className="truncate">{member.email}</span>
+                  </a>
+
+                  {/* Profile link */}
+                  <Link href={`/faculty/${member.slug ?? member._id}`}
+                    className="mt-4 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90"
+                    style={{ background:'linear-gradient(135deg,#166534,#15803d)' }}>
+                    View Profile
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
       </div>
     </section>
   );
