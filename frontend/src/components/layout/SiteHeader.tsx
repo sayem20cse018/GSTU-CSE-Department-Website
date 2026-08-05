@@ -125,31 +125,27 @@ export default function SiteHeader() {
           </div>
         </Link>
 
-        {/* ── DIAGONAL STRIPES — two green + one white gap ──────────── */}
-        <div className="relative shrink-0" style={{ width: '56px' }} aria-hidden="true">
-          {/* White fill background */}
+        {/* ── DIAGONAL STRIPES — contained within header, no overflow ── */}
+        <div
+          className="relative shrink-0 self-stretch"
+          style={{ width: '64px', overflow: 'hidden' }}
+          aria-hidden="true"
+        >
           <div className="absolute inset-0 bg-white" />
-          {/* Green stripe 1 (wide) */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: '#1a7a3c',
-              clipPath: 'polygon(55% 0%, 100% 0%, 45% 100%, 0% 100%)',
-            }}
-          />
-          {/* White gap */}
-          <div
-            className="absolute inset-0 bg-white"
-            style={{ clipPath: 'polygon(75% 0%, 88% 0%, 65% 100%, 52% 100%)' }}
-          />
-          {/* Green stripe 2 (thin) */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: '#1a7a3c',
-              clipPath: 'polygon(88% 0%, 100% 0%, 100% 100%, 77% 100%)',
-            }}
-          />
+          {/* Thick green stripe */}
+          <div className="absolute inset-0" style={{
+            background: '#1a7a3c',
+            clipPath: 'polygon(50% 0%, 100% 0%, 50% 100%, 0% 100%)',
+          }}/>
+          {/* White gap inside the green */}
+          <div className="absolute inset-0 bg-white" style={{
+            clipPath: 'polygon(72% 0%, 83% 0%, 33% 100%, 22% 100%)',
+          }}/>
+          {/* Thin second green stripe */}
+          <div className="absolute inset-0" style={{
+            background: '#1a7a3c',
+            clipPath: 'polygon(83% 0%, 100% 0%, 100% 100%, 50% 100%)',
+          }}/>
         </div>
 
         {/* ── RIGHT: dark green + building dots + utilities ──────────── */}
