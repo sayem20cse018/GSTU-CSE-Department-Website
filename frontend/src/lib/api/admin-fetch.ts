@@ -1,38 +1,34 @@
 /**
  * Thin fetch wrapper for admin CRUD operations.
- * Reads the access token from the browser cookie and
- * attaches it as a Bearer header automatically.
+ *
+ * All requests go through the Next.js /api/admin/[...path] proxy route,
+ * which reads the httpOnly access cookie server-side and forwards it as
+ * a Bearer token to the NestJS backend.
+ *
+ * This avoids cross-origin cookie issues in production (Vercel ↔ Render).
  */
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-
-function getToken(): string {
-  if (typeof document === 'undefined') return '';
-  return document.cookie.match(/cse_access=([^;]+)/)?.[1] ?? '';
-}
-
-function authHeaders(): HeadersInit {
-  const token = getToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
+// Always use the internal Next.js proxy — never call the backend directly
+// from the browser in production.
+const BASE = '/api/admin';
 
 export async function adminGet<T>(path: string): Promise<T> {
   const r = await fetch(`${BASE}${path}`, {
-    headers: authHeaders(),
     credentials: 'include',
+    cache: 'no-store',
   });
-  const json = await r.json() as { data: T; success?: boolean; message?: string };
-  if (!r.ok) throw new Error((json as { message?: string }).message ?? `Request failed: ${r.status}`);
+  if (!r.ok) {
+    const json = await r.json().catch(() => ({})) as { message?: string };
+    throw new Error(json.message ?? `Request failed: ${r.status}`);
+  }
+  const json = await r.json() as { data: T; success?: boolean };
   return (json as { data: T }).data;
 }
 
 export async function adminPost<T>(path: string, body: unknown): Promise<T> {
   const r = await fetch(`${BASE}${path}`, {
     method: 'POST',
-    headers: authHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(body),
   });
@@ -44,7 +40,7 @@ export async function adminPost<T>(path: string, body: unknown): Promise<T> {
 export async function adminPatch<T>(path: string, body: unknown): Promise<T> {
   const r = await fetch(`${BASE}${path}`, {
     method: 'PATCH',
-    headers: authHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(body),
   });
@@ -56,7 +52,6 @@ export async function adminPatch<T>(path: string, body: unknown): Promise<T> {
 export async function adminDelete(path: string): Promise<void> {
   const r = await fetch(`${BASE}${path}`, {
     method: 'DELETE',
-    headers: authHeaders(),
     credentials: 'include',
   });
   if (!r.ok) {
