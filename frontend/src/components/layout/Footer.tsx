@@ -22,28 +22,51 @@ const ACADEMIC_LINKS = [
 export default function Footer() {
   return (
     <footer className="bg-[#0d1b2e] text-white" aria-label="Site footer">
+
+      {/* ── Logo bar — centered above the grid ─────────────────────────── */}
+      <div className="border-b border-white/10 py-6 flex flex-col items-center gap-2">
+        <div className="w-16 h-16 rounded-full bg-white/10 border-2 border-white/20
+                        flex items-center justify-center overflow-hidden shadow-lg">
+          <svg viewBox="0 0 80 80" className="w-10 h-10" fill="none">
+            <path d="M40 6 L11 22 L11 44 C11 62 25 72 40 76 C55 72 69 62 69 44 L69 22 Z"
+              fill="url(#ft-lg)"/>
+            <defs>
+              <linearGradient id="ft-lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#166534"/>
+                <stop offset="100%" stopColor="#052e16"/>
+              </linearGradient>
+            </defs>
+            <line x1="24" y1="34" x2="56" y2="34" stroke="white" strokeWidth="1.8"/>
+            <line x1="24" y1="43" x2="56" y2="43" stroke="white" strokeWidth="1.8"/>
+            <line x1="24" y1="52" x2="56" y2="52" stroke="white" strokeWidth="1.8"/>
+            <line x1="32" y1="34" x2="32" y2="52" stroke="#4ade80" strokeWidth="1.3"/>
+            <line x1="48" y1="34" x2="48" y2="52" stroke="#4ade80" strokeWidth="1.3"/>
+            <circle cx="32" cy="34" r="2.2" fill="#4ade80"/>
+            <circle cx="40" cy="34" r="2.2" fill="#86efac"/>
+            <circle cx="48" cy="34" r="2.2" fill="#4ade80"/>
+            <circle cx="40" cy="52" r="2.2" fill="#bbf7d0"/>
+            <path d="M29 22 L40 14 L51 22" fill="none" stroke="#fbbf24"
+              strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <p className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-montserrat)' }}>
+          {SITE.shortName}
+        </p>
+        <p className="text-slate-400 text-xs">{SITE.university}</p>
+      </div>
+
       {/* ── Main footer ────────────────────────────────────────────────── */}
-      <div className="container-custom py-16">
+      <div className="container-custom py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
           {/* ── Brand ─────────────────────────────────────────────────── */}
           <div className="lg:col-span-1">
-            {/* Logo */}
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
               <div>
                 <p className="font-bold text-white leading-tight">Dept. of CSE</p>
                 <p className="text-xs text-slate-400">{SITE.universityShort}</p>
               </div>
             </div>
-            <p className="text-slate-400 text-sm leading-relaxed mb-5">
-              {SITE.name}, {SITE.university}. Advancing computing education and research since {SITE.founded}.
-            </p>
 
             {/* Social links */}
             <div className="flex items-center gap-3">
