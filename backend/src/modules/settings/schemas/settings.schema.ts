@@ -62,6 +62,35 @@ export class Settings {
 
   @Prop({ default: '' })
   footerText: string;           // custom footer copyright text
+
+  // ── About Section ─────────────────────────────────────────────────────────
+  @Prop({ default: '' })
+  aboutIntro: string;           // Introduction paragraph (shown on homepage About tab)
+
+  @Prop({ default: '' })
+  aboutVision: string;          // Vision statement
+
+  @Prop({ default: '' })
+  aboutMission: string;         // Mission statement
+
+  // ── Chairman's Message ────────────────────────────────────────────────────
+  @Prop({ default: 'Dr. Mrinal Kanti Baowaly' })
+  chairmanName: string;
+
+  @Prop({ default: 'Professor & Chairman' })
+  chairmanTitle: string;
+
+  @Prop({ trim: true, default: '' })
+  chairmanPhoto: string;        // URL / base64
+
+  @Prop({ default: 'baowaly@gmail.com' })
+  chairmanEmail: string;
+
+  @Prop({ default: 'baowaly@gstu.edu.bd' })
+  chairmanEmail2: string;
+
+  @Prop({ default: '' })
+  chairmanMessage: string;      // Full message text (paragraphs separated by \n\n)
 }
 
 export const SettingsSchema = SchemaFactory.createForClass(Settings);

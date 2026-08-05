@@ -24,6 +24,17 @@ export interface SiteSettings {
   youtubeUrl: string;
   foundedYear: number;
   footerText: string;
+  // About section
+  aboutIntro?: string;
+  aboutVision?: string;
+  aboutMission?: string;
+  // Chairman
+  chairmanName?: string;
+  chairmanTitle?: string;
+  chairmanPhoto?: string;
+  chairmanEmail?: string;
+  chairmanEmail2?: string;
+  chairmanMessage?: string;
 }
 
 // Fallback from hardcoded constants — used when backend is unreachable

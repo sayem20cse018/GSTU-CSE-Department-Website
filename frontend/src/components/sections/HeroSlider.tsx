@@ -2,10 +2,33 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { HERO_SLIDES, type Slide } from '@/config/slides';
+import { type Slide as StaticSlide, HERO_SLIDES as FALLBACK_SLIDES } from '@/config/slides';
 import { cn } from '@/lib/utils/cn';
 
 const AUTOPLAY_MS = 5500;
+
+interface ApiSlide {
+  _id: string; title: string; subtitle: string; tag: string; imageUrl: string;
+  overlayOpacity: number; primaryBtnLabel: string; primaryBtnHref: string;
+  secondaryBtnLabel: string; secondaryBtnHref: string;
+  align: 'left' | 'center'; isActive: boolean; sortOrder: number;
+}
+
+type Slide = StaticSlide;
+
+function apiToSlide(s: ApiSlide): Slide {
+  return {
+    id: s._id,
+    title: s.title,
+    subtitle: s.subtitle,
+    tag: s.tag || undefined,
+    imageUrl: s.imageUrl ?? '',
+    overlayOpacity: s.overlayOpacity ?? 60,
+    primaryBtn: s.primaryBtnLabel ? { label: s.primaryBtnLabel, href: s.primaryBtnHref } : undefined,
+    secondaryBtn: s.secondaryBtnLabel ? { label: s.secondaryBtnLabel, href: s.secondaryBtnHref } : undefined,
+    align: s.align ?? 'left',
+  };
+}
 
 // ─── Single slide background ──────────────────────────────────────────────────
 function SlideBackground({ slide, active }: { slide: Slide; active: boolean }) {
@@ -112,10 +135,27 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
 
 // ─── Main HeroSlider ──────────────────────────────────────────────────────────
 export default function HeroSlider() {
+  const [slides,  setSlides]  = useState<Slide[]>(FALLBACK_SLIDES);
   const [current, setCurrent] = useState(0);
   const [paused,  setPaused]  = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const total    = HERO_SLIDES.length;
+
+  // Fetch slides from API on mount; fall back to static slides if unavailable
+  useEffect(() => {
+    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    fetch(`${api}/hero-slides`)
+      .then(r => r.json())
+      .then((d: { data?: ApiSlide[] }) => {
+        const arr = d.data;
+        if (Array.isArray(arr) && arr.length) {
+          setSlides(arr.map(apiToSlide));
+          setCurrent(0);
+        }
+      })
+      .catch(() => { /* keep fallback */ });
+  }, []);
+
+  const total = slides.length;
 
   const goTo = useCallback((idx: number) => {
     setCurrent(((idx % total) + total) % total);
@@ -151,7 +191,7 @@ export default function HeroSlider() {
       onMouseLeave={() => setPaused(false)}
     >
       {/* ── Slide backgrounds (all stacked, only active is visible) ────── */}
-      {HERO_SLIDES.map((slide, i) => (
+      {slides.map((slide, i) => (
         <SlideBackground key={slide.id} slide={slide} active={i === current} />
       ))}
 
@@ -169,7 +209,7 @@ export default function HeroSlider() {
       <div className="relative z-[2] h-full container-custom flex flex-col justify-center">
         {/* Animated key forces re-mount → re-animation on slide change */}
         <div key={current} className="slide-enter">
-          <SlideContent slide={HERO_SLIDES[current]} active />
+          <SlideContent slide={slides[current]} active />
         </div>
       </div>
 
@@ -207,7 +247,7 @@ export default function HeroSlider() {
         role="tablist"
         aria-label="Slide indicators"
       >
-        {HERO_SLIDES.map((slide, i) => (
+        {slides.map((slide, i) => (
           <button
             key={slide.id}
             role="tab"

@@ -58,6 +58,35 @@ export class UpdateSettingsDto {
 
   @IsOptional() @IsString() @MaxLength(500)
   footerText?: string;
+
+  // About section
+  @IsOptional() @IsString() @MaxLength(3000)
+  aboutIntro?: string;
+
+  @IsOptional() @IsString() @MaxLength(2000)
+  aboutVision?: string;
+
+  @IsOptional() @IsString() @MaxLength(2000)
+  aboutMission?: string;
+
+  // Chairman
+  @IsOptional() @IsString() @MaxLength(200)
+  chairmanName?: string;
+
+  @IsOptional() @IsString() @MaxLength(200)
+  chairmanTitle?: string;
+
+  @IsOptional() @IsString() @MaxLength(2_000_000)
+  chairmanPhoto?: string;
+
+  @IsOptional() @IsString() @MaxLength(200)
+  chairmanEmail?: string;
+
+  @IsOptional() @IsString() @MaxLength(200)
+  chairmanEmail2?: string;
+
+  @IsOptional() @IsString() @MaxLength(10000)
+  chairmanMessage?: string;
 }
 
 const SINGLETON_KEY = 'site_settings';

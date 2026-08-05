@@ -17,6 +17,7 @@ import { AchievementsModule } from './modules/achievements/achievements.module';
 import { ClubsModule }        from './modules/clubs/clubs.module';
 import { StatisticsModule }   from './modules/statistics/statistics.module';
 import { SettingsModule }     from './modules/settings/settings.module';
+import { HeroSlidesModule }   from './modules/hero-slides/hero-slides.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { SettingsModule }     from './modules/settings/settings.module';
     ClubsModule,
     StatisticsModule,
     SettingsModule,
+    HeroSlidesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,13 +5,15 @@ import { adminGet, adminPatch } from '@/lib/api/admin-fetch';
 import type { SiteSettings } from '@/lib/api/settings';
 import { SETTINGS_FALLBACK } from '@/lib/api/settings';
 
-type Tab = 'identity' | 'contact' | 'social' | 'logos';
+type Tab = 'identity' | 'contact' | 'social' | 'logos' | 'about' | 'chairman';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'identity', label: 'Identity',   icon: '🏛️' },
-  { id: 'contact',  label: 'Contact',    icon: '📞' },
-  { id: 'social',   label: 'Social',     icon: '🔗' },
-  { id: 'logos',    label: 'Logos',      icon: '🖼️' },
+  { id: 'identity', label: 'Identity',  icon: '🏛️' },
+  { id: 'contact',  label: 'Contact',   icon: '📞' },
+  { id: 'social',   label: 'Social',    icon: '🔗' },
+  { id: 'logos',    label: 'Logos',     icon: '🖼️' },
+  { id: 'about',    label: 'About',     icon: '📝' },
+  { id: 'chairman', label: 'Chairman',  icon: '👤' },
 ];
 
 /** Convert a File to a data URL (base64) so it can be stored as a string */
@@ -330,6 +332,85 @@ export default function SettingsPage() {
                 <p>💡 <strong>Upload:</strong> click &quot;Upload Image&quot; and pick a file from your computer. It will be stored as a data URL.</p>
                 <p>🔗 <strong>URL:</strong> paste a link to an image hosted on Cloudinary, S3, or your server.</p>
                 <p>📁 <strong>Local:</strong> put the file in <code className="bg-white/10 px-1 rounded">frontend/public/images/</code> and enter <code className="bg-white/10 px-1 rounded">/images/filename.png</code></p>
+              </div>
+            </>
+          )}
+
+          {/* ABOUT */}
+          {tab === 'about' && (
+            <>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">
+                About Section — shown on homepage About tab
+              </p>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Introduction Paragraph</label>
+                <textarea rows={6} value={form.aboutIntro ?? ''}
+                  onChange={e => F('aboutIntro', e.target.value)}
+                  placeholder="The Department of Computer Science and Engineering at GSTU was established in 2011…"
+                  className={`${iCls} resize-y`}/>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Vision Statement</label>
+                <textarea rows={4} value={form.aboutVision ?? ''}
+                  onChange={e => F('aboutVision', e.target.value)}
+                  placeholder="To be a leading center of excellence in Computer Science…"
+                  className={`${iCls} resize-y`}/>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Mission Statement</label>
+                <textarea rows={5} value={form.aboutMission ?? ''}
+                  onChange={e => F('aboutMission', e.target.value)}
+                  placeholder="Our mission is to provide rigorous, high-quality education…"
+                  className={`${iCls} resize-y`}/>
+              </div>
+            </>
+          )}
+
+          {/* CHAIRMAN */}
+          {tab === 'chairman' && (
+            <>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">
+                Chairman&apos;s Message — shown on homepage
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
+                  <input value={form.chairmanName ?? ''}
+                    onChange={e => F('chairmanName', e.target.value)}
+                    placeholder="Dr. Mrinal Kanti Baowaly" className={iCls}/>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Title / Designation</label>
+                  <input value={form.chairmanTitle ?? ''}
+                    onChange={e => F('chairmanTitle', e.target.value)}
+                    placeholder="Professor & Chairman" className={iCls}/>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email 1</label>
+                  <input type="email" value={form.chairmanEmail ?? ''}
+                    onChange={e => F('chairmanEmail', e.target.value)}
+                    placeholder="baowaly@gmail.com" className={iCls}/>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email 2 (official)</label>
+                  <input type="email" value={form.chairmanEmail2 ?? ''}
+                    onChange={e => F('chairmanEmail2', e.target.value)}
+                    placeholder="baowaly@gstu.edu.bd" className={iCls}/>
+                </div>
+              </div>
+              <div className="mt-2">
+                <LogoUpload label="Photo" fieldKey="chairmanPhoto"
+                  value={form.chairmanPhoto ?? ''}
+                  onChange={v => F('chairmanPhoto', v)}/>
+              </div>
+              <div className="mt-2">
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Message <span className="text-slate-500 font-normal">(separate paragraphs with a blank line)</span>
+                </label>
+                <textarea rows={10} value={form.chairmanMessage ?? ''}
+                  onChange={e => F('chairmanMessage', e.target.value)}
+                  placeholder="Welcome to the Department of Computer Science and Engineering…"
+                  className={`${iCls} resize-y`}/>
               </div>
             </>
           )}
