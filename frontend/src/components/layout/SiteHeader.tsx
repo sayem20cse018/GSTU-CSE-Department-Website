@@ -22,119 +22,125 @@ export default function SiteHeader() {
   }
 
   const s = settings;
-  // Core dept name — strip leading "Department of" so we can render it separately
-  const deptCore = s.deptName.replace(/^Department\s+of\s*/i, '');
 
   return (
-    <header className="relative overflow-hidden select-none" style={{ height: '72px' }}>
+    <header
+      className="relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(120deg, #071e0f 0%, #0a2d17 30%, #0d3d21 60%, #0b3318 100%)',
+      }}
+    >
+      {/* ── Layered background decorations ─────────────────────────────────── */}
+      <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+        {/* Circuit-board grid */}
+        <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="hdr-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M40 0L0 0 0 40" fill="none" stroke="white" strokeWidth="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hdr-grid)"/>
+        </svg>
+        {/* Left green glow */}
+        <div className="absolute -left-10 top-0 w-72 h-full opacity-25 blur-3xl"
+          style={{ background: 'radial-gradient(ellipse at left, #22c55e, transparent 70%)' }}/>
+        {/* Right teal glow */}
+        <div className="absolute right-0 top-0 w-56 h-full opacity-10 blur-2xl"
+          style={{ background: 'radial-gradient(ellipse at right, #14b8a6, transparent 70%)' }}/>
+        {/* Horizontal light streak */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-px opacity-20"
+          style={{ background: 'linear-gradient(90deg, transparent, #4ade80 30%, #fbbf24 50%, #4ade80 70%, transparent)' }}/>
+        {/* Bottom gold accent */}
+        <div className="absolute bottom-0 inset-x-0 h-[3px]"
+          style={{ background: 'linear-gradient(90deg, transparent, #fbbf24 20%, #fde68a 50%, #fbbf24 80%, transparent)' }}/>
+      </div>
 
-      {/* ── DESKTOP (lg+) ─────────────────────────────────────────────────── */}
-      <div className="hidden lg:flex h-full">
+      {/* ── DESKTOP ─────────────────────────────────────────────────────────── */}
+      <div className="hidden lg:block relative z-10">
+        <div className="container-custom flex items-center justify-between gap-6 py-4">
 
-        {/* ── LEFT PANEL — green, logo + university ─────────────────────── */}
-        <Link
-          href="/"
-          className="relative flex items-center gap-4 px-6 shrink-0 group"
-          style={{
-            background: 'linear-gradient(135deg, #0d5c2e 0%, #1a7a3c 60%, #15803d 100%)',
-            minWidth: '340px',
-          }}
-          aria-label="Go to homepage"
-        >
-          {/* subtle dot pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-              backgroundSize: '18px 18px',
-            }} aria-hidden="true"/>
+          {/* LEFT — Logo + Identity ───────────────────────────────────────── */}
+          <Link href="/" className="flex items-center gap-4 group shrink-0">
+            {/* Logo */}
+            <div className="relative shrink-0">
+              {/* Glow ring */}
+              <div className="absolute -inset-1 rounded-full blur-md opacity-50"
+                style={{ background: 'radial-gradient(circle, #4ade80, #fbbf24, transparent)' }}
+                aria-hidden="true"/>
+              <div className="relative w-[62px] h-[62px] rounded-full overflow-hidden border-2 border-white/25
+                              bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-xl">
+                {s.deptLogo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.deptLogo} alt={s.deptShortName}
+                    className="w-full h-full object-contain p-1"/>
+                ) : (
+                  <svg viewBox="0 0 80 80" className="w-10 h-10" fill="none">
+                    <path d="M40 6 L11 22 L11 44 C11 62 25 72 40 76 C55 72 69 62 69 44 L69 22 Z"
+                      fill="url(#lg1)"/>
+                    <defs>
+                      <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#166534"/>
+                        <stop offset="100%" stopColor="#052e16"/>
+                      </linearGradient>
+                    </defs>
+                    <line x1="24" y1="34" x2="56" y2="34" stroke="white" strokeWidth="1.8"/>
+                    <line x1="24" y1="43" x2="56" y2="43" stroke="white" strokeWidth="1.8"/>
+                    <line x1="24" y1="52" x2="56" y2="52" stroke="white" strokeWidth="1.8"/>
+                    <line x1="32" y1="34" x2="32" y2="52" stroke="#4ade80" strokeWidth="1.3"/>
+                    <line x1="48" y1="34" x2="48" y2="52" stroke="#4ade80" strokeWidth="1.3"/>
+                    <circle cx="32" cy="34" r="2.2" fill="#4ade80"/>
+                    <circle cx="40" cy="34" r="2.2" fill="#86efac"/>
+                    <circle cx="48" cy="34" r="2.2" fill="#4ade80"/>
+                    <circle cx="40" cy="52" r="2.2" fill="#bbf7d0"/>
+                    <path d="M29 22 L40 14 L51 22" fill="none" stroke="#fbbf24"
+                      strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+            </div>
 
-          {/* Logo */}
-          <div className="relative shrink-0 w-12 h-12 rounded-full overflow-hidden border-2 border-white/30
-                          bg-white flex items-center justify-center shadow-lg z-10">
-            {s.deptLogo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={s.deptLogo} alt="" className="w-full h-full object-contain p-0.5"/>
-            ) : (
-              <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
-                <path d="M40 7 L13 21 L13 43 C13 60 26 71 40 75 C54 71 67 60 67 43 L67 21 Z"
-                  fill="#166534"/>
-                <line x1="23" y1="35" x2="57" y2="35" stroke="white" strokeWidth="2"/>
-                <line x1="23" y1="44" x2="57" y2="44" stroke="white" strokeWidth="2"/>
-                <circle cx="32" cy="35" r="2" fill="#4ade80"/>
-                <circle cx="48" cy="35" r="2" fill="#4ade80"/>
-                <path d="M30 21 L40 13 L50 21" fill="none" stroke="#fbbf24"
-                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            )}
-          </div>
-
-          {/* University name */}
-          <div className="z-10">
-            <p className="text-white/60 text-[9px] font-bold uppercase tracking-[0.2em] leading-none mb-1"
-              style={{ fontFamily: 'var(--font-montserrat)' }}>
-              {s.universityShortName}
-            </p>
-            <p className="text-white font-extrabold leading-tight"
-              style={{
-                fontFamily: 'var(--font-montserrat)',
-                fontSize: '0.78rem',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                maxWidth: '200px',
-              }}>
-              {s.universityName}
-            </p>
-          </div>
-
-          {/* Diagonal right edge — skewed pseudo-divider using a div */}
-          <div className="absolute right-0 top-0 h-full w-10 z-20 pointer-events-none"
-            style={{
-              background: 'linear-gradient(135deg, #0d5c2e 0%, #1a7a3c 60%, #15803d 100%)',
-              clipPath: 'polygon(0 0, 60% 0, 100% 100%, 0 100%)',
-            }} aria-hidden="true"/>
-        </Link>
-
-        {/* ── DIAGONAL BLADE — overlap transition ───────────────────────── */}
-        <div className="relative z-10 -ml-4 shrink-0 pointer-events-none" style={{ width: '40px' }}>
-          <div className="h-full w-full" style={{
-            background: '#152540',
-            clipPath: 'polygon(0 0, 100% 0, 60% 100%, 0 100%)',
-          }} aria-hidden="true"/>
-        </div>
-
-        {/* ── RIGHT PANEL — dark navy, dept name ────────────────────────── */}
-        <div className="flex-1 flex items-center justify-between px-5"
-          style={{ background: '#152540' }}>
-
-          {/* Dept name */}
-          <Link href="/" className="group shrink-0">
-            <p className="text-white/50 leading-none mb-0.5"
-              style={{
-                fontFamily: 'var(--font-inter)',
-                fontSize: '0.7rem',
-                fontStyle: 'italic',
-                letterSpacing: '0.02em',
-              }}>
-              Department of
-            </p>
-            <p className="text-white leading-tight group-hover:text-green-300 transition-colors"
-              style={{
-                fontFamily: 'var(--font-montserrat)',
-                fontWeight: 700,
-                fontSize: '1.45rem',
-                letterSpacing: '0.01em',
-              }}>
-              {deptCore}
-            </p>
+            {/* Text block */}
+            <div>
+              {/* Dept name — big, bold, Montserrat */}
+              <p
+                className="text-white leading-none group-hover:text-green-200 transition-colors"
+                style={{
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                  fontWeight: 800,
+                  fontSize: '1.45rem',
+                  letterSpacing: '0.01em',
+                  textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+                }}
+              >
+                {s.deptName}
+              </p>
+              {/* University name — smaller, gold */}
+              <p
+                className="mt-1 leading-none"
+                style={{
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                  fontWeight: 500,
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.06em',
+                  color: '#fde68a',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {s.universityName}
+                <span className="mx-2 opacity-40">·</span>
+                <span style={{ color: '#86efac', fontWeight: 700 }}>{s.universityShortName}</span>
+              </p>
+            </div>
           </Link>
 
-          {/* Utility strip */}
+          {/* RIGHT — Utility strip ─────────────────────────────────────────── */}
           <div className="flex items-center gap-0.5 shrink-0">
 
-            {/* Contact */}
             <Link href="/contact"
-              className="flex items-center gap-1.5 text-[11px] font-medium text-white/60
-                         hover:text-white hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition">
+              className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-lg transition"
+              style={{ color: 'rgba(187,247,208,0.75)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(187,247,208,0.75)'; }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
@@ -144,10 +150,11 @@ export default function SiteHeader() {
 
             <div className="w-px h-4 mx-0.5 bg-white/15" aria-hidden="true"/>
 
-            {/* Moodle */}
             <a href={s.moodleUrl || 'https://moodle.gstu.edu.bd'} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-[11px] font-medium text-white/60
-                         hover:text-white hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition">
+              className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-lg transition"
+              style={{ color: 'rgba(187,247,208,0.75)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(187,247,208,0.75)'; }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -158,28 +165,28 @@ export default function SiteHeader() {
             <div className="w-px h-4 mx-0.5 bg-white/15" aria-hidden="true"/>
 
             {/* Search */}
-            <form onSubmit={handleSearch} className="flex items-center">
+            <form onSubmit={handleSearch}>
               <div className="relative">
-                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none text-white/40"
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
+                  style={{ color: '#86efac' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 <input ref={inputRef} type="text" value={query} onChange={e => setQuery(e.target.value)}
                   placeholder="Search…" aria-label="Search"
-                  className="pl-8 pr-3 py-1.5 text-[11px] text-white placeholder-white/30
+                  className="pl-8 pr-3 py-1.5 text-[11px] text-white placeholder-green-300/40
                              rounded-lg w-32 focus:outline-none focus:w-44 transition-all duration-300"
-                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}/>
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)' }}/>
               </div>
             </form>
 
             <div className="w-px h-4 mx-0.5 bg-white/15" aria-hidden="true"/>
 
-            {/* Student Login */}
             <Link href="/student/login"
-              className="flex items-center gap-1.5 text-[11px] font-semibold text-green-300
-                         hover:text-white hover:bg-white/10 transition px-3 py-1.5 rounded-lg"
-              style={{ border: '1px solid rgba(134,239,172,0.3)' }}>
+              className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-lg transition"
+              style={{ color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(134,239,172,0.1)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#86efac'; }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -187,13 +194,12 @@ export default function SiteHeader() {
               Student Login
             </Link>
 
-            {/* Register */}
             <Link href="/admissions"
-              className="flex items-center gap-1.5 text-[11px] font-extrabold ml-1 px-3.5 py-1.5 rounded-lg transition"
+              className="flex items-center gap-1.5 text-[11px] font-extrabold ml-1.5 px-4 py-1.5 rounded-lg transition"
               style={{
-                background: 'linear-gradient(135deg, #1a7a3c, #15803d)',
-                color: '#fff',
-                boxShadow: '0 2px 10px rgba(26,122,60,0.4)',
+                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                color: '#1a1a1a',
+                boxShadow: '0 2px 12px rgba(251,191,36,0.35)',
               }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -203,110 +209,80 @@ export default function SiteHeader() {
             </Link>
           </div>
         </div>
-
-        {/* Bottom green accent line */}
-        <div className="absolute bottom-0 inset-x-0 h-[3px] pointer-events-none"
-          style={{ background: 'linear-gradient(90deg, #1a7a3c 0%, #4ade80 40%, #fbbf24 60%, #1a7a3c 100%)' }}
-          aria-hidden="true"/>
       </div>
 
-      {/* ── TABLET (md–lg) ────────────────────────────────────────────────── */}
-      <div className="hidden md:flex lg:hidden h-full items-stretch">
-
-        {/* Green left */}
-        <Link href="/" className="flex items-center gap-3 px-4 shrink-0"
-          style={{ background: 'linear-gradient(135deg,#0d5c2e,#1a7a3c)' }}>
-          <div className="w-9 h-9 rounded-full bg-white/90 border border-white/40
-                          flex items-center justify-center overflow-hidden shadow">
+      {/* ── TABLET ──────────────────────────────────────────────────────────── */}
+      <div className="hidden md:flex lg:hidden relative z-10 container-custom items-center justify-between py-3 gap-4">
+        <Link href="/" className="flex items-center gap-3 group shrink-0">
+          <div className="w-10 h-10 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm
+                          flex items-center justify-center overflow-hidden shadow-md">
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={s.deptLogo} alt="" className="w-full h-full object-contain p-0.5"/>
-              : <svg viewBox="0 0 80 80" className="w-7 h-7" fill="none">
+              : <svg viewBox="0 0 80 80" className="w-8 h-8" fill="none">
                   <path d="M40 8 L14 21 L14 43 C14 59 26 70 40 74 C54 70 66 59 66 43 L66 21 Z" fill="#166534"/>
                   <path d="M30 21 L40 14 L50 21" fill="none" stroke="#fbbf24" strokeWidth="2.5"
                     strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             }
           </div>
-          <p className="text-white font-bold text-xs uppercase tracking-wider"
-            style={{ fontFamily: 'var(--font-montserrat)' }}>
-            {s.universityShortName}
-          </p>
-        </Link>
-
-        {/* Dark right */}
-        <div className="flex-1 flex items-center justify-between px-4" style={{ background: '#152540' }}>
           <div>
-            <p className="text-white/40 text-[9px] italic">Department of</p>
-            <p className="text-white font-bold text-sm leading-tight"
-              style={{ fontFamily: 'var(--font-montserrat)' }}>
-              {deptCore}
+            <p className="text-white font-extrabold leading-tight text-sm group-hover:text-green-200 transition"
+              style={{ fontFamily: 'var(--font-montserrat)' }}>{s.deptName}</p>
+            <p className="text-[10px] font-medium" style={{ color: '#fde68a', fontFamily: 'var(--font-montserrat)' }}>
+              {s.universityShortName}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <form onSubmit={handleSearch}>
-              <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…"
-                className="rounded-lg px-3 py-1 text-xs text-white placeholder-white/30 w-24 focus:outline-none"
-                style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }}/>
-            </form>
-            <Link href="/contact" className="text-xs text-white/60 hover:text-white transition">Contact</Link>
-            <span className="text-white/20">|</span>
-            <a href={s.moodleUrl || 'https://moodle.gstu.edu.bd'} target="_blank" rel="noopener noreferrer"
-              className="text-xs text-white/60 hover:text-white transition">Moodle</a>
-            <span className="text-white/20">|</span>
-            <Link href="/student/login" className="text-xs font-semibold text-green-300 px-2.5 py-1 rounded-lg border border-green-400/30 hover:bg-white/10 transition">Login</Link>
-            <Link href="/admissions" className="text-xs font-extrabold px-2.5 py-1 rounded-lg text-white transition"
-              style={{ background: 'linear-gradient(135deg,#1a7a3c,#15803d)' }}>Register</Link>
-          </div>
+        </Link>
+        <div className="flex items-center gap-2">
+          <form onSubmit={handleSearch}>
+            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…"
+              className="rounded-lg px-3 py-1 text-xs text-white placeholder-green-300/40 focus:outline-none w-24"
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}/>
+          </form>
+          <Link href="/contact" className="text-xs text-green-200/70 hover:text-white transition">Contact</Link>
+          <span className="text-white/20">|</span>
+          <a href={s.moodleUrl || 'https://moodle.gstu.edu.bd'} target="_blank" rel="noopener noreferrer"
+            className="text-xs text-green-200/70 hover:text-white transition">Moodle</a>
+          <span className="text-white/20">|</span>
+          <Link href="/student/login" className="text-xs font-semibold px-2.5 py-1 rounded-lg transition"
+            style={{ color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>Login</Link>
+          <Link href="/admissions" className="text-xs font-extrabold px-2.5 py-1 rounded-lg"
+            style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)', color: '#1a1a1a' }}>Register</Link>
         </div>
-
-        <div className="absolute bottom-0 inset-x-0 h-[3px] pointer-events-none"
-          style={{ background: 'linear-gradient(90deg,#1a7a3c,#4ade80,#fbbf24,#1a7a3c)' }}
-          aria-hidden="true"/>
       </div>
 
-      {/* ── MOBILE ────────────────────────────────────────────────────────── */}
-      <div className="flex md:hidden h-full items-stretch">
-
-        {/* Green left */}
-        <Link href="/" className="flex items-center gap-2.5 px-3 shrink-0"
-          style={{ background: 'linear-gradient(135deg,#0d5c2e,#1a7a3c)', minWidth: '120px' }}>
-          <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center overflow-hidden">
+      {/* ── MOBILE ──────────────────────────────────────────────────────────── */}
+      <div className="flex md:hidden relative z-10 container-custom items-center justify-between py-3">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-full border border-white/20 bg-white/10
+                          flex items-center justify-center overflow-hidden shadow">
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={s.deptLogo} alt="" className="w-full h-full object-contain p-0.5"/>
-              : <svg viewBox="0 0 80 80" className="w-6 h-6" fill="none">
+              : <svg viewBox="0 0 80 80" className="w-7 h-7" fill="none">
                   <path d="M40 8 L14 21 L14 43 C14 59 26 70 40 74 C54 70 66 59 66 43 L66 21 Z" fill="#166534"/>
                   <path d="M30 21 L40 14 L50 21" fill="none" stroke="#fbbf24" strokeWidth="3"
                     strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             }
           </div>
-          <p className="text-white font-bold text-[10px] uppercase tracking-wide leading-tight"
-            style={{ fontFamily: 'var(--font-montserrat)' }}>
-            {s.universityShortName}
-          </p>
-        </Link>
-
-        {/* Dark right */}
-        <div className="flex-1 flex items-center justify-between px-3" style={{ background: '#152540' }}>
           <div>
-            <p className="text-white/40 text-[8px] italic">Dept. of</p>
-            <p className="text-white font-bold text-xs leading-tight"
+            <p className="text-white font-extrabold text-sm leading-tight group-hover:text-green-200 transition"
               style={{ fontFamily: 'var(--font-montserrat)' }}>
-              {deptCore}
+              {s.deptName}
+            </p>
+            <p className="text-[10px]" style={{ color: '#fde68a', fontFamily: 'var(--font-montserrat)' }}>
+              {s.universityShortName}
             </p>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Link href="/student/login" className="text-[11px] font-semibold text-green-300 px-2 py-1 rounded-lg border border-green-400/30">Login</Link>
-            <Link href="/admissions" className="text-[11px] font-extrabold px-2 py-1 rounded-lg text-white"
-              style={{ background: 'linear-gradient(135deg,#1a7a3c,#15803d)' }}>Register</Link>
-          </div>
+        </Link>
+        <div className="flex items-center gap-1.5">
+          <Link href="/student/login" className="text-[11px] font-semibold px-2 py-1 rounded-lg"
+            style={{ color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>Login</Link>
+          <Link href="/admissions" className="text-[11px] font-extrabold px-2 py-1 rounded-lg"
+            style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)', color: '#1a1a1a' }}>Register</Link>
         </div>
-
-        <div className="absolute bottom-0 inset-x-0 h-[3px] pointer-events-none"
-          style={{ background: 'linear-gradient(90deg,#1a7a3c,#4ade80,#fbbf24,#1a7a3c)' }}
-          aria-hidden="true"/>
       </div>
 
     </header>

@@ -9,6 +9,7 @@ import AcademicProgramsSection  from '@/components/sections/AcademicProgramsSect
 import NoticesSection           from '@/components/sections/NoticesSection';
 import NewsSection              from '@/components/sections/NewsSection';
 import AchievementsSection      from '@/components/sections/AchievementsSection';
+import UpcomingEventsSection    from '@/components/sections/UpcomingEventsSection';
 import ClubsSection             from '@/components/sections/ClubsSection';
 import FacultyPreview           from '@/components/sections/FacultyPreview';
 import DepartmentStats          from '@/components/sections/DepartmentStats';
@@ -47,7 +48,10 @@ export default function HomePage() {
       {/* 6. Recent Achievements */}
       <AchievementsSection />
 
-      {/* 7. Department Clubs */}
+      {/* 7. Upcoming Events */}
+      <UpcomingEventsSection />
+
+      {/* 8. Department Clubs */}
       <ClubsSection />
 
       {/* 8. Faculty Members */}
