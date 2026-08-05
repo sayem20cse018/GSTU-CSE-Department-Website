@@ -131,7 +131,7 @@ export default function ChairmanMessage() {
                 style={{ borderTop: '1px solid #f0fdf4' }}>
                 <div>
                   <p className="font-extrabold text-slate-900">Dr. Mrinal Kanti Baowaly</p>
-                  <p className="text-sm font-semibold" style={{ color: '#166534' }}>Chairman, Dept. of CSE — GSTU</p>
+                  <p className="text-sm font-semibold" style={{ color: '#166534' }}>Chairman, Dept. of CSE,  GSTU</p>
                 </div>
                 <div className="flex gap-2">
                   <button

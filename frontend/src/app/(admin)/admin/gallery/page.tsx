@@ -5,6 +5,7 @@ import PageHeader from '@/components/admin/ui/PageHeader';
 import Button     from '@/components/admin/ui/Button';
 import Badge      from '@/components/admin/ui/Badge';
 import EmptyState from '@/components/admin/ui/EmptyState';
+import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { cn }     from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
@@ -71,9 +72,11 @@ export default function AdminGalleryPage() {
             </div>
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
               <textarea rows={2} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Cover Image URL</label>
-              <input type="url" value={form.coverImage} onChange={e=>F('coverImage',e.target.value)} placeholder="https://…"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+            <ImageUpload
+              label="Cover Image"
+              value={form.coverImage}
+              onChange={v => F('coverImage', v)}
+            />
             <div className="flex gap-4">
               {[{k:'isPublished',l:'Published'},{k:'isFeatured',l:'Featured'}].map(({k,l})=>(
                 <label key={k} className="flex items-center gap-2 cursor-pointer">

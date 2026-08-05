@@ -5,6 +5,7 @@ import PageHeader  from '@/components/admin/ui/PageHeader';
 import Button      from '@/components/admin/ui/Button';
 import Badge       from '@/components/admin/ui/Badge';
 import EmptyState  from '@/components/admin/ui/EmptyState';
+import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { cn }      from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 
@@ -73,11 +74,20 @@ export default function FacultyPage() {
             <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Faculty':'Add Faculty Member'}</h3>
             {err && <p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {([['Full Name','name','text','Dr. Mohammad Rahman'],['Email','email','email','name@gstu.edu.bd'],['Phone','phone','text','+880-XXX'],['Photo URL','photo','url','https://…'],['Office Room','officeRoom','text','Room 302, CSE Building'],['Google Scholar URL','googleScholarUrl','url','https://scholar.google.com/…'],['LinkedIn URL','linkedinUrl','url','https://linkedin.com/in/…'],['ORCID ID','orcidId','text','0000-0000-0000-0000']] as [string,keyof typeof EMPTY,string,string][]).map(([label,key,type,ph])=>(
+              {([['Full Name','name','text','Dr. Mohammad Rahman'],['Email','email','email','name@gstu.edu.bd'],['Phone','phone','text','+880-XXX'],['Office Room','officeRoom','text','Room 302, CSE Building'],['Google Scholar URL','googleScholarUrl','url','https://scholar.google.com/…'],['LinkedIn URL','linkedinUrl','url','https://linkedin.com/in/…'],['ORCID ID','orcidId','text','0000-0000-0000-0000']] as [string,keyof typeof EMPTY,string,string][]).map(([label,key,type,ph])=>(
                 <div key={key}><label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
                   <input type={type} value={form[key] as string} onChange={e=>F(key,e.target.value)} placeholder={ph}
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
+
+              {/* Photo upload */}
+              <div className="sm:col-span-2">
+                <ImageUpload
+                  label="Photo"
+                  value={form.photo}
+                  onChange={v => F('photo', v)}
+                  previewRounded
+                />
+              </div>              <div><label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
                 <select value={form.title} onChange={e=>F('title',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                   {['Dr.','Prof.','Mr.','Ms.','Engr.'].map(t=><option key={t} value={t}>{t}</option>)}
                 </select></div>
