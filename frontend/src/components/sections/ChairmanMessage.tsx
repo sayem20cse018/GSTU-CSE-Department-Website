@@ -10,15 +10,14 @@ export default function ChairmanMessage() {
     <section className="section-py" style={{ background: 'linear-gradient(180deg,#f0faf4 0%,#ffffff 100%)' }}>
       <div className="container-custom">
 
-        {/* Section label */}
-        <div className="text-center mb-10">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-3"
-            style={{ color: '#166534', background: 'rgba(22,101,52,0.08)', border: '1px solid rgba(22,101,52,0.15)' }}>
-            From the Chairman&apos;s Desk
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Chairman&apos;s Message</h2>
-          <div className="mt-3 mx-auto w-14 h-1 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#166534,#4ade80)' }} aria-hidden="true"/>
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-10">
+          <h2
+            className="text-2xl font-bold uppercase tracking-wide whitespace-nowrap"
+            style={{ color: '#1a7a3c', fontFamily: 'var(--font-oswald)' }}>
+            Chairman&apos;s Message
+          </h2>
+          <div className="flex-1 h-[2px]" style={{ background: '#1a7a3c' }} aria-hidden="true" />
         </div>
 
         {/* Card */}

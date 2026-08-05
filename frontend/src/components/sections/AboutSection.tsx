@@ -84,13 +84,14 @@ export default function AboutSection() {
     <section className="section-py bg-white" aria-labelledby="about-heading">
       <div className="container-custom">
 
-        {/* Section label */}
-        <div className="text-center mb-12">
-          <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">About the Department</p>
-          <h2 id="about-heading" className="text-3xl sm:text-4xl font-bold text-slate-900">
-            Who We Are
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-10">
+          <h2 id="about-heading"
+            className="text-2xl font-bold uppercase tracking-wide whitespace-nowrap"
+            style={{ color: '#1a7a3c', fontFamily: 'var(--font-oswald)' }}>
+            About the Department
           </h2>
-          <div className="mt-3 mx-auto w-12 h-1 rounded-full bg-blue-600" aria-hidden="true"/>
+          <div className="flex-1 h-[2px]" style={{ background: '#1a7a3c' }} aria-hidden="true" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -98,25 +99,6 @@ export default function AboutSection() {
           {/* ── Left: Tabs (Intro / Vision / Mission) ──────────────────── */}
           <div>
             <AboutTabs tabs={TABS} />
-
-            {/* Key highlights */}
-            <div className="mt-8 grid grid-cols-2 gap-3">
-              {[
-                { value: `${SITE.founded}`, label: 'Established', icon: '🏛️' },
-                { value: 'BSc · MSc · PhD', label: 'Programs Offered', icon: '🎓' },
-                { value: '14+', label: 'Expert Faculty', icon: '👨‍🏫' },
-                { value: '800+', label: 'Alumni Worldwide', icon: '🌍' },
-              ].map((item) => (
-                <div key={item.label}
-                  className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-4 hover:border-blue-200 transition">
-                  <span className="text-2xl shrink-0" aria-hidden="true">{item.icon}</span>
-                  <div>
-                    <p className="font-extrabold text-slate-900 text-sm leading-tight">{item.value}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{item.label}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/about"

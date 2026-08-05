@@ -113,13 +113,22 @@ export default function SiteHeader() {
 
             {/* Dynamic names from settings */}
             <div>
-              <p className="font-extrabold text-white leading-tight tracking-tight
-                             group-hover:text-green-100 transition"
-                style={{ fontSize: '1.25rem', textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>
+              <p className="text-white leading-tight tracking-tight group-hover:text-green-100 transition"
+                style={{
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                  fontWeight: 800,
+                  fontSize: '1.3rem',
+                  textShadow: '0 1px 8px rgba(0,0,0,0.4)',
+                }}>
                 {s.deptName}
               </p>
-              <p className="font-semibold mt-1 tracking-wide flex items-center gap-2"
-                style={{ fontSize: '0.78rem', color: '#fde68a' }}>
+              <p className="mt-1 tracking-wide flex items-center gap-2"
+                style={{
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                  fontWeight: 600,
+                  fontSize: '0.72rem',
+                  color: '#fde68a',
+                }}>
                 <span className="inline-block w-1 h-1 rounded-full bg-yellow-400" aria-hidden="true"/>
                 {s.universityName}
                 <span className="opacity-50">·</span>

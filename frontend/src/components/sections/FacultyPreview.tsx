@@ -52,20 +52,16 @@ export default async function FacultyPreview() {
     <section className="section-py bg-white">
       <div className="container-custom">
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-          <div>
-            <span className="inline-block text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3"
-              style={{ color:'#166534', background:'rgba(22,101,52,0.08)', border:'1px solid rgba(22,101,52,0.15)' }}>
-              Our People
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Faculty Members</h2>
-            <p className="text-slate-500 text-sm mt-2 max-w-lg">
-              Experienced educators and researchers dedicated to excellence in computing.
-            </p>
-          </div>
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-10">
+          <h2
+            className="text-2xl font-bold uppercase tracking-wide whitespace-nowrap"
+            style={{ color: '#1a7a3c', fontFamily: 'var(--font-oswald)' }}>
+            Faculty Members
+          </h2>
+          <div className="flex-1 h-[2px]" style={{ background: '#1a7a3c' }} aria-hidden="true" />
           <Link href="/faculty"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl border transition hover:shadow-sm shrink-0"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-xl border transition hover:shadow-sm shrink-0"
             style={{ color:'#166534', borderColor:'rgba(22,101,52,0.3)' }}>
             All Faculty
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

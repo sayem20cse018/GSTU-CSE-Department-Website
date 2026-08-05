@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Oswald, Montserrat } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
@@ -20,6 +20,20 @@ const jetbrainsMono = JetBrains_Mono({
   preload: false,
 });
 
+const oswald = Oswald({
+  variable: '--font-oswald',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
+
+const montserrat = Montserrat({
+  variable: '--font-montserrat',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],   // 800 = ExtraBold
+});
+
 export const metadata: Metadata = {
   title: {
     default: 'Dept. of CSE — GSTU',
@@ -30,7 +44,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${oswald.variable} ${montserrat.variable} scroll-smooth`}>
       <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased"
         style={{ fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif' }}>
         <AuthProvider>{children}</AuthProvider>

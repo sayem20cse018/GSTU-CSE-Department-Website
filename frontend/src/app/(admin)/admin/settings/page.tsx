@@ -34,14 +34,31 @@ function LogoUpload({
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Validate: image only, max 2MB
-    if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
-    if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2MB.'); return; }
+    // Reset input so the same file can be re-selected after a remove
+    e.target.value = '';
+
+    // Validate type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file (PNG, JPG, SVG, WebP).');
+      return;
+    }
+    // Validate size — base64 encoding adds ~33% overhead, keep source under 3.5 MB
+    // so the encoded string stays well within the 5 MB backend limit
+    const MAX_BYTES = 3.5 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      alert(`Image is too large (${(file.size / 1024 / 1024).toFixed(1)} MB).\nPlease choose a file under 3.5 MB, or paste an external URL instead.`);
+      return;
+    }
+
     setUploading(true);
     try {
       const dataUrl = await fileToDataUrl(file);
       onChange(dataUrl);
-    } finally { setUploading(false); }
+    } catch {
+      alert('Failed to read the image file. Please try again.');
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
@@ -80,7 +97,7 @@ function LogoUpload({
             )}
           </button>
 
-          <p className="text-[10px] text-slate-500">PNG, JPG, SVG · max 2MB</p>
+          <p className="text-[10px] text-slate-500">PNG, JPG, SVG, WebP · max 3.5 MB</p>
         </div>
       </div>
 

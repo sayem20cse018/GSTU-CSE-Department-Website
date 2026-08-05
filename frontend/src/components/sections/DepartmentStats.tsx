@@ -40,11 +40,15 @@ export default async function DepartmentStats() {
       style={{ background:'linear-gradient(135deg,#0b3d1f 0%,#0e4d2a 50%,#0b3d1f 100%)' }}>
 
       {/* Header */}
-      <div className="container-custom pt-12 pb-2 text-center">
-        <p className="text-xs font-bold uppercase tracking-widest" style={{ color:'#86efac' }}>
-          At a Glance
-        </p>
-        <h2 className="text-2xl font-extrabold text-white mt-1">Department Statistics</h2>
+      <div className="container-custom pt-10 pb-2">
+        <div className="flex items-center gap-4">
+          <h2
+            className="text-2xl font-bold uppercase tracking-wide whitespace-nowrap text-white"
+            style={{ fontFamily: 'var(--font-oswald)' }}>
+            Department Statistics
+          </h2>
+          <div className="flex-1 h-[2px]" style={{ background: 'rgba(255,255,255,0.25)' }} aria-hidden="true" />
+        </div>
       </div>
 
       {/* Stats grid */}

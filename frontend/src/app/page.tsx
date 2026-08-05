@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
-import SiteHeader          from '@/components/layout/SiteHeader';
-import Navbar              from '@/components/layout/Navbar';
-import Footer              from '@/components/layout/Footer';
-import HeroSlider          from '@/components/sections/HeroSlider';
-import AboutSection        from '@/components/sections/AboutSection';
-import ChairmanMessage     from '@/components/sections/ChairmanMessage';
-import NoticesSection      from '@/components/sections/NoticesSection';
-import NewsSection         from '@/components/sections/NewsSection';
-import AchievementsSection from '@/components/sections/AchievementsSection';
-import ClubsSection        from '@/components/sections/ClubsSection';
-import FacultyPreview      from '@/components/sections/FacultyPreview';
-import ResearchHighlights  from '@/components/sections/ResearchHighlights';
-import DepartmentStats     from '@/components/sections/DepartmentStats';
+import SiteHeader               from '@/components/layout/SiteHeader';
+import Navbar                   from '@/components/layout/Navbar';
+import Footer                   from '@/components/layout/Footer';
+import HeroSlider               from '@/components/sections/HeroSlider';
+import AboutSection             from '@/components/sections/AboutSection';
+import ChairmanMessage          from '@/components/sections/ChairmanMessage';
+import AcademicProgramsSection  from '@/components/sections/AcademicProgramsSection';
+import NoticesSection           from '@/components/sections/NoticesSection';
+import NewsSection              from '@/components/sections/NewsSection';
+import AchievementsSection      from '@/components/sections/AchievementsSection';
+import ClubsSection             from '@/components/sections/ClubsSection';
+import FacultyPreview           from '@/components/sections/FacultyPreview';
+import DepartmentStats          from '@/components/sections/DepartmentStats';
 
 export const metadata: Metadata = {
   title: 'Department of Computer Science & Engineering — GSTU',
@@ -35,7 +35,10 @@ export default function HomePage() {
       {/* 3. Chairman's Message */}
       <ChairmanMessage />
 
-      {/* 4. Latest Notices */}
+      {/* 4. Academic Programs */}
+      <AcademicProgramsSection />
+
+      {/* 5. Latest Notices */}
       <NoticesSection />
 
       {/* 5. Latest News */}
@@ -50,10 +53,7 @@ export default function HomePage() {
       {/* 8. Faculty Members */}
       <FacultyPreview />
 
-      {/* 9. Research & Innovation */}
-      <ResearchHighlights />
-
-      {/* 10. Department Statistics — LAST */}
+      {/* 9. Department Statistics — LAST */}
       <DepartmentStats />
 
       <Footer />

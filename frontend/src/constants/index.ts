@@ -7,8 +7,8 @@ export const SITE = {
   universityShort: "GSTU",
   tagline: "Advancing Computing, Shaping the Future",
   email: "cse@gstu.edu.bd",
-  phone: "+880-468-XXXXXX",
-  address: "CSE Building, GSTU Campus, Gopalganj-8100, Bangladesh",
+  phone: "+8801739515598",
+  address: "Academic Building, Fourth-Floor, GSTU Campus, Gopalganj-8100, Bangladesh",
   founded: 2011,
   socialLinks: {
     facebook: "https://facebook.com/gstu.cse",
@@ -143,6 +143,17 @@ export const NAV_LINKS = [
     children: [
       { label: "General Forms",    href: "/forms" },
       { label: "Evaluation Forms", href: "/forms#evaluation" },
+    ],
+  },
+  {
+    label: "Photos",
+    href: "/gallery",
+    children: [
+      { label: "Photo Gallery",    href: "/gallery" },
+      { label: "Events",           href: "/gallery?cat=event" },
+      { label: "Academic",         href: "/gallery?cat=academic" },
+      { label: "Cultural",         href: "/gallery?cat=cultural" },
+      { label: "Sports",           href: "/gallery?cat=sports" },
     ],
   },
 ] as const;

@@ -50,12 +50,14 @@ export default function ClubsSection() {
     <section className="section-py bg-slate-50" aria-labelledby="clubs-heading">
       <div className="container-custom">
 
-        {/* Header */}
-        <div className="text-center mb-12">
-          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color:'#166534' }}>Student Life</p>
-          <h2 id="clubs-heading" className="text-4xl font-extrabold text-slate-900">Department Clubs</h2>
-          <p className="mt-4 text-slate-500 max-w-xl mx-auto">Join our vibrant student clubs and develop skills beyond the classroom.</p>
-          <div className="mt-4 mx-auto w-14 h-1 rounded-full" style={{ background:'linear-gradient(90deg,#166534,#4ade80)' }} aria-hidden="true"/>
+        {/* Section header */}
+        <div className="flex items-center gap-4 mb-10">
+          <h2 id="clubs-heading"
+            className="text-2xl font-bold uppercase tracking-wide whitespace-nowrap"
+            style={{ color: '#1a7a3c', fontFamily: 'var(--font-oswald)' }}>
+            Department Clubs
+          </h2>
+          <div className="flex-1 h-[2px]" style={{ background: '#1a7a3c' }} aria-hidden="true" />
         </div>
 
         {/* Grid */}

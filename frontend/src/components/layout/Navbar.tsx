@@ -102,10 +102,9 @@ function DropdownPortal({
 }
 
 // ─── NavItem classes ──────────────────────────────────────────────────────────
-// No box on hover — just color + underline slide
 const ITEM_BASE = [
   'relative flex items-center gap-1',
-  'px-3 h-[3.25rem]',           // full nav height
+  'px-3 h-[3.25rem]',
   'text-[0.8rem] font-semibold whitespace-nowrap',
   'transition-colors duration-200',
   // Sliding underline
@@ -174,11 +173,11 @@ export default function Navbar() {
   }, []);
 
   // ─── Shared styles ────────────────────────────────────────────────────────
-  // Active: gold underline + bright white text
+  // Active: green underline + green text
   // Hover:  green text + green underline slides in
   function itemStyle(isActive: boolean, isOpen = false): React.CSSProperties {
-    if (isActive || isOpen) return { color: '#fde68a' };  // gold when active
-    return { color: 'rgba(220,252,231,0.80)' };           // soft green-white
+    if (isActive || isOpen) return { color: '#1a7a3c' };  // green when active
+    return { color: '#1a1a1a' };                           // black normally
   }
 
   return (
@@ -187,12 +186,12 @@ export default function Navbar() {
         ref={navRef}
         className="sticky top-0 z-[9999] transition-all duration-300"
         style={{
-          background: scrolled
-            ? 'rgba(11,45,30,0.97)'
-            : 'linear-gradient(180deg, #0b3d1f 0%, #0d4423 100%)',
+          background: '#ffffff',
           backdropFilter: scrolled ? 'blur(12px)' : undefined,
-          borderBottom: '1px solid rgba(74,222,128,0.12)',
-          boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.35)' : '0 1px 0 rgba(74,222,128,0.08)',
+          borderBottom: scrolled
+            ? '1px solid rgba(0,0,0,0.1)'
+            : '1px solid rgba(0,0,0,0.08)',
+          boxShadow: scrolled ? '0 2px 16px rgba(0,0,0,0.10)' : 'none',
         }}
         aria-label="Main navigation"
       >
@@ -201,14 +200,14 @@ export default function Navbar() {
 
             {/* Mobile logo */}
             <Link href="/" className="flex lg:hidden items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-white/10 border border-green-400/30
-                              flex items-center justify-center">
+              <div className="w-7 h-7 rounded-full border flex items-center justify-center"
+                style={{ background: '#1a7a3c', borderColor: '#1a7a3c' }}>
                 <svg className="w-4 h-4 text-white" viewBox="0 0 40 40" fill="none" aria-hidden="true">
                   <path d="M20 4L6 12v9c0 7.18 5.927 13.905 14 15.354C28.073 34.905 34 28.18 34 21v-9L20 4z"
                     fill="none" stroke="white" strokeWidth="3" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <span className="text-sm font-bold text-white">{SITE.shortName}</span>
+              <span className="text-sm font-bold text-slate-900">{SITE.shortName}</span>
             </Link>
 
             {/* Desktop nav */}
@@ -220,10 +219,9 @@ export default function Navbar() {
 
                 const commonCls = cn(
                   ITEM_BASE,
-                  // underline colour
                   isActive || isOpen
-                    ? 'after:bg-[#fbbf24] after:scale-x-100'   // gold, always visible
-                    : 'after:bg-[#4ade80]',                     // green, slides in on hover
+                    ? 'after:bg-[#1a7a3c] after:scale-x-100'   // green, always visible
+                    : 'after:bg-[#1a7a3c]',                     // green, slides in on hover
                 );
 
                 if (hasChildren(link)) {
@@ -236,8 +234,8 @@ export default function Navbar() {
                       aria-haspopup="true"
                       style={itemStyle(isActive, isOpen)}
                       className={cn(commonCls, 'group')}
-                      onMouseEnter={e => { if (!isActive && !isOpen) e.currentTarget.style.color = '#4ade80'; }}
-                      onMouseLeave={e => { if (!isActive && !isOpen) e.currentTarget.style.color = 'rgba(220,252,231,0.80)'; }}
+                      onMouseEnter={e => { if (!isActive && !isOpen) e.currentTarget.style.color = '#1a7a3c'; }}
+                      onMouseLeave={e => { if (!isActive && !isOpen) e.currentTarget.style.color = '#1a1a1a'; }}
                     >
                       {link.label}
                       <svg
@@ -257,8 +255,8 @@ export default function Navbar() {
                     aria-current={pathname === link.href ? 'page' : undefined}
                     style={itemStyle(isActive)}
                     className={commonCls}
-                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = '#4ade80'; }}
-                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(220,252,231,0.80)'; }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = '#1a7a3c'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = '#1a1a1a'; }}
                   >
                     {link.label}
                   </Link>
@@ -269,7 +267,7 @@ export default function Navbar() {
             {/* Mobile hamburger */}
             <button
               className="lg:hidden p-2 rounded-lg transition"
-              style={{ color: 'rgba(220,252,231,0.85)' }}
+              style={{ color: '#374151' }}
               onClick={() => setMobileOpen(v => !v)}
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileOpen}
@@ -287,12 +285,12 @@ export default function Navbar() {
         {mobileOpen && (
           <div id="mobile-menu"
             className="lg:hidden border-t max-h-[80vh] overflow-y-auto"
-            style={{ background: '#061a0d', borderColor: 'rgba(74,222,128,0.12)' }}
+            style={{ background: '#ffffff', borderColor: 'rgba(0,0,0,0.08)' }}
           >
             <div className="container-custom py-3 space-y-0.5">
-              <div className="px-3 py-2 mb-2 border-b" style={{ borderColor: 'rgba(74,222,128,0.12)' }}>
-                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#86efac' }}>{SITE.shortName}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: 'rgba(134,239,172,0.5)' }}>{SITE.university}</p>
+              <div className="px-3 py-2 mb-2 border-b" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#1a7a3c' }}>{SITE.shortName}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: '#64748b' }}>{SITE.university}</p>
               </div>
 
               {NAV_LINKS.map((link) => {
@@ -303,10 +301,10 @@ export default function Navbar() {
                       <button
                         onClick={() => setMobileExpand(expanded ? null : link.label)}
                         className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors"
-                        style={{ color: 'rgba(220,252,231,0.85)' }}
+                        style={{ color: '#1a1a1a' }}
                         aria-expanded={expanded}
-                        onMouseEnter={e => (e.currentTarget.style.color = '#4ade80')}
-                        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(220,252,231,0.85)')}
+                        onMouseEnter={e => (e.currentTarget.style.color = '#1a7a3c')}
+                        onMouseLeave={e => (e.currentTarget.style.color = '#1a1a1a')}
                       >
                         {link.label}
                         <svg className={cn('w-4 h-4 transition-transform', expanded && 'rotate-180')}
@@ -316,24 +314,22 @@ export default function Navbar() {
                       </button>
                       {expanded && (
                         <div className="ml-3 pl-3 border-l space-y-0.5 mb-1"
-                          style={{ borderColor: 'rgba(74,222,128,0.15)' }}>
+                          style={{ borderColor: 'rgba(26,122,60,0.2)' }}>
                           {link.children.map((child) => (
                             <Link
                               key={child.href}
                               href={child.href}
                               className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
                               style={{
-                                color: pathname === child.href
-                                  ? '#fbbf24'
-                                  : 'rgba(187,247,208,0.75)',
+                                color: pathname === child.href ? '#1a7a3c' : '#374151',
                               }}
-                              onMouseEnter={e => (e.currentTarget.style.color = '#4ade80')}
+                              onMouseEnter={e => (e.currentTarget.style.color = '#1a7a3c')}
                               onMouseLeave={e => {
-                                e.currentTarget.style.color = pathname === child.href ? '#fbbf24' : 'rgba(187,247,208,0.75)';
+                                e.currentTarget.style.color = pathname === child.href ? '#1a7a3c' : '#374151';
                               }}
                             >
                               <span className="w-1 h-1 rounded-full shrink-0"
-                                style={{ background: '#4ade80' }} aria-hidden="true"/>
+                                style={{ background: '#1a7a3c' }} aria-hidden="true"/>
                               {child.label}
                             </Link>
                           ))}
@@ -347,10 +343,10 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     className="block px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors"
-                    style={{ color: pathname === link.href ? '#fbbf24' : 'rgba(220,252,231,0.85)' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#4ade80')}
+                    style={{ color: pathname === link.href ? '#1a7a3c' : '#1a1a1a' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#1a7a3c')}
                     onMouseLeave={e => {
-                      e.currentTarget.style.color = pathname === link.href ? '#fbbf24' : 'rgba(220,252,231,0.85)';
+                      e.currentTarget.style.color = pathname === link.href ? '#1a7a3c' : '#1a1a1a';
                     }}
                   >
                     {link.label}
@@ -359,20 +355,20 @@ export default function Navbar() {
               })}
 
               <div className="flex gap-2 pt-3 pb-2 mt-3 border-t"
-                style={{ borderColor: 'rgba(74,222,128,0.12)' }}>
+                style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
                 <Link href="/student/login"
                   className="flex-1 text-center text-sm font-bold py-2.5 rounded-lg transition"
-                  style={{ color: '#86efac', border: '1px solid rgba(134,239,172,0.3)' }}>
+                  style={{ color: '#1a7a3c', border: '1px solid rgba(26,122,60,0.4)' }}>
                   Student Login
                 </Link>
                 <Link href="/admissions"
                   className="flex-1 text-center text-sm font-extrabold py-2.5 rounded-lg transition"
-                  style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)', color: '#1a1a1a' }}>
+                  style={{ background: '#1a7a3c', color: '#ffffff' }}>
                   Register
                 </Link>
                 <a href="https://moodle.gstu.edu.bd" target="_blank" rel="noopener noreferrer"
                   className="flex-1 text-center text-sm font-semibold py-2.5 rounded-lg transition"
-                  style={{ color: 'rgba(187,247,208,0.8)', border: '1px solid rgba(74,222,128,0.15)' }}>
+                  style={{ color: '#374151', border: '1px solid rgba(0,0,0,0.15)' }}>
                   Moodle
                 </a>
               </div>
