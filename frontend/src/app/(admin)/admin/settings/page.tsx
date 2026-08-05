@@ -147,7 +147,12 @@ export default function SettingsPage() {
   async function save() {
     setSaving(true); setError(''); setSaved(false);
     try {
-      await adminPatch<SiteSettings>('/settings', form);
+      // Strip Mongoose-injected fields that DTO forbids
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, key, __v, createdAt, updatedAt, ...payload } = form as SiteSettings & {
+        _id?: unknown; key?: unknown; __v?: unknown; createdAt?: unknown; updatedAt?: unknown;
+      };
+      await adminPatch<SiteSettings>('/settings', payload);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) { setError(e instanceof Error ? e.message : 'Save failed'); }
