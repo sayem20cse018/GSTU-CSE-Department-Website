@@ -222,10 +222,8 @@ export class Faculty {
 // ─── Schema & Indexes ─────────────────────────────────────────────────────────
 export const FacultySchema = SchemaFactory.createForClass(Faculty);
 
-// Full-text search
 FacultySchema.index({ name: 'text', shortBio: 'text', researchInterests: 'text' });
-// Query patterns
 FacultySchema.index({ designation: 1, isActive: 1 });
-FacultySchema.index({ slug: 1 });
+// slug unique+sparse index is already enforced by `unique: true, sparse: true` on the @Prop above
 FacultySchema.index({ sortOrder: 1 });
 FacultySchema.index({ employmentStatus: 1 });

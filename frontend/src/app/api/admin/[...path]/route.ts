@@ -13,7 +13,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+// BACKEND_URL is server-only — works correctly in serverless API routes at runtime.
+const BACKEND = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 async function handler(
   req: NextRequest,

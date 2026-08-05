@@ -197,8 +197,8 @@ export class Event {
 export const EventSchema = SchemaFactory.createForClass(Event);
 
 EventSchema.index({ title: 'text', description: 'text' });
-EventSchema.index({ slug: 1 }, { unique: true });
-EventSchema.index({ isPublished: 1, startDate: 1 });            // upcoming query
+// slug unique index is already enforced by `unique: true` on the @Prop above
+EventSchema.index({ isPublished: 1, startDate: 1 });
 EventSchema.index({ isFeatured: 1, isPublished: 1 });
 EventSchema.index({ status: 1, isPublished: 1 });
 EventSchema.index({ type: 1 });

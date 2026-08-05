@@ -147,8 +147,8 @@ export class Gallery {
 export const GallerySchema = SchemaFactory.createForClass(Gallery);
 
 GallerySchema.index({ title: 'text', description: 'text', tags: 'text' });
-GallerySchema.index({ slug: 1 }, { unique: true });
-GallerySchema.index({ isPublished: 1, albumDate: -1 });         // main listing
+// slug unique index is already enforced by `unique: true` on the @Prop above
+GallerySchema.index({ isPublished: 1, albumDate: -1 });
 GallerySchema.index({ isFeatured: 1, isPublished: 1 });
 GallerySchema.index({ category: 1, isPublished: 1 });
 GallerySchema.index({ relatedEvent: 1 });

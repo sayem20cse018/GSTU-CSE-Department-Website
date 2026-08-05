@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { REFRESH_COOKIE, setAuthCookies } from '@/lib/auth/cookies';
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+const BACKEND = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 export async function POST(req: NextRequest) {
   const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value;

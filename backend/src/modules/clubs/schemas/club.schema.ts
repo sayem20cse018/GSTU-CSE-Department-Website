@@ -61,6 +61,6 @@ export class Club {
 }
 
 export const ClubSchema = SchemaFactory.createForClass(Club);
-ClubSchema.index({ slug: 1 }, { unique: true });
+// slug unique index is already enforced by `unique: true` on the @Prop above
 ClubSchema.index({ isActive: 1, sortOrder: 1 });
 ClubSchema.index({ name: 'text', description: 'text' });

@@ -7,7 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setAuthCookies } from '@/lib/auth/cookies';
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+// BACKEND_URL is a server-only env var — safe for server-side API routes.
+// NEXT_PUBLIC_API_URL is a build-time client var and must NOT be used here.
+const BACKEND = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 export async function POST(req: NextRequest) {
   try {

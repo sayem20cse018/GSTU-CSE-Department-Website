@@ -64,7 +64,7 @@ export class Course {
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
-CourseSchema.index({ code: 1 }, { unique: true });
+// code unique index is already enforced by `unique: true` on the @Prop above
 CourseSchema.index({ degree: 1, semester: 1 });
 CourseSchema.index({ type: 1 });
 CourseSchema.index({ title: 'text', description: 'text' });

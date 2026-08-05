@@ -108,5 +108,5 @@ export class Admin {
 // ─── Schema & Indexes ─────────────────────────────────────────────────────────
 export const AdminSchema = SchemaFactory.createForClass(Admin);
 
-AdminSchema.index({ email: 1 });
+// email unique index is already enforced by `unique: true` on the @Prop above
 AdminSchema.index({ role: 1, isActive: 1 });

@@ -124,8 +124,8 @@ export class News {
 export const NewsSchema = SchemaFactory.createForClass(News);
 
 NewsSchema.index({ title: 'text', excerpt: 'text', content: 'text' });
-NewsSchema.index({ slug: 1 }, { unique: true });
-NewsSchema.index({ isPublished: 1, publishedAt: -1 });          // main listing
-NewsSchema.index({ isFeatured: 1, isPublished: 1 });            // homepage hero
+// slug unique index is already enforced by `unique: true` on the @Prop above
+NewsSchema.index({ isPublished: 1, publishedAt: -1 });
+NewsSchema.index({ isFeatured: 1, isPublished: 1 });
 NewsSchema.index({ category: 1, isPublished: 1 });
 NewsSchema.index({ tags: 1 });

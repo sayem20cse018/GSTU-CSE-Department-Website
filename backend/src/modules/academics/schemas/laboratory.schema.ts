@@ -83,6 +83,6 @@ export class Laboratory {
 }
 
 export const LaboratorySchema = SchemaFactory.createForClass(Laboratory);
-LaboratorySchema.index({ slug: 1 }, { unique: true });
+// slug unique index is already enforced by `unique: true` on the @Prop above
 LaboratorySchema.index({ isActive: 1, sortOrder: 1 });
 LaboratorySchema.index({ name: 'text', description: 'text' });
