@@ -50,7 +50,7 @@ export default function Footer() {
 
       {/* ── MAIN FOOTER — dark green with building photo overlay ─────── */}
       <div className="relative overflow-hidden text-white"
-        style={{ background: 'linear-gradient(160deg, #063a17 0%, #0a5425 40%, #0d6b31 70%, #0a4a1f 100%)' }}>
+        style={{ background: 'linear-gradient(160deg, #1a4a2e 0%, #1e6b3a 40%, #206b3c 70%, #1a5530 100%)' }}>
 
         {/* Campus building aerial photo — low-opacity overlay */}
         {/* Using a CSS background pattern to mimic aerial photo texture */}
@@ -271,7 +271,7 @@ export default function Footer() {
       </div>
 
       {/* ── COPYRIGHT BAR ─────────────────────────────────────────────── */}
-      <div style={{ background: '#041a0a' }}>
+      <div style={{ background: '#0f2d19' }}>
         <div className="container-custom py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
           style={{ color: 'rgba(255,255,255,0.4)' }}>
           <p>© {new Date().getFullYear()} {SITE.name}, {SITE.university}. All rights reserved.</p>

@@ -27,7 +27,7 @@ export default function SiteHeader() {
   return (
     <>
       {/* ══════════════════════ DESKTOP (lg+) ══════════════════════════ */}
-      <header className="hidden lg:block overflow-hidden" style={{ height: '90px' }}>
+      <header className="hidden lg:block overflow-hidden" style={{ height: '100px' }}>
         <div className="flex h-full">
 
           {/* ── WHITE LEFT — logo + identity ──────────────────────────── */}
@@ -83,16 +83,16 @@ export default function SiteHeader() {
 
             {/* Text */}
             <div>
-              <p className="text-slate-500 font-semibold leading-none mb-1"
-                style={{ fontFamily: 'var(--font-montserrat)', fontSize: '0.62rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              <p className="text-slate-500 font-semibold leading-none mb-1.5"
+                style={{ fontFamily: 'var(--font-montserrat)', fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase' }}>
                 Department of
               </p>
               <p className="text-slate-900 leading-tight group-hover:text-green-800 transition"
-                style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 800, fontSize: '1.3rem', letterSpacing: '-0.01em' }}>
+                style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 800, fontSize: '1.55rem', letterSpacing: '-0.01em', lineHeight: 1.1 }}>
                 {deptCore}
               </p>
-              <p className="mt-0.5 text-slate-500"
-                style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              <p className="mt-1.5 text-slate-600"
+                style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 600, fontSize: '0.68rem', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
                 {s.universityName}
               </p>
             </div>
@@ -109,48 +109,36 @@ export default function SiteHeader() {
             </div>
           </Link>
 
-          {/* ── DARK GREEN RIGHT — tech illustration + utility ─────────── */}
-          <div className="relative flex-1 flex items-center justify-between px-8 overflow-hidden"
-            style={{ background: 'linear-gradient(120deg, #0d4a1f 0%, #1a7a3c 50%, #0f5c28 100%)' }}>
+          {/* ── DARK GREEN RIGHT — building silhouette bg ─────────────── */}
+          <div className="relative flex-1 flex items-center justify-end px-8 overflow-hidden"
+            style={{ background: 'linear-gradient(120deg, #0d4a1f 0%, #1a7a3c 60%, #155f30 100%)' }}>
 
-            {/* Subtle tech pattern overlay */}
-            <svg className="absolute inset-0 w-full h-full opacity-[0.08] pointer-events-none" aria-hidden="true">
+            {/* Subtle dot pattern */}
+            <svg className="absolute inset-0 w-full h-full opacity-[0.07] pointer-events-none" aria-hidden="true">
               <defs>
-                <pattern id="sh-dots" width="30" height="30" patternUnits="userSpaceOnUse">
-                  <circle cx="2" cy="2" r="1" fill="white"/>
+                <pattern id="sh-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1.2" fill="white"/>
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#sh-dots)"/>
             </svg>
 
-            {/* Ghost "CSE" watermark */}
-            <div className="absolute right-56 top-1/2 -translate-y-1/2 select-none pointer-events-none"
-              style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 900, fontSize: '5rem',
-                       color: 'rgba(255,255,255,0.07)', letterSpacing: '-0.03em' }}
-              aria-hidden="true">
-              CSE
-            </div>
-
-            {/* Tech icon strip */}
-            <div className="relative flex items-center gap-5 opacity-40 pointer-events-none select-none" aria-hidden="true">
-              {/* Code brackets */}
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-              </svg>
-              {/* CPU */}
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M9 3H7a2 2 0 00-2 2v2M9 3h6M9 3V1m6 2h2a2 2 0 012 2v2m0 0V9m0-2h2M21 9v6m0 0v2a2 2 0 01-2 2h-2m0 0H9m6 0v2m-6-2H7a2 2 0 01-2-2v-2m0 0V9m0 6H3m18-6H3"/>
-              </svg>
-              {/* Database */}
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3v2c0 1.657-3.582 3-8 3S4 10.657 4 9V7zm0 5c0 1.657 3.582 3 8 3s8-1.343 8-3m-16 3c0 1.657 3.582 3 8 3s8-1.343 8-3"/>
-              </svg>
-              {/* Cloud */}
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+            {/* Building silhouette outline — right side decoration */}
+            <div className="absolute left-8 top-0 bottom-0 flex items-center opacity-10 pointer-events-none select-none" aria-hidden="true">
+              <svg viewBox="0 0 320 90" className="w-72 h-20" fill="none">
+                {/* Main building blocks */}
+                <rect x="10" y="30" width="60" height="55" fill="white"/>
+                <rect x="80" y="15" width="80" height="70" fill="white"/>
+                <rect x="170" y="25" width="50" height="60" fill="white"/>
+                <rect x="230" y="35" width="40" height="50" fill="white"/>
+                <rect x="280" y="45" width="35" height="40" fill="white"/>
+                {/* Windows */}
+                {[20,35,50].map(x => [40,55,68].map(y => (
+                  <rect key={`${x}-${y}`} x={x} y={y} width="8" height="7" fill="#0d4a1f"/>
+                )))}
+                {[90,108,126,144].map(x => [25,38,51,64,77].map(y => (
+                  <rect key={`${x}-${y}`} x={x} y={y} width="10" height="8" fill="#0d4a1f"/>
+                )))}
               </svg>
             </div>
 
