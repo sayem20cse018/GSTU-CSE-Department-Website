@@ -16,7 +16,7 @@ export default function AcademicsAdminPage() {
     <div className="p-6 max-w-4xl mx-auto">
       <AdminPageTitle title="Academics Management" />
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-white">Academics</h2>
+        <h2 className="text-xl font-bold text-slate-900">Academics</h2>
         <p className="text-slate-400 text-sm mt-1">Manage all academic content for the public website.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

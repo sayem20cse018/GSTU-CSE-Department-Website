@@ -12,10 +12,9 @@ import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fe
 const DESIG     = ['Professor','Associate Professor','Assistant Professor','Lecturer','Senior Lecturer','Adjunct Faculty','Administrative Officer','Section Officer','Assistant Officer','System Analyst'];
 const EMP_STATUS = ['full_time','part_time','on_leave','retired'];
 const STAFF_TYPES = [
-  { key: 'faculty',   label: 'Faculty Members',  icon: '👨‍🏫' },
-  { key: 'chairman',  label: 'Chairman List',     icon: '🎓' },
-  { key: 'staff',     label: 'Officers & Staff',  icon: '🏢' },
-  { key: 'officer',   label: 'Officers',          icon: '📋' },
+  { key: 'faculty',  label: 'Faculty Members',  icon: '👨‍🏫' },
+  { key: 'staff',    label: 'Staff',            icon: '🏢' },
+  { key: 'officer',  label: 'Officers',         icon: '📋' },
 ] as const;
 
 type StaffType = typeof STAFF_TYPES[number]['key'];
@@ -167,7 +166,7 @@ export default function PeoplePage() {
                 </div>
 
                 {/* Title — only for faculty/chairman */}
-                {(activeType === 'faculty' || activeType === 'chairman') && (
+                {(activeType === 'faculty') && (
                   <div>
                     <label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
                     <select value={form.title} onChange={e=>F('title',e.target.value)} className={iCls}>
@@ -211,7 +210,7 @@ export default function PeoplePage() {
               </div>
 
               {/* Research interests — faculty/chairman only */}
-              {(activeType === 'faculty' || activeType === 'chairman') && (
+              {(activeType === 'faculty') && (
                 <div>
                   <label className="block text-xs font-medium text-slate-400 mb-1">Research Interests (comma-separated)</label>
                   <input value={form.researchInterests} onChange={e=>F('researchInterests',e.target.value)}
@@ -220,7 +219,7 @@ export default function PeoplePage() {
               )}
 
               {/* Online links — faculty/chairman only */}
-              {(activeType === 'faculty' || activeType === 'chairman') && (
+              {(activeType === 'faculty') && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="block text-xs font-medium text-slate-400 mb-1">Google Scholar URL</label>
                     <input type="url" value={form.googleScholarUrl} onChange={e=>F('googleScholarUrl',e.target.value)} placeholder="https://scholar.google.com/…" className={iCls}/></div>
