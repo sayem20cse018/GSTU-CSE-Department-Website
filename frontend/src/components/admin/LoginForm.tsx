@@ -62,7 +62,7 @@ export default function LoginForm() {
 
       {/* Server error banner */}
       {serverError && (
-        <div role="alert" className="flex items-start gap-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-3 text-sm">
+        <div role="alert" className="flex items-start gap-3 bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3 text-sm">
           <svg className="w-4 h-4 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
@@ -72,7 +72,7 @@ export default function LoginForm() {
 
       {/* Email */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">
+        <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-1.5">
           Email address
         </label>
         <input
@@ -84,11 +84,11 @@ export default function LoginForm() {
           aria-invalid={!!errors.email}
           aria-describedby={errors.email ? 'email-error' : undefined}
           className={[
-            'w-full rounded-lg px-4 py-2.5 text-sm bg-white/5 border text-white placeholder-slate-500',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500 transition',
+            'w-full rounded-lg px-4 py-2.5 text-sm bg-white border text-slate-900 placeholder-slate-400',
+            'focus:outline-none focus:ring-2 focus:ring-green-500 transition',
             errors.email
-              ? 'border-red-500/60 focus:ring-red-500'
-              : 'border-white/10 hover:border-white/20',
+              ? 'border-red-400 focus:ring-red-500'
+              : 'border-slate-300 hover:border-slate-400',
           ].join(' ')}
         />
         {errors.email && (
@@ -100,7 +100,7 @@ export default function LoginForm() {
 
       {/* Password */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">
+        <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-1.5">
           Password
         </label>
         <div className="relative">
@@ -113,18 +113,18 @@ export default function LoginForm() {
             aria-invalid={!!errors.password}
             aria-describedby={errors.password ? 'password-error' : undefined}
             className={[
-              'w-full rounded-lg px-4 py-2.5 pr-10 text-sm bg-white/5 border text-white placeholder-slate-500',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500 transition',
+              'w-full rounded-lg px-4 py-2.5 pr-10 text-sm bg-white border text-slate-900 placeholder-slate-400',
+              'focus:outline-none focus:ring-2 focus:ring-green-500 transition',
               errors.password
-                ? 'border-red-500/60 focus:ring-red-500'
-                : 'border-white/10 hover:border-white/20',
+                ? 'border-red-400 focus:ring-red-500'
+                : 'border-slate-300 hover:border-slate-400',
             ].join(' ')}
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
           >
             {showPassword ? (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -151,8 +151,8 @@ export default function LoginForm() {
         disabled={isSubmitting}
         className={[
           'w-full py-2.5 px-4 rounded-lg text-sm font-semibold transition-all',
-          'bg-blue-600 text-white hover:bg-blue-500 focus:outline-none focus:ring-2',
-          'focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent',
+          'bg-green-700 text-white hover:bg-green-600 focus:outline-none focus:ring-2',
+          'focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-white',
           isSubmitting ? 'opacity-60 cursor-not-allowed' : '',
         ].join(' ')}
       >
