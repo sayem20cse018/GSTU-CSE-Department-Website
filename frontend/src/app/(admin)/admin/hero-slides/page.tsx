@@ -159,7 +159,7 @@ export default function AdminHeroSlidesPage() {
       {/* Slide cards */}
       <div className="space-y-3 mt-4">
         {loading ? (
-          [1, 2, 3].map(i => <div key={i} className="h-24 bg-white/5 rounded-xl animate-pulse"/>)
+          [1, 2, 3].map(i => <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse"/>)
         ) : list.length === 0 ? (
           <EmptyState title="No slides yet" description="Add the first hero slide." action={<Button onClick={openNew}>Add Slide</Button>}/>
         ) : list.map((s, i) => (

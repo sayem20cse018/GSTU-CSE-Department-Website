@@ -140,7 +140,7 @@ export default function AdminCoursesPage() {
       {/* Table */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-6 space-y-3">{[1,2,3,4].map(i=><div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+          <div className="p-6 space-y-3">{[1,2,3,4].map(i=><div key={i} className="h-12 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         ) : courses.length === 0 ? (
           <EmptyState title={`No ${degree} courses yet`} description="Add the first course."/>
         ) : Object.keys(grouped).map(Number).sort((a,b)=>a-b).map(sem => (

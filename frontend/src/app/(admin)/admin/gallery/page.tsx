@@ -92,7 +92,7 @@ export default function AdminGalleryPage() {
       </div>)}
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+        {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         :list.length===0?<EmptyState title="No albums yet" description="Create the first photo album."/>
         :(<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
           {list.map(a=>(

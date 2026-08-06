@@ -127,7 +127,7 @@ export default function AdminNewsPage() {
         </div>)}
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        {loading ? <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+        {loading ? <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         : list.length===0 ? <EmptyState title="No articles yet" description="Write the first news article."/>
         : (
           <table className="w-full text-sm">

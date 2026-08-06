@@ -94,7 +94,7 @@ export default function NoticesPage() {
         </div>)}
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        {loading ? <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+        {loading ? <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         : list.length===0 ? <EmptyState title="No notices yet" description="Post the first notice."/>
         : (
           <table className="w-full text-sm">
@@ -112,7 +112,7 @@ export default function NoticesPage() {
                     <div className="flex items-center gap-2">
                       {n.isUrgent && <span className="text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded shrink-0">URGENT</span>}
                       {n.isPinned && !n.isUrgent && <span className="text-[10px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded shrink-0">PIN</span>}
-                      <span className="text-white font-medium line-clamp-1">{n.title}</span>
+                      <span className="text-slate-900 font-medium line-clamp-1">{n.title}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-center hidden sm:table-cell"><Badge variant="neutral">{n.category.replace('_',' ')}</Badge></td>

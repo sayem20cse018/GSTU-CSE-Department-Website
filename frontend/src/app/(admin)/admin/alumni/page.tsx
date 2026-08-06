@@ -190,7 +190,7 @@ export default function AlumniAdminPage() {
       {/* Table */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-6 space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+          <div className="p-6 space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         ) : list.length === 0 ? (
           <EmptyState title="No alumni records yet" description="Add the first alumni." action={<Button onClick={openNew}>Add Alumni</Button>}/>
         ) : (

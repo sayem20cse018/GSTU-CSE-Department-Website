@@ -104,7 +104,7 @@ export default function AdminEventsPage() {
       </div>)}
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+        {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         :list.length===0?<EmptyState title="No events yet" description="Schedule the first event."/>
         :(<table className="w-full text-sm">
           <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">

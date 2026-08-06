@@ -143,7 +143,7 @@ export default function AdminProgramsPage() {
       {/* List */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-16 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+          <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         ) : programs.length === 0 ? (
           <EmptyState title="No programs yet" description="Add your first academic program." action={<Button onClick={openNew}>Add Program</Button>}/>
         ) : (

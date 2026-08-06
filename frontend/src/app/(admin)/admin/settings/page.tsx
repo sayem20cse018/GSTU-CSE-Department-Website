@@ -234,7 +234,7 @@ export default function SettingsPage() {
 
       {/* Tab content */}
       {loading ? (
-        <div className="space-y-4">{[1,2,3,4].map(i => <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
+        <div className="space-y-4">{[1,2,3,4].map(i => <div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
       ) : (
         <div className="rounded-2xl p-6 space-y-5 border border-slate-200" style={{ background: 'rgba(255,255,255,0.02)' }}>
 
