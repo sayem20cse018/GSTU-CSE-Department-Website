@@ -212,6 +212,16 @@ export class Faculty {
   })
   employmentStatus: string;
 
+  // Differentiates faculty, staff, officers, and chairmen
+  @Prop({
+    enum: {
+      values: ['faculty', 'staff', 'officer', 'chairman'],
+      message: 'Invalid staff type',
+    },
+    default: 'faculty',
+  })
+  staffType: string;
+
   @Prop({ default: 0 })
   sortOrder: number;          // lower number = shown first
 

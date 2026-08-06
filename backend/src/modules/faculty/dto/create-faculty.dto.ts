@@ -42,4 +42,17 @@ export class CreateFacultyDto {
 
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isActive?: boolean;
   @ApiPropertyOptional() @IsOptional() @IsNumber() sortOrder?: number;
+
+  @ApiPropertyOptional({ enum: ['faculty', 'staff', 'officer', 'chairman'] })
+  @IsOptional()
+  @IsEnum(['faculty', 'staff', 'officer', 'chairman'])
+  staffType?: string;
+
+  @ApiPropertyOptional() @IsOptional() @IsString() shortBio?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() officeRoom?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() googleScholarUrl?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() linkedinUrl?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() orcidId?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() websiteUrl?: string;
+  @ApiPropertyOptional() @IsOptional() @IsEnum(['full_time','part_time','on_leave','retired']) employmentStatus?: string;
 }

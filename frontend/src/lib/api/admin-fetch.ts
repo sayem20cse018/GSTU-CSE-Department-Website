@@ -1,27 +1,28 @@
 /**
- * Thin fetch wrapper for admin CRUD operations.
- *
- * All requests go through the Next.js /api/admin/[...path] proxy route,
- * which reads the httpOnly access cookie server-side and forwards it as
- * a Bearer token to the NestJS backend.
- *
- * This avoids cross-origin cookie issues in production (Vercel ↔ Render).
+ * Admin CRUD wrapper — all requests go through /api/admin/[...path] proxy.
+ * The proxy reads the httpOnly cookie server-side and forwards Bearer token.
  */
 
-// Always use the internal Next.js proxy — never call the backend directly
-// from the browser in production.
 const BASE = '/api/admin';
+
+/** Safe JSON parse — returns null if body is not JSON (e.g. HTML error page) */
+async function safeJson(r: Response): Promise<Record<string, unknown> | null> {
+  try {
+    return await r.json() as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
 
 export async function adminGet<T>(path: string): Promise<T> {
   const r = await fetch(`${BASE}${path}`, {
     credentials: 'include',
     cache: 'no-store',
   });
+  const json = await safeJson(r);
   if (!r.ok) {
-    const json = await r.json().catch(() => ({})) as { message?: string };
-    throw new Error(json.message ?? `Request failed: ${r.status}`);
+    throw new Error((json?.message as string) ?? `Request failed: ${r.status}`);
   }
-  const json = await r.json() as { data: T; success?: boolean };
   return (json as { data: T }).data;
 }
 
@@ -32,9 +33,11 @@ export async function adminPost<T>(path: string, body: unknown): Promise<T> {
     credentials: 'include',
     body: JSON.stringify(body),
   });
-  const json = await r.json() as { data: T; message?: string };
-  if (!r.ok) throw new Error(json.message ?? `Request failed: ${r.status}`);
-  return json.data;
+  const json = await safeJson(r);
+  if (!r.ok) {
+    throw new Error((json?.message as string) ?? `Request failed: ${r.status}`);
+  }
+  return (json as { data: T }).data;
 }
 
 export async function adminPatch<T>(path: string, body: unknown): Promise<T> {
@@ -44,9 +47,11 @@ export async function adminPatch<T>(path: string, body: unknown): Promise<T> {
     credentials: 'include',
     body: JSON.stringify(body),
   });
-  const json = await r.json() as { data: T; message?: string };
-  if (!r.ok) throw new Error(json.message ?? `Request failed: ${r.status}`);
-  return json.data;
+  const json = await safeJson(r);
+  if (!r.ok) {
+    throw new Error((json?.message as string) ?? `Request failed: ${r.status}`);
+  }
+  return (json as { data: T }).data;
 }
 
 export async function adminDelete(path: string): Promise<void> {
@@ -55,7 +60,7 @@ export async function adminDelete(path: string): Promise<void> {
     credentials: 'include',
   });
   if (!r.ok) {
-    const json = await r.json().catch(() => ({})) as { message?: string };
-    throw new Error(json.message ?? `Delete failed: ${r.status}`);
+    const json = await safeJson(r);
+    throw new Error((json?.message as string) ?? `Delete failed: ${r.status}`);
   }
 }

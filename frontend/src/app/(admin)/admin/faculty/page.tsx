@@ -9,16 +9,38 @@ import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { cn }      from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 
-const DESIG = ['Professor','Associate Professor','Assistant Professor','Lecturer','Senior Lecturer','Adjunct Faculty'];
-const EMPTY = { name:'', title:'Dr.', designation:'Lecturer', email:'', phone:'', photo:'', shortBio:'', officeRoom:'', researchInterests:'', googleScholarUrl:'', linkedinUrl:'', orcidId:'', isActive:true, sortOrder:0 };
+const DESIG     = ['Professor','Associate Professor','Assistant Professor','Lecturer','Senior Lecturer','Adjunct Faculty','Administrative Officer','Section Officer','Assistant Officer','System Analyst'];
+const EMP_STATUS = ['full_time','part_time','on_leave','retired'];
+const STAFF_TYPES = [
+  { key: 'faculty',   label: 'Faculty Members',  icon: '👨‍🏫' },
+  { key: 'chairman',  label: 'Chairman List',     icon: '🎓' },
+  { key: 'staff',     label: 'Officers & Staff',  icon: '🏢' },
+  { key: 'officer',   label: 'Officers',          icon: '📋' },
+] as const;
 
-interface Faculty { _id:string; name:string; title?:string; designation:string; email:string; phone?:string; photo?:string; shortBio?:string; officeRoom?:string; researchInterests:string[]; googleScholarUrl?:string; linkedinUrl?:string; orcidId?:string; isActive:boolean; sortOrder:number }
+type StaffType = typeof STAFF_TYPES[number]['key'];
 
-export default function FacultyPage() {
-  const [list, setList]       = useState<Faculty[]>([]);
+const EMPTY = {
+  name:'', title:'Dr.', designation:'Lecturer', email:'', phone:'', photo:'',
+  shortBio:'', officeRoom:'', researchInterests:'', googleScholarUrl:'', linkedinUrl:'',
+  orcidId:'', websiteUrl:'', isActive:true, sortOrder:0, staffType:'faculty' as StaffType,
+  employmentStatus:'full_time',
+};
+
+interface FacultyMember {
+  _id:string; name:string; title?:string; designation:string; email:string;
+  phone?:string; photo?:string; shortBio?:string; officeRoom?:string;
+  researchInterests:string[]; googleScholarUrl?:string; linkedinUrl?:string;
+  orcidId?:string; isActive:boolean; sortOrder:number;
+  staffType:string; employmentStatus:string;
+}
+
+export default function PeoplePage() {
+  const [list, setList]       = useState<FacultyMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeType, setActiveType] = useState<StaffType>('faculty');
   const [form, setForm]       = useState(EMPTY);
-  const [editing, setEditing] = useState<Faculty|null>(null);
+  const [editing, setEditing] = useState<FacultyMember|null>(null);
   const [open, setOpen]       = useState(false);
   const [saving, setSaving]   = useState(false);
   const [delId, setDelId]     = useState<string|null>(null);
@@ -26,18 +48,32 @@ export default function FacultyPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { setList(await adminGet<Faculty[]>('/faculty')); }
+    try { setList(await adminGet<FacultyMember[]>('/faculty')); }
     catch { setList([]); } finally { setLoading(false); }
   }, []);
-
   useEffect(() => { load(); }, [load]);
 
+  const filtered = list.filter(m => (m.staffType || 'faculty') === activeType);
   const F = (k: keyof typeof EMPTY, v: unknown) => setForm(p => ({ ...p, [k]: v }));
 
-  function openNew() { setEditing(null); setForm(EMPTY); setErr(''); setOpen(true); }
-  function openEdit(f: Faculty) {
-    setEditing(f);
-    setForm({ name:f.name, title:f.title??'Dr.', designation:f.designation, email:f.email, phone:f.phone??'', photo:f.photo??'', shortBio:f.shortBio??'', officeRoom:f.officeRoom??'', researchInterests:(f.researchInterests??[]).join(', '), googleScholarUrl:f.googleScholarUrl??'', linkedinUrl:f.linkedinUrl??'', orcidId:f.orcidId??'', isActive:f.isActive, sortOrder:f.sortOrder });
+  function openNew() {
+    setEditing(null);
+    setForm({ ...EMPTY, staffType: activeType });
+    setErr(''); setOpen(true);
+  }
+  function openEdit(m: FacultyMember) {
+    setEditing(m);
+    setForm({
+      name: m.name, title: m.title ?? 'Dr.', designation: m.designation,
+      email: m.email, phone: m.phone ?? '', photo: m.photo ?? '',
+      shortBio: m.shortBio ?? '', officeRoom: m.officeRoom ?? '',
+      researchInterests: (m.researchInterests ?? []).join(', '),
+      googleScholarUrl: m.googleScholarUrl ?? '', linkedinUrl: m.linkedinUrl ?? '',
+      orcidId: m.orcidId ?? '', websiteUrl: '',
+      isActive: m.isActive, sortOrder: m.sortOrder,
+      staffType: (m.staffType || 'faculty') as StaffType,
+      employmentStatus: m.employmentStatus || 'full_time',
+    });
     setErr(''); setOpen(true);
   }
 
@@ -54,101 +90,211 @@ export default function FacultyPage() {
   }
 
   async function del(id: string) {
-    if (!confirm('Delete this faculty member?')) return;
+    if (!confirm('Delete this record?')) return;
     setDelId(id);
     try { await adminDelete(`/faculty/${id}`); load(); }
     catch (e) { alert(e instanceof Error ? e.message : 'Delete failed'); }
     finally { setDelId(null); }
   }
 
+  const iCls = 'w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500';
+  const current = STAFF_TYPES.find(t => t.key === activeType)!;
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <AdminPageTitle title="Manage Faculty" />
-      <PageHeader title="Faculty Members" description={`${list.length} member${list.length!==1?'s':''}`}
-        action={<Button onClick={openNew} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Faculty</Button>}/>
+      <AdminPageTitle title="People" />
+      <PageHeader title="People Management" description="Manage faculty, staff, officers and chairman list"/>
+
+      {/* Type Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {STAFF_TYPES.map(t => {
+          const count = list.filter(m => (m.staffType || 'faculty') === t.key).length;
+          return (
+            <button key={t.key} onClick={() => setActiveType(t.key)}
+              className={cn('flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border',
+                activeType === t.key
+                  ? 'bg-green-700 text-white border-green-700 shadow-sm'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-green-400 hover:text-green-700'
+              )}>
+              <span>{t.icon}</span>
+              <span>{t.label}</span>
+              <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-bold',
+                activeType === t.key ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500')}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Add button */}
+      <div className="flex justify-end mb-4">
+        <Button onClick={openNew} icon={
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>}>
+          Add {current.label.replace(/s$/, '')}
+        </Button>
+      </div>
 
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
-            <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Faculty':'Add Faculty Member'}</h3>
+          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+            <h3 className="text-lg font-bold text-white mb-1">
+              {editing ? 'Edit' : 'Add'} {current.icon} {current.label.replace(/s$/, '')}
+            </h3>
+            <p className="text-xs text-slate-500 mb-5">Fields marked * are required</p>
             {err && <p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {([['Full Name','name','text','Dr. Mohammad Rahman'],['Email','email','email','name@gstu.edu.bd'],['Phone','phone','text','+880-XXX'],['Office Room','officeRoom','text','Room 302, CSE Building'],['Google Scholar URL','googleScholarUrl','url','https://scholar.google.com/…'],['LinkedIn URL','linkedinUrl','url','https://linkedin.com/in/…'],['ORCID ID','orcidId','text','0000-0000-0000-0000']] as [string,keyof typeof EMPTY,string,string][]).map(([label,key,type,ph])=>(
-                <div key={key}><label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
-                  <input type={type} value={form[key] as string} onChange={e=>F(key,e.target.value)} placeholder={ph}
-                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
 
-              {/* Photo upload */}
-              <div className="sm:col-span-2">
-                <ImageUpload
-                  label="Photo"
-                  value={form.photo}
-                  onChange={v => F('photo', v)}
-                  previewRounded
-                />
-              </div>              <div><label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
-                <select value={form.title} onChange={e=>F('title',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  {['Dr.','Prof.','Mr.','Ms.','Engr.'].map(t=><option key={t} value={t}>{t}</option>)}
-                </select></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Designation</label>
-                <select value={form.designation} onChange={e=>F('designation',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  {DESIG.map(d=><option key={d} value={d}>{d}</option>)}
-                </select></div>
-              <div className="sm:col-span-2"><label className="block text-xs font-medium text-slate-400 mb-1">Short Bio</label>
-                <textarea rows={2} value={form.shortBio} onChange={e=>F('shortBio',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
-              <div className="sm:col-span-2"><label className="block text-xs font-medium text-slate-400 mb-1">Research Interests (comma separated)</label>
-                <input type="text" value={form.researchInterests} onChange={e=>F('researchInterests',e.target.value)} placeholder="Machine Learning, Computer Vision, NLP"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={form.isActive} onChange={e=>F('isActive',e.target.checked)} className="accent-blue-500"/><span className="text-sm text-slate-300">Active</span></label>
-                <div><label className="text-xs text-slate-400 mr-2">Sort Order</label><input type="number" value={form.sortOrder} onChange={e=>F('sortOrder',+e.target.value)} className="w-16 bg-white/5 border border-slate-200 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+            <div className="space-y-4">
+              {/* Photo */}
+              <ImageUpload label="Photo" value={form.photo} onChange={v => F('photo', v)} previewRounded dark />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Common fields */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
+                  <input value={form.name} onChange={e=>F('name',e.target.value)} placeholder="Dr. Mohammad Rahman" className={iCls}/>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Email *</label>
+                  <input type="email" value={form.email} onChange={e=>F('email',e.target.value)} placeholder="name@gstu.edu.bd" className={iCls}/>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Phone</label>
+                  <input value={form.phone} onChange={e=>F('phone',e.target.value)} placeholder="+880-XXX" className={iCls}/>
+                </div>
+
+                {/* Title — only for faculty/chairman */}
+                {(activeType === 'faculty' || activeType === 'chairman') && (
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
+                    <select value={form.title} onChange={e=>F('title',e.target.value)} className={iCls}>
+                      {['Dr.','Prof.','Mr.','Ms.','Engr.'].map(t=><option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Designation</label>
+                  <select value={form.designation} onChange={e=>F('designation',e.target.value)} className={iCls}>
+                    {DESIG.map(d=><option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Employment Status</label>
+                  <select value={form.employmentStatus} onChange={e=>F('employmentStatus',e.target.value)} className={iCls}>
+                    {EMP_STATUS.map(s=><option key={s} value={s}>{s.replace('_',' ')}</option>)}
+                  </select>
+                </div>
+
+                {/* Staff type picker (hidden but set from activeType) */}
+                <input type="hidden" value={form.staffType}/>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Office Room</label>
+                  <input value={form.officeRoom} onChange={e=>F('officeRoom',e.target.value)} placeholder="Room 302, CSE Building" className={iCls}/>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Sort Order</label>
+                  <input type="number" value={form.sortOrder} onChange={e=>F('sortOrder',+e.target.value)} className={iCls}/>
+                </div>
               </div>
+
+              {/* Bio */}
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Short Bio</label>
+                <textarea rows={2} value={form.shortBio} onChange={e=>F('shortBio',e.target.value)}
+                  className={`${iCls} resize-none`}/>
+              </div>
+
+              {/* Research interests — faculty/chairman only */}
+              {(activeType === 'faculty' || activeType === 'chairman') && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">Research Interests (comma-separated)</label>
+                  <input value={form.researchInterests} onChange={e=>F('researchInterests',e.target.value)}
+                    placeholder="Machine Learning, Computer Vision, NLP" className={iCls}/>
+                </div>
+              )}
+
+              {/* Online links — faculty/chairman only */}
+              {(activeType === 'faculty' || activeType === 'chairman') && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Google Scholar URL</label>
+                    <input type="url" value={form.googleScholarUrl} onChange={e=>F('googleScholarUrl',e.target.value)} placeholder="https://scholar.google.com/…" className={iCls}/></div>
+                  <div><label className="block text-xs font-medium text-slate-400 mb-1">LinkedIn URL</label>
+                    <input type="url" value={form.linkedinUrl} onChange={e=>F('linkedinUrl',e.target.value)} placeholder="https://linkedin.com/in/…" className={iCls}/></div>
+                  <div><label className="block text-xs font-medium text-slate-400 mb-1">ORCID ID</label>
+                    <input value={form.orcidId} onChange={e=>F('orcidId',e.target.value)} placeholder="0000-0000-0000-0000" className={iCls}/></div>
+                </div>
+              )}
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={form.isActive} onChange={e=>F('isActive',e.target.checked)} className="accent-green-500"/>
+                <span className="text-sm text-slate-300">Active</span>
+              </label>
             </div>
+
             <div className="flex gap-3 mt-6">
-              <Button onClick={save} loading={saving} className="flex-1">{editing?'Update':'Add Member'}</Button>
+              <Button onClick={save} loading={saving} className="flex-1">{editing?'Update':'Add'}</Button>
               <Button variant="secondary" onClick={()=>setOpen(false)} className="flex-1">Cancel</Button>
             </div>
           </div>
-        </div>)}
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-6 space-y-3">{[1,2,3,4,5].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
-        ) : list.length===0 ? (
-          <EmptyState title="No faculty members yet" description="Add the first faculty member to get started." action={<Button onClick={openNew}>Add Faculty</Button>}/>
+          <div className="p-6 space-y-3">{[1,2,3,4].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
+        ) : filtered.length === 0 ? (
+          <EmptyState title={`No ${current.label} yet`} description={`Add the first ${current.label.replace(/s$/, '').toLowerCase()}.`}
+            action={<Button onClick={openNew}>Add {current.label.replace(/s$/, '')}</Button>}/>
         ) : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
-              <th className="text-left px-5 py-3 text-slate-600">Member</th>
-              <th className="text-left px-4 py-3 hidden md:table-cell">Designation</th>
-              <th className="text-left px-4 py-3 hidden lg:table-cell">Research Interests</th>
-              <th className="text-center px-4 py-3">Status</th>
-              <th className="text-right px-5 py-3">Actions</th>
-            </tr></thead>
+            <thead>
+              <tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                <th className="text-left px-5 py-3">Person</th>
+                <th className="text-left px-4 py-3 hidden md:table-cell">Designation</th>
+                <th className="text-center px-4 py-3 hidden sm:table-cell">Status</th>
+                <th className="text-right px-5 py-3">Actions</th>
+              </tr>
+            </thead>
             <tbody>
-              {list.map((f,i)=>(
-                <tr key={f._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
+              {filtered.map((m, i) => (
+                <tr key={m._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'bg-slate-50/30')}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      {f.photo ? <img src={f.photo} alt={f.name} className="w-9 h-9 rounded-full object-cover shrink-0"/> :
-                        <div className="w-9 h-9 rounded-full bg-blue-600/20 border border-blue-600/30 flex items-center justify-center shrink-0 text-xs font-bold text-blue-400">{f.name.charAt(0)}</div>}
-                      <div><p className="font-medium text-white">{f.title} {f.name}</p><p className="text-xs text-slate-500">{f.email}</p></div>
+                      {m.photo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={m.photo} alt={m.name} className="w-9 h-9 rounded-full object-cover shrink-0"/>
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-green-100 border border-green-200 flex items-center justify-center shrink-0 text-xs font-bold text-green-700">
+                          {m.name.charAt(0)}
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-semibold text-slate-900">{m.title} {m.name}</p>
+                        <p className="text-xs text-slate-500">{m.email}</p>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 hidden md:table-cell text-slate-300 text-sm">{f.designation}</td>
-                  <td className="px-4 py-4 hidden lg:table-cell">
-                    <div className="flex flex-wrap gap-1">{(f.researchInterests??[]).slice(0,2).map(r=><span key={r} className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">{r}</span>)}</div>
+                  <td className="px-4 py-3 hidden md:table-cell text-slate-600 text-xs">{m.designation}</td>
+                  <td className="px-4 py-3 text-center hidden sm:table-cell">
+                    <Badge variant={m.isActive ? 'success' : 'neutral'}>
+                      {m.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
                   </td>
-                  <td className="px-4 py-4 text-center"><Badge variant={f.isActive?'success':'neutral'}>{f.isActive?'Active':'Inactive'}</Badge></td>
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
-                      <Button size="sm" variant="secondary" onClick={()=>openEdit(f)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId===f._id} onClick={()=>del(f._id)}>Delete</Button>
+                      <Button size="sm" variant="secondary" onClick={()=>openEdit(m)}>Edit</Button>
+                      <Button size="sm" variant="danger" loading={delId===m._id} onClick={()=>del(m._id)}>Del</Button>
                     </div>
                   </td>
-                </tr>))}
+                </tr>
+              ))}
             </tbody>
           </table>
         )}

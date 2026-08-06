@@ -10,6 +10,7 @@ interface Faculty {
   email: string; phone?: string; photo?: string; shortBio?: string;
   researchInterests: string[]; officeRoom?: string; slug?: string;
   googleScholarUrl?: string; linkedinUrl?: string; isActive: boolean;
+  staffType?: string;
 }
 
 const DESIGNATION_ORDER = [
@@ -40,7 +41,10 @@ async function fetchFaculty(): Promise<Faculty[]> {
     const r = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
     if (!r.ok) return MOCK;
     const d = await r.json() as { data: Faculty[] };
-    return d.data?.length ? d.data : MOCK;
+    // Show only faculty and chairman type, filter out staff/officer
+    const all = d.data ?? [];
+    const filtered = all.filter(f => !f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman');
+    return filtered.length ? filtered : MOCK;
   } catch { return MOCK; }
 }
 
