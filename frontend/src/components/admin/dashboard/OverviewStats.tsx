@@ -9,14 +9,14 @@ export default function OverviewStats() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    // Use server-side public proxy so it works in production
     Promise.allSettled([
-      fetch(`${api}/faculty`),
-      fetch(`${api}/news?limit=1`),
-      fetch(`${api}/events?limit=1`),
-      fetch(`${api}/notices?limit=1`),
-      fetch(`${api}/achievements?limit=1`),
-      fetch(`${api}/clubs`),
+      fetch('/api/public/faculty'),
+      fetch('/api/public/news?limit=1'),
+      fetch('/api/public/events?limit=1'),
+      fetch('/api/public/notices?limit=1'),
+      fetch('/api/public/achievements?limit=1'),
+      fetch('/api/public/clubs'),
     ]).then(async results => {
       const get = async (r: PromiseSettledResult<Response>, path: string) => {
         if (r.status !== 'fulfilled' || !r.value.ok) return 0;
@@ -50,7 +50,7 @@ export default function OverviewStats() {
   if (loading) return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
       {[1,2,3,4,5,6].map(i => (
-        <div key={i} className="h-24 rounded-2xl animate-pulse" style={{ background:'rgba(255,255,255,0.05)' }}/>
+        <div key={i} className="h-24 rounded-2xl animate-pulse bg-slate-100"/>
       ))}
     </div>
   );
@@ -60,11 +60,11 @@ export default function OverviewStats() {
       {stats.map(s => (
         <Link key={s.label} href={s.href}
           className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${s.color} p-4 hover:scale-[1.03] transition-all`}
-          style={{ boxShadow:'0 4px 20px rgba(0,0,0,0.25)' }}>
-          <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-white/10 blur-xl" aria-hidden="true"/>
+          style={{ boxShadow:'0 4px 16px rgba(0,0,0,0.12)' }}>
+          <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-white/20 blur-xl" aria-hidden="true"/>
           <p className="text-2xl mb-2" aria-hidden="true">{s.icon}</p>
           <p className="text-2xl font-black text-white leading-none">{s.value}</p>
-          <p className="text-xs font-medium mt-1.5 text-white/75">{s.label}</p>
+          <p className="text-xs font-medium mt-1.5 text-white/80">{s.label}</p>
         </Link>
       ))}
     </div>

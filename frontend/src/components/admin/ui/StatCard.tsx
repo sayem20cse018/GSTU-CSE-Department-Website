@@ -26,7 +26,7 @@ export default function StatCard({
   const c = colorMap[color];
 
   return (
-    <div className="bg-slate-900 border border-white/10 rounded-xl p-5 flex items-start gap-4">
+    <div className="bg-white border border-slate-200 rounded-xl p-5 flex items-start gap-4 hover:shadow-sm transition">
       {/* Icon */}
       <div className={cn('p-2.5 rounded-lg border', c.bg, c.border)}>
         <span className={cn('block w-5 h-5', c.icon)}>{icon}</span>
@@ -34,8 +34,8 @@ export default function StatCard({
 
       {/* Data */}
       <div className="flex-1 min-w-0">
-        <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{label}</p>
-        <p className="text-2xl font-bold text-white mt-0.5">{value}</p>
+        <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">{label}</p>
+        <p className="text-2xl font-bold text-slate-900 mt-0.5">{value}</p>
         {trend && (
           <p className={cn('text-xs mt-1 font-medium', trend.positive ? 'text-emerald-400' : 'text-rose-400')}>
             {trend.positive ? '↑' : '↓'} {trend.value}

@@ -9,7 +9,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#060f1e' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#f0fdf4' }}>
 
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
@@ -17,7 +17,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
       {/* Main area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Topbar onMenuClick={() => setSidebarOpen(true)}/>
-        <main className="flex-1 overflow-y-auto" style={{ background: '#08152a' }}>
+        <main className="flex-1 overflow-y-auto" style={{ background: '#f0fdf4' }}>
           {children}
         </main>
       </div>

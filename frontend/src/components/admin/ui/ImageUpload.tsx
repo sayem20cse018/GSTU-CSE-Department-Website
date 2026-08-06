@@ -102,7 +102,7 @@ export default function ImageUpload({
       <div className="flex items-start gap-3">
         {/* Preview */}
         {value && (
-          <div className={`w-16 h-16 shrink-0 overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center ${previewRounded ? 'rounded-full' : 'rounded-lg'}`}>
+          <div className={`w-16 h-16 shrink-0 overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center ${previewRounded ? 'rounded-full' : 'rounded-lg'}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={value}
@@ -120,7 +120,7 @@ export default function ImageUpload({
             value={isDataUrl ? '' : (value ?? '')}
             onChange={e => { setError(''); onChange(e.target.value); }}
             placeholder="https://… or upload below"
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 mb-2"
           />
 
           {/* Upload button */}
