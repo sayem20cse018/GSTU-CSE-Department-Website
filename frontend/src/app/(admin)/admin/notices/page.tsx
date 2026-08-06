@@ -61,22 +61,22 @@ export default function NoticesPage() {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Notice':'Post Notice'}</h3>
             {err && <p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
             <div className="space-y-4">
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Title *</label>
                 <input type="text" value={form.title} onChange={e=>F('title',e.target.value)} placeholder="Notice title"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Description (optional)</label>
-                <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Category</label>
-                  <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     {CATS.map(c=><option key={c} value={c}>{c.replace('_',' ')}</option>)}
                   </select></div>
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Posted By</label>
-                  <input type="text" value={form.postedByName} onChange={e=>F('postedByName',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                  <input type="text" value={form.postedByName} onChange={e=>F('postedByName',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
               </div>
               <div className="flex flex-wrap gap-4">
                 {[{k:'isPublished',l:'Published'},{k:'isPinned',l:'Pinned'},{k:'isUrgent',l:'Urgent'}].map(({k,l})=>(
@@ -93,12 +93,12 @@ export default function NoticesPage() {
           </div>
         </div>)}
 
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         : list.length===0 ? <EmptyState title="No notices yet" description="Post the first notice."/>
         : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
               <th className="text-left px-5 py-3">Title</th>
               <th className="text-center px-4 py-3 hidden sm:table-cell">Category</th>
               <th className="text-center px-4 py-3">Status</th>
@@ -107,7 +107,7 @@ export default function NoticesPage() {
             </tr></thead>
             <tbody>
               {list.map((n,i)=>(
-                <tr key={n._id} className={cn('border-b border-white/5 last:border-0 hover:bg-white/[0.03]',i%2?'bg-white/[0.01]':'')}>
+                <tr key={n._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       {n.isUrgent && <span className="text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded shrink-0">URGENT</span>}

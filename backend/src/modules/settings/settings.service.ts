@@ -22,11 +22,11 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() @MaxLength(300)
   tagline?: string;
 
-  // Logo fields accept either a URL or a base64 data URL — no @IsUrl() here
-  @IsOptional() @IsString() @MaxLength(2_000_000)
+  // Logo fields — base64 can be large, use generous limit
+  @IsOptional() @IsString() @MaxLength(5_000_000)
   deptLogo?: string;
 
-  @IsOptional() @IsString() @MaxLength(2_000_000)
+  @IsOptional() @IsString() @MaxLength(5_000_000)
   universityLogo?: string;
 
   @IsOptional() @IsString() @MaxLength(200)
@@ -76,7 +76,7 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() @MaxLength(200)
   chairmanTitle?: string;
 
-  @IsOptional() @IsString() @MaxLength(2_000_000)
+  @IsOptional() @IsString() @MaxLength(5_000_000)
   chairmanPhoto?: string;
 
   @IsOptional() @IsString() @MaxLength(200)
@@ -87,6 +87,19 @@ export class UpdateSettingsDto {
 
   @IsOptional() @IsString() @MaxLength(10000)
   chairmanMessage?: string;
+
+  // About section images (shown in the photo grid on homepage About section)
+  @IsOptional() @IsString() @MaxLength(5_000_000)
+  aboutImage1?: string;
+
+  @IsOptional() @IsString() @MaxLength(5_000_000)
+  aboutImage2?: string;
+
+  @IsOptional() @IsString() @MaxLength(5_000_000)
+  aboutImage3?: string;
+
+  @IsOptional() @IsString() @MaxLength(5_000_000)
+  aboutImage4?: string;
 }
 
 const SINGLETON_KEY = 'site_settings';

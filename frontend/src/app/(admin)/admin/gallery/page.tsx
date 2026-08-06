@@ -54,24 +54,24 @@ export default function AdminGalleryPage() {
         action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>New Album</Button>}/>
 
       {open&&(<div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6">
+        <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-md p-6">
           <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit':'New'} Album</h3>
           {err&&<p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
           <div className="space-y-4">
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Album Title *</label>
               <input value={form.title} onChange={e=>{F('title',e.target.value);if(!editing)F('slug',toSlug(e.target.value));}}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Slug *</label>
-              <input value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+              <input value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Category</label>
-                <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                   {CATS.map(c=><option key={c} value={c}>{c.replace('_',' ')}</option>)}</select></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Album Date *</label>
-                <input type="date" value={form.albumDate} onChange={e=>F('albumDate',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                <input type="date" value={form.albumDate} onChange={e=>F('albumDate',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
             </div>
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
-              <textarea rows={2} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+              <textarea rows={2} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
             <ImageUpload
               label="Cover Image"
               value={form.coverImage}
@@ -91,12 +91,12 @@ export default function AdminGalleryPage() {
         </div>
       </div>)}
 
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         :list.length===0?<EmptyState title="No albums yet" description="Create the first photo album."/>
         :(<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
           {list.map(a=>(
-            <div key={a._id} className="bg-white/5 border border-white/10 rounded-xl overflow-hidden group">
+            <div key={a._id} className="bg-white/5 border border-slate-200 rounded-xl overflow-hidden group">
               <div className="h-32 bg-slate-800 relative">
                 {a.coverImage?<img src={a.coverImage} alt={a.title} className="w-full h-full object-cover"/>
                   :<div className="w-full h-full flex items-center justify-center text-4xl" aria-hidden="true">🖼️</div>}

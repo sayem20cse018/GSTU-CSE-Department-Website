@@ -2,18 +2,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { AdminPageTitle }   from '@/context/AdminPageContext';
 import { adminGet, adminPatch } from '@/lib/api/admin-fetch';
+import ImageUpload from '@/components/admin/ui/ImageUpload';
 import type { SiteSettings } from '@/lib/api/settings';
 import { SETTINGS_FALLBACK } from '@/lib/api/settings';
 
-type Tab = 'identity' | 'contact' | 'social' | 'logos' | 'about' | 'chairman';
+type Tab = 'identity' | 'contact' | 'social' | 'logos' | 'about' | 'images' | 'chairman';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'identity', label: 'Identity',  icon: '🏛️' },
-  { id: 'contact',  label: 'Contact',   icon: '📞' },
-  { id: 'social',   label: 'Social',    icon: '🔗' },
-  { id: 'logos',    label: 'Logos',     icon: '🖼️' },
-  { id: 'about',    label: 'About',     icon: '📝' },
-  { id: 'chairman', label: 'Chairman',  icon: '👤' },
+  { id: 'identity', label: 'Identity',     icon: '🏛️' },
+  { id: 'contact',  label: 'Contact',      icon: '📞' },
+  { id: 'social',   label: 'Social',       icon: '🔗' },
+  { id: 'logos',    label: 'Logos',        icon: '🖼️' },
+  { id: 'about',    label: 'About Text',   icon: '📝' },
+  { id: 'images',   label: 'About Photos', icon: '📸' },
+  { id: 'chairman', label: 'Chairman',     icon: '👤' },
 ];
 
 /** Convert a File to a data URL (base64) so it can be stored as a string */
@@ -114,7 +116,7 @@ function LogoUpload({
         value={value.startsWith('data:') ? '' : value}
         onChange={e => onChange(e.target.value)}
         placeholder="https://example.com/logo.png"
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white
+        className="w-full bg-white/5 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-white
                    placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
       />
       {value && (
@@ -161,7 +163,7 @@ export default function SettingsPage() {
     finally { setSaving(false); }
   }
 
-  const iCls = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition";
+  const iCls = "w-full bg-white/5 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition";
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -214,13 +216,13 @@ export default function SettingsPage() {
             {form.universityName || 'University'} · {form.universityShortName}
           </p>
         </div>
-        <span className="ml-auto text-[10px] text-slate-500 bg-white/5 px-2.5 py-1 rounded-full border border-white/10">
+        <span className="ml-auto text-[10px] text-slate-500 bg-white/5 px-2.5 py-1 rounded-full border border-slate-200">
           Header Preview
         </span>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl mb-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.03)' }}>
+      <div className="flex gap-1 p-1 rounded-xl mb-6 border border-slate-200" style={{ background: 'rgba(255,255,255,0.03)' }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 flex-1 justify-center py-2 px-2 rounded-lg text-sm font-semibold transition-all ${tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}>
@@ -234,12 +236,12 @@ export default function SettingsPage() {
       {loading ? (
         <div className="space-y-4">{[1,2,3,4].map(i => <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
       ) : (
-        <div className="rounded-2xl p-6 space-y-5 border border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-2xl p-6 space-y-5 border border-slate-200" style={{ background: 'rgba(255,255,255,0.02)' }}>
 
           {/* IDENTITY */}
           {tab === 'identity' && (
             <>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">Department Identity</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-slate-200">Department Identity</p>
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">Department Full Name</label>
                 <input value={form.deptName} onChange={e => F('deptName', e.target.value)} placeholder="Department of Computer Science & Engineering" className={iCls}/>
@@ -279,7 +281,7 @@ export default function SettingsPage() {
           {/* CONTACT */}
           {tab === 'contact' && (
             <>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">Contact Information</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-slate-200">Contact Information</p>
               {[
                 { label:'Official Email', k:'email',   type:'email', ph:'cse@gstu.edu.bd' },
                 { label:'Phone Number',  k:'phone',   type:'tel',   ph:'+880-468-XXXXXX' },
@@ -298,7 +300,7 @@ export default function SettingsPage() {
           {/* SOCIAL */}
           {tab === 'social' && (
             <>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">Social Media</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-slate-200">Social Media</p>
               {[
                 { label:'Facebook',  k:'facebookUrl', icon:'📘', ph:'https://facebook.com/gstu.cse' },
                 { label:'Twitter/X', k:'twitterUrl',  icon:'🐦', ph:'https://twitter.com/gstu_cse' },
@@ -319,12 +321,12 @@ export default function SettingsPage() {
           {/* LOGOS */}
           {tab === 'logos' && (
             <>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-slate-200">
                 Logos &amp; Images — Upload directly or paste a URL
               </p>
               <LogoUpload label="Department Logo" fieldKey="deptLogo"
                 value={form.deptLogo} onChange={v => F('deptLogo', v)}/>
-              <div className="border-t border-white/10 pt-5">
+              <div className="border-t border-slate-200 pt-5">
                 <LogoUpload label="University Logo" fieldKey="universityLogo"
                   value={form.universityLogo} onChange={v => F('universityLogo', v)}/>
               </div>
@@ -339,7 +341,7 @@ export default function SettingsPage() {
           {/* ABOUT */}
           {tab === 'about' && (
             <>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-slate-200">
                 About Section — shown on homepage About tab
               </p>
               <div>
@@ -366,10 +368,40 @@ export default function SettingsPage() {
             </>
           )}
 
+          {/* ABOUT PHOTOS */}
+          {tab === 'images' && (
+            <>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-slate-200">
+                About Section Photos — 4 images shown in the homepage photo grid
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {([
+                  ['Photo 1 (Large — top-left)', 'aboutImage1'],
+                  ['Photo 2 (Small — top-right)', 'aboutImage2'],
+                  ['Photo 3 (Small — bottom-right)', 'aboutImage3'],
+                  ['Photo 4 (Wide — bottom)', 'aboutImage4'],
+                ] as [string, keyof SiteSettings][]).map(([label, key]) => (
+                  <div key={key} className="bg-white/5 border border-slate-200 rounded-xl p-4">
+                    <ImageUpload
+                      label={label}
+                      value={(form[key] as string) ?? ''}
+                      onChange={v => F(key, v)}
+                      dark={true}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 text-xs text-blue-300">
+                💡 Upload photos of your department building, labs, classrooms, and student activities.
+                Recommended size: 800×600px or larger.
+              </div>
+            </>
+          )}
+
           {/* CHAIRMAN */}
           {tab === 'chairman' && (
             <>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-white/10">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-2 border-b border-slate-200">
                 Chairman&apos;s Message — shown on homepage
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

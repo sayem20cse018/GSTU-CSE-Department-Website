@@ -90,7 +90,20 @@ export class Settings {
   chairmanEmail2: string;
 
   @Prop({ default: '' })
-  chairmanMessage: string;      // Full message text (paragraphs separated by \n\n)
+  chairmanMessage: string;
+
+  // ── About Section Images ───────────────────────────────────────────────────
+  @Prop({ default: '' })
+  aboutImage1: string;          // photo 1 (large, col-span-2)
+
+  @Prop({ default: '' })
+  aboutImage2: string;          // photo 2
+
+  @Prop({ default: '' })
+  aboutImage3: string;          // photo 3
+
+  @Prop({ default: '' })
+  aboutImage4: string;          // photo 4 (wide, col-span-2)
 }
 
 export const SettingsSchema = SchemaFactory.createForClass(Settings);

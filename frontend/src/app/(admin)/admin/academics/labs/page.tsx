@@ -72,25 +72,25 @@ export default function AdminLabsPage() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Lab':'New Lab'}</h3>
             <div className="space-y-4">
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Lab Name</label>
                 <input type="text" value={form.name}
                   onChange={e=>{F('name',e.target.value); if(!editing) F('slug',toSlug(e.target.value));}}
                   placeholder="Artificial Intelligence Lab"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Slug (URL)</label>
                 <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} placeholder="ai-lab"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Location</label>
                   <input type="text" value={form.location} onChange={e=>F('location',e.target.value)} placeholder="Room 302, CSE Building"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Lab Type</label>
                   <select value={form.labType} onChange={e=>F('labType',e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="teaching">Teaching</option><option value="research">Research</option><option value="both">Both</option>
                   </select></div>
               </div>
@@ -99,19 +99,19 @@ export default function AdminLabsPage() {
                 {[{label:'Capacity',key:'capacity'},{label:'Workstations',key:'workstations'}].map(f=>(
                   <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
                     <input type="number" value={form[f.key as keyof typeof form] as number} onChange={e=>F(f.key as keyof typeof form,+e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
+                      className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
               </div>
 
               <div><label className="block text-xs font-medium text-slate-400 mb-1">In-Charge</label>
                 <input type="text" value={form.inCharge} onChange={e=>F('inCharge',e.target.value)} placeholder="Dr. Mohammad Rahman"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
                 <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
               {[{label:'Facilities (comma separated)',key:'facilities',placeholder:'AC, Projector, UPS, High-speed Internet'},{label:'Software Installed (comma separated)',key:'softwareInstalled',placeholder:'Python, TensorFlow, PyTorch'}].map(f=>(
                 <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
                   <input type="text" value={form[f.key as keyof typeof form] as string} onChange={e=>F(f.key as keyof typeof form,e.target.value)} placeholder={f.placeholder}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>))}
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>))}
 
               <div className="flex gap-4">
                 {[{k:'isActive',l:'Active'},{k:'isFeatured',l:'Featured'}].map(f=>(
@@ -128,14 +128,14 @@ export default function AdminLabsPage() {
           </div>
         </div>)}
 
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-16 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         ) : labs.length === 0 ? (
           <EmptyState title="No labs yet" description="Add your first laboratory."/>
         ) : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
               <th className="text-left px-5 py-3">Lab</th>
               <th className="text-center px-4 py-3">Type</th>
               <th className="text-center px-4 py-3">Capacity</th>
@@ -144,7 +144,7 @@ export default function AdminLabsPage() {
             </tr></thead>
             <tbody>
               {labs.map((l,i)=>(
-                <tr key={l._id} className={`border-b border-white/5 last:border-0 hover:bg-white/[0.03] ${i%2?'bg-white/[0.02]':''}`}>
+                <tr key={l._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white/[0.02]':''}`}>
                   <td className="px-5 py-4"><p className="font-medium text-white">{l.name}</p><p className="text-xs text-slate-500">{l.location}</p></td>
                   <td className="px-4 py-4 text-center"><Badge variant="neutral">{l.labType}</Badge></td>
                   <td className="px-4 py-4 text-center text-slate-300">{l.capacity??0}</td>

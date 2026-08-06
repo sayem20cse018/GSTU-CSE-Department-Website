@@ -3,32 +3,12 @@ import Image from 'next/image';
 import { SITE } from '@/constants';
 import { fetchSettings } from '@/lib/api/settings';
 
-// Department images — replace URLs with real photos when available
-const DEPT_IMAGES = [
-  {
-    src: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80',
-    alt: 'CSE Department Building',
-    span: 'col-span-2 row-span-2',
-    label: 'CSE Building',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&q=80',
-    alt: 'Students in computer lab',
-    span: 'col-span-1 row-span-1',
-    label: 'AI Lab',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80',
-    alt: 'Faculty lecture',
-    span: 'col-span-1 row-span-1',
-    label: 'Classroom',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80',
-    alt: 'Team collaboration',
-    span: 'col-span-2 row-span-1',
-    label: 'Research Team',
-  },
+// Fallback images used when admin hasn't uploaded custom photos yet
+const FALLBACK_IMAGES = [
+  { src: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80', alt: 'CSE Department Building', span: 'col-span-2 row-span-2', label: 'CSE Building' },
+  { src: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&q=80', alt: 'Students in computer lab',  span: 'col-span-1 row-span-1', label: 'AI Lab' },
+  { src: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80', alt: 'Faculty lecture',            span: 'col-span-1 row-span-1', label: 'Classroom' },
+  { src: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80', alt: 'Team collaboration',         span: 'col-span-2 row-span-1', label: 'Research Team' },
 ];
 
 const TABS = [
@@ -82,6 +62,14 @@ export default async function AboutSection() {
       t.id === 'vision'  ? (s?.aboutVision  || DEFAULT_VISION)  :
       t.id === 'mission' ? (s?.aboutMission || DEFAULT_MISSION) : '',
   }));
+
+  // Build image list: use admin-uploaded URLs, fall back to Unsplash placeholders
+  const DEPT_IMAGES = [
+    { src: s?.aboutImage1 || FALLBACK_IMAGES[0].src, alt: 'CSE Department',        span: 'col-span-2 row-span-2', label: 'CSE Department' },
+    { src: s?.aboutImage2 || FALLBACK_IMAGES[1].src, alt: 'Computer Lab',          span: 'col-span-1 row-span-1', label: 'Lab' },
+    { src: s?.aboutImage3 || FALLBACK_IMAGES[2].src, alt: 'Faculty & Students',    span: 'col-span-1 row-span-1', label: 'Classroom' },
+    { src: s?.aboutImage4 || FALLBACK_IMAGES[3].src, alt: 'Research & Innovation', span: 'col-span-2 row-span-1', label: 'Research' },
+  ];
   return (
     <section className="section-py bg-white" aria-labelledby="about-heading">
       <div className="container-custom">

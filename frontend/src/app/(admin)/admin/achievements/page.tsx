@@ -48,27 +48,27 @@ export default function AchievementsAdminPage() {
         action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Achievement</Button>}/>
 
       {open&&(<div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
+        <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
           <h3 className="text-lg font-bold text-white mb-4">{editing?'Edit':'Add'} Achievement</h3>
           {err&&<p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-3">{err}</p>}
           <div className="space-y-3">
             {[{l:'Title *',k:'title',ph:'1st Place — ACM ICPC 2024'},{l:'Achiever Name',k:'achieverName',ph:'Student/Faculty name'},{l:'Awarded By',k:'awardedBy',ph:'Organisation name'}].map(f=>(
               <div key={f.k}><label className="block text-xs font-medium text-slate-400 mb-1">{f.l}</label>
                 <input type="text" value={form[f.k as keyof typeof EMPTY] as string} onChange={e=>F(f.k as keyof typeof EMPTY,e.target.value)} placeholder={f.ph}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
             <ImageUpload
               label="Achievement Image"
               value={form.image}
               onChange={v => F('image', v)}
             />            <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Type</label>
-                <select value={form.type} onChange={e=>F('type',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select value={form.type} onChange={e=>F('type',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                   {TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Date *</label>
-                <input type="date" value={form.achievedAt} onChange={e=>F('achievedAt',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                <input type="date" value={form.achievedAt} onChange={e=>F('achievedAt',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
             </div>
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Description *</label>
-              <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+              <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
             <div className="flex gap-4">
               {[{k:'isPublished',l:'Published'},{k:'isFeatured',l:'Featured'}].map(({k,l})=>(
                 <label key={k} className="flex items-center gap-2 cursor-pointer">
@@ -83,15 +83,15 @@ export default function AchievementsAdminPage() {
         </div>
       </div>)}
 
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         :list.length===0?<EmptyState title="No achievements yet" description="Add the first achievement."/>
-        :(<table className="w-full text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+        :(<table className="w-full text-sm"><thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
           <th className="text-left px-5 py-3">Title</th><th className="text-center px-4 py-3">Type</th>
           <th className="text-center px-4 py-3">Date</th><th className="text-center px-4 py-3">Status</th>
           <th className="text-right px-5 py-3">Actions</th></tr></thead>
           <tbody>{list.map((a,i)=>(
-            <tr key={a._id} className={cn('border-b border-white/5 last:border-0 hover:bg-white/[0.03]',i%2?'bg-white/[0.01]':'')}>
+            <tr key={a._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
               <td className="px-5 py-3 font-medium text-white line-clamp-1">{a.title}</td>
               <td className="px-4 py-3 text-center"><Badge variant="neutral">{a.type}</Badge></td>
               <td className="px-4 py-3 text-center text-xs text-slate-400">{formatDate(a.achievedAt)}</td>

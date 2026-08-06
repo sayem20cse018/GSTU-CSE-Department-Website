@@ -70,14 +70,14 @@ export default function FacultyPage() {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
             <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Faculty':'Add Faculty Member'}</h3>
             {err && <p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {([['Full Name','name','text','Dr. Mohammad Rahman'],['Email','email','email','name@gstu.edu.bd'],['Phone','phone','text','+880-XXX'],['Office Room','officeRoom','text','Room 302, CSE Building'],['Google Scholar URL','googleScholarUrl','url','https://scholar.google.com/…'],['LinkedIn URL','linkedinUrl','url','https://linkedin.com/in/…'],['ORCID ID','orcidId','text','0000-0000-0000-0000']] as [string,keyof typeof EMPTY,string,string][]).map(([label,key,type,ph])=>(
                 <div key={key}><label className="block text-xs font-medium text-slate-400 mb-1">{label}</label>
                   <input type={type} value={form[key] as string} onChange={e=>F(key,e.target.value)} placeholder={ph}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
 
               {/* Photo upload */}
               <div className="sm:col-span-2">
@@ -88,21 +88,21 @@ export default function FacultyPage() {
                   previewRounded
                 />
               </div>              <div><label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
-                <select value={form.title} onChange={e=>F('title',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select value={form.title} onChange={e=>F('title',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                   {['Dr.','Prof.','Mr.','Ms.','Engr.'].map(t=><option key={t} value={t}>{t}</option>)}
                 </select></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Designation</label>
-                <select value={form.designation} onChange={e=>F('designation',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select value={form.designation} onChange={e=>F('designation',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                   {DESIG.map(d=><option key={d} value={d}>{d}</option>)}
                 </select></div>
               <div className="sm:col-span-2"><label className="block text-xs font-medium text-slate-400 mb-1">Short Bio</label>
-                <textarea rows={2} value={form.shortBio} onChange={e=>F('shortBio',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                <textarea rows={2} value={form.shortBio} onChange={e=>F('shortBio',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
               <div className="sm:col-span-2"><label className="block text-xs font-medium text-slate-400 mb-1">Research Interests (comma separated)</label>
                 <input type="text" value={form.researchInterests} onChange={e=>F('researchInterests',e.target.value)} placeholder="Machine Learning, Computer Vision, NLP"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={form.isActive} onChange={e=>F('isActive',e.target.checked)} className="accent-blue-500"/><span className="text-sm text-slate-300">Active</span></label>
-                <div><label className="text-xs text-slate-400 mr-2">Sort Order</label><input type="number" value={form.sortOrder} onChange={e=>F('sortOrder',+e.target.value)} className="w-16 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                <div><label className="text-xs text-slate-400 mr-2">Sort Order</label><input type="number" value={form.sortOrder} onChange={e=>F('sortOrder',+e.target.value)} className="w-16 bg-white/5 border border-slate-200 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
@@ -113,15 +113,15 @@ export default function FacultyPage() {
         </div>)}
 
       {/* Table */}
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-6 space-y-3">{[1,2,3,4,5].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         ) : list.length===0 ? (
           <EmptyState title="No faculty members yet" description="Add the first faculty member to get started." action={<Button onClick={openNew}>Add Faculty</Button>}/>
         ) : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
-              <th className="text-left px-5 py-3">Member</th>
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+              <th className="text-left px-5 py-3 text-slate-600">Member</th>
               <th className="text-left px-4 py-3 hidden md:table-cell">Designation</th>
               <th className="text-left px-4 py-3 hidden lg:table-cell">Research Interests</th>
               <th className="text-center px-4 py-3">Status</th>
@@ -129,7 +129,7 @@ export default function FacultyPage() {
             </tr></thead>
             <tbody>
               {list.map((f,i)=>(
-                <tr key={f._id} className={cn('border-b border-white/5 last:border-0 hover:bg-white/[0.03]',i%2?'bg-white/[0.01]':'')}>
+                <tr key={f._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {f.photo ? <img src={f.photo} alt={f.name} className="w-9 h-9 rounded-full object-cover shrink-0"/> :

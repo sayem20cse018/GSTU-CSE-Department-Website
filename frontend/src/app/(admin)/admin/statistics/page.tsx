@@ -40,22 +40,22 @@ export default function StatisticsAdminPage() {
       {err&&<p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
 
       {loading ? (
-        <div className="space-y-3">{[1,2,3,4,5,6].map(i=><div key={i} className="h-16 bg-slate-900 border border-white/10 rounded-xl animate-pulse"/>)}</div>
+        <div className="space-y-3">{[1,2,3,4,5,6].map(i=><div key={i} className="h-16 bg-slate-900 border border-slate-200 rounded-xl animate-pulse"/>)}</div>
       ) : (
         <div className="space-y-3">
           {list.map(s=>(
             <div key={s._id}
-              className={cn('bg-slate-900 border rounded-xl p-5 transition', editing?._id===s._id?'border-blue-500/50':'border-white/10')}>
+              className={cn('bg-slate-900 border rounded-xl p-5 transition', editing?._id===s._id?'border-blue-400':'border-slate-200')}>
               {editing?._id===s._id ? (
                 /* Edit mode */
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-3">
                     <div><label className="block text-xs font-medium text-slate-400 mb-1">Value *</label>
-                      <input type="text" value={form.value} onChange={e=>setForm(p=>({...p,value:e.target.value}))} placeholder="e.g. 14+" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                      <input type="text" value={form.value} onChange={e=>setForm(p=>({...p,value:e.target.value}))} placeholder="e.g. 14+" className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
                     <div><label className="block text-xs font-medium text-slate-400 mb-1">Label</label>
-                      <input type="text" value={form.label} onChange={e=>setForm(p=>({...p,label:e.target.value}))} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                      <input type="text" value={form.label} onChange={e=>setForm(p=>({...p,label:e.target.value}))} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
                     <div><label className="block text-xs font-medium text-slate-400 mb-1">Icon (emoji)</label>
-                      <input type="text" value={form.icon} onChange={e=>setForm(p=>({...p,icon:e.target.value}))} placeholder="👨‍🏫" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                      <input type="text" value={form.icon} onChange={e=>setForm(p=>({...p,icon:e.target.value}))} placeholder="👨‍🏫" className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
                   </div>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">

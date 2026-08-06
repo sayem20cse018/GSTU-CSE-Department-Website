@@ -74,22 +74,22 @@ export default function AdminResourcesPage() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Resource':'Upload Resource'}</h3>
             <div className="space-y-4">
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
                 <input type="text" value={form.title} onChange={e=>F('title',e.target.value)} placeholder="Spring 2024 Class Routine"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Type</label>
                   <select value={form.type} onChange={e=>F('type',e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     {Object.entries(TYPE_LABELS).map(([k,v])=><option key={k} value={k}>{v}</option>)}
                   </select></div>
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Target Degree</label>
                   <select value={form.targetDegree} onChange={e=>F('targetDegree',e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="all">All Programs</option><option value="BSc">BSc</option><option value="MSc">MSc</option><option value="PhD">PhD</option>
                   </select></div>
               </div>
@@ -97,23 +97,23 @@ export default function AdminResourcesPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Academic Year</label>
                   <input type="text" value={form.academicYear} onChange={e=>F('academicYear',e.target.value)} placeholder="2024-25"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Term</label>
                   <select value={form.term} onChange={e=>F('term',e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>Spring</option><option>Summer</option><option>Fall</option><option>Annual</option>
                   </select></div>
               </div>
 
               <div><label className="block text-xs font-medium text-slate-400 mb-1">File URL (PDF/DOC)</label>
                 <input type="url" value={form.fileUrl} onChange={e=>F('fileUrl',e.target.value)} placeholder="https://drive.google.com/…"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">File Name (display)</label>
                 <input type="text" value={form.fileName} onChange={e=>F('fileName',e.target.value)} placeholder="routine-spring-2024.pdf"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Description (optional)</label>
                 <textarea rows={2} value={form.description} onChange={e=>F('description',e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
 
               <div className="flex gap-4">
                 {[{key:'isPublished',label:'Published'},{key:'isPinned',label:'Pinned'}].map(f=>(
@@ -130,14 +130,14 @@ export default function AdminResourcesPage() {
           </div>
         </div>)}
 
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-16 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         ) : resources.length === 0 ? (
           <EmptyState title="No resources yet" description="Upload your first academic resource."/>
         ) : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
               <th className="text-left px-5 py-3">Resource</th>
               <th className="text-center px-4 py-3">Type</th>
               <th className="text-center px-4 py-3">Year/Term</th>
@@ -146,7 +146,7 @@ export default function AdminResourcesPage() {
             </tr></thead>
             <tbody>
               {resources.map((r,i)=>(
-                <tr key={r._id} className={`border-b border-white/5 last:border-0 hover:bg-white/[0.03] ${i%2?'bg-white/[0.02]':''}`}>
+                <tr key={r._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white/[0.02]':''}`}>
                   <td className="px-5 py-4">
                     <p className="font-medium text-white">{r.title}</p>
                     <p className="text-xs text-slate-500">{r.targetDegree} · {r.files.length} file{r.files.length!==1?'s':''}</p>

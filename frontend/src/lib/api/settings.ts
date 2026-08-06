@@ -35,6 +35,11 @@ export interface SiteSettings {
   chairmanEmail?: string;
   chairmanEmail2?: string;
   chairmanMessage?: string;
+  // About images
+  aboutImage1?: string;
+  aboutImage2?: string;
+  aboutImage3?: string;
+  aboutImage4?: string;
 }
 
 // Fallback from hardcoded constants — used when backend is unreachable

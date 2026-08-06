@@ -74,7 +74,7 @@ export default function AdminCoursesPage() {
         action={<Button onClick={()=>{setEditing(null);setForm({...EMPTY_FORM,degree});setShowForm(true)}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Course</Button>}/>
 
       {/* Degree tabs */}
-      <div className="flex rounded-xl border border-white/10 overflow-hidden w-fit mb-6">
+      <div className="flex rounded-xl border border-slate-200 overflow-hidden w-fit mb-6">
         {(['BSc','MSc','PhD'] as const).map(d=>(
           <button key={d} onClick={()=>setDegree(d)}
             className={cn('px-5 py-2 text-sm font-semibold transition', degree===d?'bg-blue-600 text-white':'text-slate-400 hover:bg-white/5')}>
@@ -85,35 +85,35 @@ export default function AdminCoursesPage() {
       {/* Form */}
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
             <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Course':'New Course'}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 {[{label:'Course Code',key:'code',placeholder:'CSE-301'},{label:'Teacher Name',key:'teacherName',placeholder:'Dr. John Doe'}].map(f=>(
                   <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
                     <input type="text" value={form[f.key as keyof typeof form] as string} onChange={e=>F(f.key as keyof typeof form,e.target.value)} placeholder={f.placeholder}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>))}
+                      className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>))}
               </div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Course Title</label>
                 <input type="text" value={form.title} onChange={e=>F('title',e.target.value)} placeholder="Data Structures & Algorithms"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
 
               <div className="grid grid-cols-4 gap-3">
                 {[{label:'Credits',key:'credits',type:'number'},{label:'Semester',key:'semester',type:'number'},{label:'Theory Hrs',key:'theoryHours',type:'number'},{label:'Lab Hrs',key:'labHours',type:'number'}].map(f=>(
                   <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
                     <input type="number" value={form[f.key as keyof typeof form] as number} onChange={e=>F(f.key as keyof typeof form,+e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
+                      className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Degree</label>
                   <select value={form.degree} onChange={e=>F('degree',e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="BSc">BSc</option><option value="MSc">MSc</option><option value="PhD">PhD</option>
                   </select></div>
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Type</label>
                   <select value={form.type} onChange={e=>F('type',e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="core">Core</option><option value="elective">Elective</option><option value="lab">Lab</option><option value="sessional">Sessional</option>
                   </select></div>
                 <div className="flex items-end pb-2">
@@ -125,10 +125,10 @@ export default function AdminCoursesPage() {
 
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
                 <textarea rows={2} value={form.description} onChange={e=>F('description',e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Syllabus PDF URL</label>
                 <input type="url" value={form.syllabusUrl} onChange={e=>F('syllabusUrl',e.target.value)} placeholder="https://…"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
             </div>
             <div className="flex gap-3 mt-6">
               <Button onClick={save} loading={saving} className="flex-1">{editing?'Update':'Create'}</Button>
@@ -138,20 +138,20 @@ export default function AdminCoursesPage() {
         </div>)}
 
       {/* Table */}
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-6 space-y-3">{[1,2,3,4].map(i=><div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         ) : courses.length === 0 ? (
           <EmptyState title={`No ${degree} courses yet`} description="Add the first course."/>
         ) : Object.keys(grouped).map(Number).sort((a,b)=>a-b).map(sem => (
           <div key={sem}>
-            <div className="px-5 py-2.5 bg-white/5 border-b border-white/10">
+            <div className="px-5 py-2.5 bg-white/5 border-b border-slate-200">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Semester {sem}</p>
             </div>
             <table className="w-full text-sm">
               <tbody>
                 {grouped[sem].map((c,i)=>(
-                  <tr key={c._id} className={`border-b border-white/5 last:border-0 hover:bg-white/[0.03] ${i%2?'bg-white/[0.01]':''}`}>
+                  <tr key={c._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white':''}`}>
                     <td className="px-5 py-3 font-mono text-xs text-blue-400 font-bold w-24">{c.code}</td>
                     <td className="px-4 py-3 text-white">{c.title}</td>
                     <td className="px-4 py-3 text-center text-slate-400 w-16">{c.credits}cr</td>

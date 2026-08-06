@@ -69,7 +69,7 @@ export default function AdminHeroSlidesPage() {
     finally { setDelId(null); }
   }
 
-  const iCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const iCls = 'w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500';
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -80,7 +80,7 @@ export default function AdminHeroSlidesPage() {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
             <h3 className="text-lg font-bold text-white mb-5">{editing ? 'Edit Slide' : 'New Slide'}</h3>
             {err && <p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
 
@@ -163,7 +163,7 @@ export default function AdminHeroSlidesPage() {
         ) : list.length === 0 ? (
           <EmptyState title="No slides yet" description="Add the first hero slide." action={<Button onClick={openNew}>Add Slide</Button>}/>
         ) : list.map((s, i) => (
-          <div key={s._id} className="flex items-center gap-4 bg-slate-900 border border-white/10 rounded-xl p-4">
+          <div key={s._id} className="flex items-center gap-4 bg-slate-900 border border-slate-200 rounded-xl p-4">
             {/* Thumbnail */}
             <div className="w-28 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-800 flex items-center justify-center">
               {s.imageUrl && !s.imageUrl.startsWith('data:')

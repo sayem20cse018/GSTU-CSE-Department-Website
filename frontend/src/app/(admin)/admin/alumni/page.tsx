@@ -86,7 +86,7 @@ export default function AlumniAdminPage() {
     finally { setDelId(null); }
   }
 
-  const iCls = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const iCls = 'w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500';
   const statusColor: Record<string, 'success' | 'danger' | 'neutral'> = { approved:'success', rejected:'danger', pending:'neutral' };
 
   return (
@@ -98,10 +98,10 @@ export default function AlumniAdminPage() {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-white">{editing ? 'Edit Alumni' : 'Add Alumni'}</h3>
-              <div className="flex rounded-lg border border-white/10 overflow-hidden text-xs">
+              <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs">
                 {(['basic','career','social'] as const).map(t => (
                   <button key={t} onClick={() => setTab(t)}
                     className={cn('px-3 py-1.5 font-semibold capitalize transition', tab === t ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-white/5')}>
@@ -188,14 +188,14 @@ export default function AlumniAdminPage() {
       )}
 
       {/* Table */}
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-6 space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         ) : list.length === 0 ? (
           <EmptyState title="No alumni records yet" description="Add the first alumni." action={<Button onClick={openNew}>Add Alumni</Button>}/>
         ) : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
               <th className="text-left px-5 py-3">Name</th>
               <th className="text-left px-4 py-3 hidden md:table-cell">Position</th>
               <th className="text-center px-4 py-3 hidden sm:table-cell">Batch</th>
@@ -204,7 +204,7 @@ export default function AlumniAdminPage() {
             </tr></thead>
             <tbody>
               {list.map((a, i) => (
-                <tr key={a._id} className={cn('border-b border-white/5 last:border-0 hover:bg-white/[0.03]', i%2?'bg-white/[0.01]':'')}>
+                <tr key={a._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'')}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {a.photo ? (

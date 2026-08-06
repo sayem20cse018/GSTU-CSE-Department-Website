@@ -79,7 +79,7 @@ export default function AdminProgramsPage() {
       {/* Form modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
             <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Program':'New Program'}</h3>
             <div className="space-y-4">
               {[
@@ -91,14 +91,14 @@ export default function AdminProgramsPage() {
                   <input type={f.type} value={form[f.key as keyof typeof form] as string}
                     onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                     placeholder={f.placeholder}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/>
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/>
                 </div>))}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-slate-400 mb-1">Degree</label>
                   <select value={form.degree} onChange={e => setForm(p=>({...p,degree:e.target.value as 'BSc'|'MSc'|'PhD'}))}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="BSc">BSc</option><option value="MSc">MSc</option><option value="PhD">PhD</option>
                   </select>
                 </div>
@@ -106,7 +106,7 @@ export default function AdminProgramsPage() {
                   <label className="block text-xs font-medium text-slate-400 mb-1">Total Credits</label>
                   <input type="number" value={form.totalCredits}
                     onChange={e=>setForm(p=>({...p,totalCredits:+e.target.value}))}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                 </div>
               </div>
 
@@ -115,16 +115,16 @@ export default function AdminProgramsPage() {
                   <label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
                   <textarea rows={3} value={form[f.key as keyof typeof form] as string}
                     onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/>
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/>
                 </div>))}
 
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Total Seats</label>
                   <input type="number" value={form.totalSeats} onChange={e=>setForm(p=>({...p,totalSeats:+e.target.value}))}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
                 <div><label className="block text-xs font-medium text-slate-400 mb-1">Tuition Fee</label>
                   <input type="text" value={form.tuitionFee} onChange={e=>setForm(p=>({...p,tuitionFee:e.target.value}))} placeholder="e.g. 5000 BDT/semester"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
               </div>
 
               <label className="flex items-center gap-2 cursor-pointer">
@@ -141,14 +141,14 @@ export default function AdminProgramsPage() {
         </div>)}
 
       {/* List */}
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-16 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         ) : programs.length === 0 ? (
           <EmptyState title="No programs yet" description="Add your first academic program." action={<Button onClick={openNew}>Add Program</Button>}/>
         ) : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
               <th className="text-left px-5 py-3">Program</th>
               <th className="text-center px-4 py-3">Degree</th>
               <th className="text-center px-4 py-3">Credits</th>
@@ -157,7 +157,7 @@ export default function AdminProgramsPage() {
             </tr></thead>
             <tbody>
               {programs.map((p,i)=>(
-                <tr key={p._id} className={`border-b border-white/5 last:border-0 hover:bg-white/[0.03] ${i%2?'bg-white/[0.02]':''}`}>
+                <tr key={p._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white/[0.02]':''}`}>
                   <td className="px-5 py-4"><p className="font-medium text-white">{p.name}</p><p className="text-xs text-slate-500 mt-0.5">{p.duration}</p></td>
                   <td className="px-4 py-4 text-center"><Badge variant={DEGREE_COLORS[p.degree]??'neutral'}>{p.degree}</Badge></td>
                   <td className="px-4 py-4 text-center text-slate-300">{p.totalCredits}</td>

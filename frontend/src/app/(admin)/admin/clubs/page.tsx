@@ -46,26 +46,26 @@ export default function ClubsAdminPage() {
         action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Club</Button>}/>
 
       {open&&(<div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
+        <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
           <h3 className="text-lg font-bold text-white mb-4">{editing?'Edit':'Add'} Club</h3>
           {err&&<p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-3">{err}</p>}
           <div className="space-y-3">
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Club Name *</label>
               <input type="text" value={form.name} onChange={e=>{F('name',e.target.value);if(!editing)F('slug',toSlug(e.target.value));}}
-                placeholder="Programming Club" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                placeholder="Programming Club" className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Slug *</label>
-              <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+              <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
             {[{l:'Short Description',k:'shortDescription',ph:'One line description'},{l:'Logo URL',k:'logo',ph:'https://...'},{l:'Cover Image URL',k:'coverImage',ph:'https://...'},{l:'Faculty Advisor',k:'advisorName',ph:'Dr. Name'},{l:'President',k:'presidentName',ph:'Student name'},{l:'Email',k:'email',ph:'club@gstu.edu.bd'},{l:'Facebook URL',k:'facebookUrl',ph:'https://facebook.com/...'}].map(f=>(
               <div key={f.k}><label className="block text-xs font-medium text-slate-400 mb-1">{f.l}</label>
                 <input type="text" value={form[f.k as keyof typeof EMPTY] as string} onChange={e=>F(f.k as keyof typeof EMPTY,e.target.value)} placeholder={f.ph}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
+                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
             <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
-              <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+              <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Founded Year</label>
-                <input type="number" value={form.foundedYear} onChange={e=>F('foundedYear',+e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                <input type="number" value={form.foundedYear} onChange={e=>F('foundedYear',+e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
               <div><label className="block text-xs font-medium text-slate-400 mb-1">Members</label>
-                <input type="number" value={form.memberCount} onChange={e=>F('memberCount',+e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                <input type="number" value={form.memberCount} onChange={e=>F('memberCount',+e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
             </div>
             <div className="flex gap-4">
               {[{k:'isActive',l:'Active'},{k:'isFeatured',l:'Featured'}].map(({k,l})=>(
@@ -81,14 +81,14 @@ export default function ClubsAdminPage() {
         </div>
       </div>)}
 
-      <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse"/>)}</div>
         :list.length===0?<EmptyState title="No clubs yet" description="Add the first student club."/>
-        :(<table className="w-full text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-400 uppercase tracking-wider">
+        :(<table className="w-full text-sm"><thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
           <th className="text-left px-5 py-3">Club</th><th className="text-center px-4 py-3">Members</th>
           <th className="text-center px-4 py-3">Status</th><th className="text-right px-5 py-3">Actions</th></tr></thead>
           <tbody>{list.map((c,i)=>(
-            <tr key={c._id} className={cn('border-b border-white/5 last:border-0 hover:bg-white/[0.03]',i%2?'bg-white/[0.01]':'')}>
+            <tr key={c._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
               <td className="px-5 py-3"><p className="font-medium text-white">{c.name}</p>{c.advisorName&&<p className="text-xs text-slate-500">Advisor: {c.advisorName}</p>}</td>
               <td className="px-4 py-3 text-center text-slate-300">{c.memberCount}</td>
               <td className="px-4 py-3 text-center"><div className="flex justify-center gap-1.5">
