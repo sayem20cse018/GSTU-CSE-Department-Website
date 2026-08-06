@@ -1,19 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { IsOptional, IsString, IsBoolean, IsArray, MaxLength } from 'class-validator';
 import { News, NewsDocument } from './schemas/news.schema';
 
 export class CreateNewsDto {
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  coverImage?: string;
-  category?: string;
-  tags?: string[];
-  authorName: string;
-  isPublished?: boolean;
-  isFeatured?: boolean;
+  @IsString() @MaxLength(300) title: string;
+  @IsString() @MaxLength(300) slug: string;
+  @IsString() @MaxLength(600) excerpt: string;
+  @IsString() content: string;
+  @IsOptional() @IsString() coverImage?: string;
+  @IsOptional() @IsString() category?: string;
+  @IsOptional() @IsArray() @IsString({ each: true }) tags?: string[];
+  @IsString() authorName: string;
+  @IsOptional() @IsBoolean() isPublished?: boolean;
+  @IsOptional() @IsBoolean() isFeatured?: boolean;
 }
 
 @Injectable()

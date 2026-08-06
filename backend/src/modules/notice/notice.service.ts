@@ -1,18 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {
+  IsOptional, IsString, IsBoolean, IsArray, IsDateString, MaxLength,
+} from 'class-validator';
 import { Notice, NoticeDocument } from './schemas/notice.schema';
 
 export class CreateNoticeDto {
-  title: string;
-  description?: string;
-  category?: string;
-  targetAudience?: string[];
-  isPublished?: boolean;
-  isPinned?: boolean;
-  isUrgent?: boolean;
-  expiresAt?: string;
-  postedByName?: string;
+  @IsString() @MaxLength(300) title: string;
+  @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() category?: string;
+  @IsOptional() @IsArray() @IsString({ each: true }) targetAudience?: string[];
+  @IsOptional() @IsBoolean() isPublished?: boolean;
+  @IsOptional() @IsBoolean() isPinned?: boolean;
+  @IsOptional() @IsBoolean() isUrgent?: boolean;
+  @IsOptional() @IsString() expiresAt?: string;
+  @IsOptional() @IsString() postedByName?: string;
 }
 
 @Injectable()

@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
 import { Statistic, StatisticDocument } from './schemas/statistic.schema';
 
-// Default stats seeded on first run
 const DEFAULT_STATS = [
   { key: 'faculty_members',   label: 'Faculty Members',      value: '14+',  icon: '👨‍🏫', sortOrder: 1 },
   { key: 'total_students',    label: 'Total Students',        value: '800+', icon: '🎓', sortOrder: 2 },
@@ -14,11 +14,11 @@ const DEFAULT_STATS = [
 ];
 
 export class UpdateStatDto {
-  label?: string;
-  value?: string;
-  icon?: string;
-  sortOrder?: number;
-  isVisible?: boolean;
+  @IsOptional() @IsString() label?: string;
+  @IsOptional() @IsString() value?: string;
+  @IsOptional() @IsString() icon?: string;
+  @IsOptional() @IsNumber() sortOrder?: number;
+  @IsOptional() @IsBoolean() isVisible?: boolean;
 }
 
 @Injectable()

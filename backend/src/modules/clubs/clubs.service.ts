@@ -1,26 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {
+  IsOptional, IsString, IsBoolean, IsNumber, IsArray, MaxLength,
+} from 'class-validator';
 import { Club, ClubDocument } from './schemas/club.schema';
 
 export class CreateClubDto {
-  name: string;
-  slug: string;
-  description: string;
-  shortDescription?: string;
-  logo?: string;
-  coverImage?: string;
-  founderName?: string;
-  presidentName?: string;
-  advisorName?: string;
-  foundedYear?: number;
-  activities?: string[];
-  email?: string;
-  facebookUrl?: string;
-  memberCount?: number;
-  isActive?: boolean;
-  isFeatured?: boolean;
-  sortOrder?: number;
+  @IsString() @MaxLength(200) name: string;
+  @IsString() @MaxLength(200) slug: string;
+  @IsString() description: string;
+  @IsOptional() @IsString() shortDescription?: string;
+  @IsOptional() @IsString() logo?: string;
+  @IsOptional() @IsString() coverImage?: string;
+  @IsOptional() @IsString() founderName?: string;
+  @IsOptional() @IsString() presidentName?: string;
+  @IsOptional() @IsString() advisorName?: string;
+  @IsOptional() @IsNumber() foundedYear?: number;
+  @IsOptional() @IsArray() @IsString({ each: true }) activities?: string[];
+  @IsOptional() @IsString() email?: string;
+  @IsOptional() @IsString() facebookUrl?: string;
+  @IsOptional() @IsNumber() memberCount?: number;
+  @IsOptional() @IsBoolean() isActive?: boolean;
+  @IsOptional() @IsBoolean() isFeatured?: boolean;
+  @IsOptional() @IsNumber() sortOrder?: number;
 }
 
 @Injectable()

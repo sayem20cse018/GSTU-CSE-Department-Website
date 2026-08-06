@@ -1,19 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {
+  IsOptional, IsString, IsBoolean, IsNumber, IsArray, MaxLength,
+} from 'class-validator';
 import { Achievement, AchievementDocument } from './schemas/achievement.schema';
 
 export class CreateAchievementDto {
-  title: string;
-  description: string;
-  image?: string;
-  type?: string;
-  achievedAt: string;
-  achieverName?: string;
-  awardedBy?: string;
-  isPublished?: boolean;
-  isFeatured?: boolean;
-  sortOrder?: number;
+  @IsString() @MaxLength(300) title: string;
+  @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() image?: string;
+  @IsOptional() @IsString() type?: string;
+  @IsString() achievedAt: string;
+  @IsOptional() @IsString() achieverName?: string;
+  @IsOptional() @IsString() awardedBy?: string;
+  @IsOptional() @IsBoolean() isPublished?: boolean;
+  @IsOptional() @IsBoolean() isFeatured?: boolean;
+  @IsOptional() @IsNumber() sortOrder?: number;
 }
 
 @Injectable()

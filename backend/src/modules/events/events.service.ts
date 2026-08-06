@@ -1,24 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {
+  IsOptional, IsString, IsBoolean, MaxLength,
+} from 'class-validator';
 import { Event, EventDocument } from './schemas/event.schema';
 
 export class CreateEventDto {
-  title: string;
-  slug: string;
-  description: string;
-  shortDescription?: string;
-  venue: string;
-  startDate: string;
-  endDate?: string;
-  type?: string;
-  mode?: string;
-  coverImage?: string;
-  organizerName?: string;
-  organizerContact?: string;
-  isPublished?: boolean;
-  isFeatured?: boolean;
-  status?: string;
+  @IsString() @MaxLength(300) title: string;
+  @IsString() @MaxLength(300) slug: string;
+  @IsString() description: string;
+  @IsOptional() @IsString() shortDescription?: string;
+  @IsOptional() @IsString() venue?: string;
+  @IsString() startDate: string;
+  @IsOptional() @IsString() endDate?: string;
+  @IsOptional() @IsString() type?: string;
+  @IsOptional() @IsString() mode?: string;
+  @IsOptional() @IsString() coverImage?: string;
+  @IsOptional() @IsString() organizerName?: string;
+  @IsOptional() @IsString() organizerContact?: string;
+  @IsOptional() @IsBoolean() isPublished?: boolean;
+  @IsOptional() @IsBoolean() isFeatured?: boolean;
+  @IsOptional() @IsString() status?: string;
 }
 
 @Injectable()

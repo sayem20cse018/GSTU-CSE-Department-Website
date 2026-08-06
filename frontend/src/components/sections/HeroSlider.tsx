@@ -140,19 +140,18 @@ export default function HeroSlider() {
   const [paused,  setPaused]  = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch slides from API on mount; fall back to static slides if unavailable
+  // Fetch slides from API on mount; use server-side proxy so it works in production
   useEffect(() => {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    fetch(`${api}/hero-slides`)
-      .then(r => r.json())
+    fetch('/api/public/hero-slides')
+      .then(r => r.ok ? r.json() : Promise.reject())
       .then((d: { data?: ApiSlide[] }) => {
-        const arr = d.data;
+        const arr = d?.data;
         if (Array.isArray(arr) && arr.length) {
           setSlides(arr.map(apiToSlide));
           setCurrent(0);
         }
       })
-      .catch(() => { /* keep fallback */ });
+      .catch(() => { /* keep static FALLBACK_SLIDES */ });
   }, []);
 
   const total = slides.length;

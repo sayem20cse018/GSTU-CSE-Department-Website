@@ -1,20 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {
+  IsOptional, IsString, IsBoolean, IsArray, IsNumber, MaxLength,
+} from 'class-validator';
 import { Gallery, GalleryDocument } from './schemas/gallery.schema';
 
 export class CreateGalleryDto {
-  title: string;
-  slug: string;
-  description?: string;
-  category?: string;
-  tags?: string[];
-  coverImage?: string;
-  albumDate: string;
-  uploadedByName?: string;
-  isPublished?: boolean;
-  isFeatured?: boolean;
-  media?: { url: string; thumbnailUrl: string; caption?: string; altText?: string; mediaType?: string }[];
+  @IsString() @MaxLength(300) title: string;
+  @IsString() @MaxLength(300) slug: string;
+  @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() category?: string;
+  @IsOptional() @IsArray() @IsString({ each: true }) tags?: string[];
+  @IsOptional() @IsString() coverImage?: string;
+  @IsString() albumDate: string;
+  @IsOptional() @IsString() uploadedByName?: string;
+  @IsOptional() @IsBoolean() isPublished?: boolean;
+  @IsOptional() @IsBoolean() isFeatured?: boolean;
+  @IsOptional() @IsArray() media?: { url: string; thumbnailUrl: string; caption?: string; altText?: string; mediaType?: string }[];
 }
 
 @Injectable()

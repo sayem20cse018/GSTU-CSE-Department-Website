@@ -12,7 +12,14 @@ export default function SiteHeader() {
   const router   = useRouter();
 
   useEffect(() => {
-    fetchSettings().then(setSettings).catch(() => {});
+    // /api/public is a server-side proxy — works in production without NEXT_PUBLIC_API_URL
+    fetch('/api/public/settings')
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((d: { data?: SiteSettings }) => {
+        const payload = d?.data ?? (d as unknown as SiteSettings);
+        if (payload?.deptName) setSettings(prev => ({ ...prev, ...payload }));
+      })
+      .catch(() => {}); // keep SETTINGS_FALLBACK silently
   }, []);
 
   function handleSearch(e: React.FormEvent) {
