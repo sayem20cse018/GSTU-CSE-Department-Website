@@ -23,14 +23,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     });
   }
 
-  /** Determine if a nav item is active, respecting query params */
+  /** Determine if a nav item is active */
   function isItemActive(href: string): boolean {
     const [hrefPath, hrefQuery] = href.split('?');
 
-    // Exact path match needed when item has query params (e.g. ?tab=history)
+    // Items with query params — exact path + exact query match only
     if (hrefQuery) {
       if (pathname !== hrefPath) return false;
-      // Parse query params and check each key=value
       const hrefParams = new URLSearchParams(hrefQuery);
       for (const [key, val] of hrefParams.entries()) {
         if (searchParams.get(key) !== val) return false;
@@ -38,11 +37,26 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       return true;
     }
 
-    // Dashboard: exact only
+    // Dashboard — always exact
     if (href === '/admin/dashboard') return pathname === href;
 
-    // All other plain paths: startsWith, but not matching siblings
-    return pathname === hrefPath || pathname.startsWith(hrefPath + '/');
+    // Exact match first
+    if (pathname === hrefPath) return true;
+
+    // Check if this path has sibling items in the same group
+    // If any sibling starts with the same base, use exact matching only
+    const group = NAV_GROUPS.find(g => g.items.some(i => i.href.split('?')[0] === hrefPath));
+    if (group) {
+      const hasSiblingWithLongerPath = group.items.some(item => {
+        const sibPath = item.href.split('?')[0];
+        return sibPath !== hrefPath && sibPath.startsWith(hrefPath + '/');
+      });
+      // If siblings exist that are sub-paths, only use exact match to avoid double-active
+      if (hasSiblingWithLongerPath) return pathname === hrefPath;
+    }
+
+    // No siblings with sub-paths — allow startsWith
+    return pathname.startsWith(hrefPath + '/');
   }
 
   return (

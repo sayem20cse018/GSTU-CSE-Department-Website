@@ -74,12 +74,12 @@ export default function SettingsPage() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <AdminPageTitle title="Site Settings" />
+      <AdminPageTitle title="Settings" />
 
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Site Settings</h1>
+          <h1 className="text-xl font-bold text-slate-900">Settings</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage department identity, contact info, and account</p>
         </div>
         {tab !== 'account' && (
@@ -199,47 +199,9 @@ export default function SettingsPage() {
           {/* ── ACCOUNT ── */}
           {tab === 'account' && (
             <>
-              <p className={sectionLabel}>Account & Branding</p>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
-                ℹ️ Logo and department name set in <strong>Identity</strong> tab are automatically shown on the login page. No need to set them again here.
-                You can optionally override the logo here if needed.
-              </div>
-
-              {/* Dept Logo */}
-              <div>
-                <label className={lCls}>Department Logo</label>
-                <div className="flex items-start gap-3">
-                  {form.deptLogo && (
-                    <div className="w-14 h-14 rounded-xl border border-slate-200 overflow-hidden shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={form.deptLogo} alt="" className="w-full h-full object-contain p-1"/>
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <input type="url" value={form.deptLogo?.startsWith('data:') ? '' : form.deptLogo}
-                      onChange={e => F('deptLogo', e.target.value)} placeholder="https://…logo.png"
-                      className={`${iCls} mb-2`}/>
-                    <label className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg border border-green-300 text-green-700 hover:bg-green-50 transition cursor-pointer">
-                      📷 Upload Logo
-                      <input type="file" accept="image/*" className="hidden"
-                        onChange={async e => {
-                          const file = e.target.files?.[0]; e.target.value = '';
-                          if (!file) return;
-                          const reader = new FileReader();
-                          reader.onload = () => F('deptLogo', reader.result as string);
-                          reader.readAsDataURL(file);
-                        }}/>
-                    </label>
-                    {form.deptLogo && (
-                      <button type="button" onClick={() => F('deptLogo', '')} className="ml-2 text-xs text-red-500">× Remove</button>
-                    )}
-                  </div>
-                </div>
-                <p className="text-xs text-slate-400 mt-1">Shown in header, login page, and footer.</p>
-              </div>
-
-              <div className="border-t border-slate-100 pt-4">
-                <p className={sectionLabel}>Change Password</p>
+              <p className={sectionLabel}>Change Password</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700 mb-2">
+                ℹ️ Logo & department name are managed in the <strong>Identity</strong> tab — they auto-appear on the login page.
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
                 ⚠️ Changing your password will require you to log in again.

@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 import { useRef, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AdminPageTitle } from '@/context/AdminPageContext';
@@ -240,3 +241,16 @@ export default function AboutAdminPage() {
 }
 
 const sec = 'text-[10px] font-bold uppercase tracking-widest text-slate-400 pb-2 border-b border-slate-100';
+
+// Suspense wrapper — required because useSearchParams is used inside
+function AboutAdminPageInner() {
+  return <AboutAdminPage />;
+}
+
+export default function AboutAdminPageWithSuspense() {
+  return (
+    <Suspense fallback={<div className="p-6 space-y-4">{[1,2,3].map(i=><div key={i} className="h-12 bg-slate-100 rounded-xl animate-pulse"/>)}</div>}>
+      <AboutAdminPageInner />
+    </Suspense>
+  );
+}
