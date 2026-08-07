@@ -32,11 +32,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed top-0 left-0 z-30 h-full flex flex-col transition-transform duration-300 shadow-2xl shadow-emerald-950/20',
+          'fixed top-0 left-0 z-30 h-full flex flex-col transition-transform duration-300',
           'lg:translate-x-0 lg:static lg:z-auto',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
-        style={{ width: '256px', background: '#0f2f1b', borderRight: '1px solid #134e2d' }}
+        style={{ width: '256px', background: '#111827', borderRight: '1px solid #1f2937' }}
       >
         {/* Brand */}
         <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-800 shrink-0">
@@ -137,7 +137,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer profile */}
-        <div className="shrink-0 px-3 py-3 border-t border-emerald-800">
+        <div className="shrink-0 px-3 py-3 border-t border-gray-800">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white"
               style={{ background: '#16a34a' }}>
