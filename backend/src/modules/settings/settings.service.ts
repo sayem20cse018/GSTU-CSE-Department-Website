@@ -69,6 +69,9 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() @MaxLength(2000)
   aboutMission?: string;
 
+  @IsOptional() @IsString() @MaxLength(5000)
+  aboutHistory?: string;
+
   // Chairman
   @IsOptional() @IsString() @MaxLength(200)
   chairmanName?: string;

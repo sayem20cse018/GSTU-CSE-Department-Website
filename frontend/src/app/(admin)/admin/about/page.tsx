@@ -1,5 +1,6 @@
 'use client';
 import { useRef, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { adminGet, adminPatch } from '@/lib/api/admin-fetch';
@@ -65,13 +66,18 @@ function PhotoUpload({ label, value, onChange }: { label: string; value: string;
   );
 }
 
+function getTabValue(value: string | null): Tab {
+  return value === 'photos' || value === 'chairman' ? value : 'department';
+}
+
 export default function AboutAdminPage() {
+  const params = useSearchParams();
   const [form,    setForm]   = useState<SiteSettings>(SETTINGS_FALLBACK);
   const [loading, setLoad]   = useState(true);
   const [saving,  setSave]   = useState(false);
   const [saved,   setSaved]  = useState(false);
   const [err,     setErr]    = useState('');
-  const [tab,     setTab]    = useState<Tab>('department');
+  const [tab,     setTab]    = useState<Tab>(() => getTabValue(params.get('tab')));
 
   useEffect(() => {
     setLoad(true);
@@ -80,6 +86,11 @@ export default function AboutAdminPage() {
       .catch(() => {})
       .finally(() => setLoad(false));
   }, []);
+
+  useEffect(() => {
+    const queryTab = getTabValue(params.get('tab'));
+    if (queryTab !== tab) setTab(queryTab);
+  }, [params, tab]);
 
   const F = (k: keyof SiteSettings, v: string) => { setForm(p => ({ ...p, [k]: v })); setSaved(false); };
 
@@ -156,8 +167,13 @@ export default function AboutAdminPage() {
                 <textarea rows={5} value={form.aboutMission ?? ''} onChange={e => F('aboutMission', e.target.value)}
                   placeholder="Our mission is to provide rigorous, high-quality education…" className={taCls}/>
               </div>
-            </>
-          )}
+              <div>
+                <label className={lCls}>History Content</label>
+                <textarea rows={7} value={form.aboutHistory ?? ''} onChange={e => F('aboutHistory', e.target.value)}
+                  placeholder="The department was founded in 2011 with a mission to…" className={taCls}/>
+                <p className="text-xs text-slate-400 mt-1">This text will be shown on the About → History page.</p>
+              </div>
+            </>) }
 
           {/* ── ABOUT PHOTOS ── */}
           {tab === 'photos' && (

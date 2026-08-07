@@ -29,6 +29,39 @@ async function toBase64(file: File): Promise<string> {
   });
 }
 
+async function resizeAndBase64(file: File): Promise<string> {
+  const dataUrl = await toBase64(file);
+
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      const maxDimension = 1600;
+      let width = image.width;
+      let height = image.height;
+      if (width > maxDimension || height > maxDimension) {
+        const ratio = maxDimension / Math.max(width, height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Unable to get canvas context')); return;
+      }
+      ctx.drawImage(image, 0, 0, width, height);
+
+      const outputType = file.type === 'image/png' ? 'image/png' : 'image/webp';
+      const resized = canvas.toDataURL(outputType, 0.8);
+      resolve(resized);
+    };
+    image.onerror = reject;
+    image.src = dataUrl;
+  });
+}
+
 async function uploadFile(file: File): Promise<string> {
   // Try Cloudinary only if both env vars present
   if (CLOUD_NAME && UPLOAD_PRESET) {
@@ -44,11 +77,11 @@ async function uploadFile(file: File): Promise<string> {
       const d = await res.json() as { secure_url: string };
       return d.secure_url;
     }
-    // Cloudinary failed (e.g. preset not found) → fall through to base64
-    console.warn('Cloudinary upload failed, falling back to base64');
+    // Cloudinary failed → fall back to resized base64 upload
   }
-  // Base64 fallback — always works
-  return toBase64(file);
+
+  // Resize + compress before base64 to keep payload small and avoid 413 errors
+  return resizeAndBase64(file);
 }
 
 export default function ImageUpload({

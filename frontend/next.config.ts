@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   // ── API route body size limit (for image uploads via proxy) ───────────────
   experimental: {
     serverActions: {
-      bodySizeLimit: '15mb',
+      bodySizeLimit: '50mb',
     },
   },
 

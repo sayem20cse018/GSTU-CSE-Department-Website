@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SectionHero from '@/components/academics/SectionHero';
 import { SITE } from '@/constants';
+import { fetchSettings } from '@/lib/api/settings';
 
 export const metadata: Metadata = { title: 'History — GSTU CSE' };
 
@@ -16,7 +17,11 @@ const MILESTONES = [
   { year: '2024', title: 'Continued Growth', desc: 'With 14+ faculty members, 500+ students, and an active research culture, the department continues to grow in academic excellence and national recognition.' },
 ];
 
-export default function HistoryPage() {
+export default async function HistoryPage() {
+  const settings = await fetchSettings().catch(() => null);
+  const historyIntro = settings?.aboutHistory ||
+    `The Department of Computer Science and Engineering at ${SITE.university} has grown from a small founding unit into one of the most dynamic computing departments in the region. Our history reflects a consistent dedication to academic excellence, research innovation, and student success.`;
+
   return (
     <>
       <SectionHero
@@ -31,7 +36,7 @@ export default function HistoryPage() {
           {/* Intro */}
           <div className="prose prose-slate max-w-none mb-12">
             <p className="text-lg text-slate-600 leading-relaxed">
-              The Department of Computer Science and Engineering at {SITE.university} has grown from a small founding unit into one of the most dynamic computing departments in the region. Our history reflects a consistent dedication to academic excellence, research innovation, and student success.
+              {historyIntro}
             </p>
           </div>
 

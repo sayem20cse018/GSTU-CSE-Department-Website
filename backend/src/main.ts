@@ -12,9 +12,9 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ── Body size limit — raised to 15 MB to support base64-encoded image uploads ─
-  app.use(require('express').json({ limit: '15mb' }));
-  app.use(require('express').urlencoded({ extended: true, limit: '15mb' }));
+  // ── Body size limit — raised to 50 MB to support base64-encoded image uploads ─
+  app.use(require('express').json({ limit: '50mb' }));
+  app.use(require('express').urlencoded({ extended: true, limit: '50mb' }));
 
   // ── Security ──────────────────────────────────────────────────────────────
   app.use(helmet());

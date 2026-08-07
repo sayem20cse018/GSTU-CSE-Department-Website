@@ -28,6 +28,7 @@ export interface SiteSettings {
   aboutIntro?: string;
   aboutVision?: string;
   aboutMission?: string;
+  aboutHistory?: string;
   // Chairman
   chairmanName?: string;
   chairmanTitle?: string;
@@ -61,6 +62,7 @@ export const SETTINGS_FALLBACK: SiteSettings = {
   youtubeUrl:         SITE.socialLinks.youtube,
   foundedYear:        SITE.founded,
   footerText:         '',
+  aboutHistory:       '',
 };
 
 /** Server-side fetch — used by Server Components */

@@ -73,6 +73,9 @@ export class Settings {
   @Prop({ default: '' })
   aboutMission: string;         // Mission statement
 
+  @Prop({ default: '' })
+  aboutHistory: string;         // Department history content
+
   // ── Chairman's Message ────────────────────────────────────────────────────
   @Prop({ default: 'Dr. Mrinal Kanti Baowaly' })
   chairmanName: string;
