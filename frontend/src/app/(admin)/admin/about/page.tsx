@@ -7,11 +7,13 @@ import { adminGet, adminPatch } from '@/lib/api/admin-fetch';
 import type { SiteSettings } from '@/lib/api/settings';
 import { SETTINGS_FALLBACK } from '@/lib/api/settings';
 
-type Tab = 'department' | 'photos' | 'chairman';
+type Tab = 'department' | 'vision' | 'history' | 'photos' | 'chairman';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'department', label: 'About Department', icon: '🏛️' },
-  { id: 'photos',     label: 'About Photos',     icon: '📸' },
+  { id: 'vision',     label: 'Vision & Mission',  icon: '🎯' },
+  { id: 'history',    label: 'History',           icon: '📜' },
+  { id: 'photos',     label: 'About Photos',      icon: '📸' },
   { id: 'chairman',   label: "Chairman's Message", icon: '👤' },
 ];
 
@@ -67,7 +69,9 @@ function PhotoUpload({ label, value, onChange }: { label: string; value: string;
 }
 
 function getTabValue(value: string | null): Tab {
-  return value === 'photos' || value === 'chairman' ? value : 'department';
+  return value === 'vision' || value === 'history' || value === 'photos' || value === 'chairman'
+    ? value
+    : 'department';
 }
 
 export default function AboutAdminPage() {
