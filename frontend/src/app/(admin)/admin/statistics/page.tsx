@@ -50,16 +50,16 @@ export default function StatisticsAdminPage() {
                 /* Edit mode */
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-3">
-                    <div><label className="block text-xs font-medium text-slate-400 mb-1">Value *</label>
-                      <input type="text" value={form.value} onChange={e=>setForm(p=>({...p,value:e.target.value}))} placeholder="e.g. 14+" className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-                    <div><label className="block text-xs font-medium text-slate-400 mb-1">Label</label>
-                      <input type="text" value={form.label} onChange={e=>setForm(p=>({...p,label:e.target.value}))} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-                    <div><label className="block text-xs font-medium text-slate-400 mb-1">Icon (emoji)</label>
-                      <input type="text" value={form.icon} onChange={e=>setForm(p=>({...p,icon:e.target.value}))} placeholder="👨‍🏫" className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Value *</label>
+                      <input type="text" value={form.value} onChange={e=>setForm(p=>({...p,value:e.target.value}))} placeholder="e.g. 14+" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Label</label>
+                      <input type="text" value={form.label} onChange={e=>setForm(p=>({...p,label:e.target.value}))} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Icon (emoji)</label>
+                      <input type="text" value={form.icon} onChange={e=>setForm(p=>({...p,icon:e.target.value}))} placeholder="👨‍🏫" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
                   </div>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={form.isVisible} onChange={e=>setForm(p=>({...p,isVisible:e.target.checked}))} className="accent-blue-500"/>
+                      <input type="checkbox" checked={form.isVisible} onChange={e=>setForm(p=>({...p,isVisible:e.target.checked}))} className="accent-green-600"/>
                       <span className="text-sm text-slate-300">Visible on homepage</span>
                     </label>
                   </div>

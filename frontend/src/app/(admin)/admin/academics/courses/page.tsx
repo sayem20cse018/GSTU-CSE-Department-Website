@@ -85,50 +85,50 @@ export default function AdminCoursesPage() {
       {/* Form */}
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
-            <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Course':'New Course'}</h3>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-5">{editing?'Edit Course':'New Course'}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 {[{label:'Course Code',key:'code',placeholder:'CSE-301'},{label:'Teacher Name',key:'teacherName',placeholder:'Dr. John Doe'}].map(f=>(
-                  <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
+                  <div key={f.key}><label className="block text-xs font-semibold text-slate-700 mb-1.5">{f.label}</label>
                     <input type="text" value={form[f.key as keyof typeof form] as string} onChange={e=>F(f.key as keyof typeof form,e.target.value)} placeholder={f.placeholder}
-                      className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>))}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>))}
               </div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Course Title</label>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Course Title</label>
                 <input type="text" value={form.title} onChange={e=>F('title',e.target.value)} placeholder="Data Structures & Algorithms"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>
 
               <div className="grid grid-cols-4 gap-3">
                 {[{label:'Credits',key:'credits',type:'number'},{label:'Semester',key:'semester',type:'number'},{label:'Theory Hrs',key:'theoryHours',type:'number'},{label:'Lab Hrs',key:'labHours',type:'number'}].map(f=>(
-                  <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
+                  <div key={f.key}><label className="block text-xs font-semibold text-slate-700 mb-1.5">{f.label}</label>
                     <input type="number" value={form[f.key as keyof typeof form] as number} onChange={e=>F(f.key as keyof typeof form,+e.target.value)}
-                      className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>))}
               </div>
 
               <div className="grid grid-cols-3 gap-3">
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Degree</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Degree</label>
                   <select value={form.degree} onChange={e=>F('degree',e.target.value)}
-                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
                     <option value="BSc">BSc</option><option value="MSc">MSc</option><option value="PhD">PhD</option>
                   </select></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Type</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Type</label>
                   <select value={form.type} onChange={e=>F('type',e.target.value)}
-                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
                     <option value="core">Core</option><option value="elective">Elective</option><option value="lab">Lab</option><option value="sessional">Sessional</option>
                   </select></div>
                 <div className="flex items-end pb-2">
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form.isActive} onChange={e=>F('isActive',e.target.checked)} className="accent-blue-500"/>
-                    <span className="text-sm text-slate-300">Active</span>
+                    <input type="checkbox" checked={form.isActive} onChange={e=>F('isActive',e.target.checked)} className="accent-green-600"/>
+                    <span className="text-sm font-medium text-slate-700">Active</span>
                   </label></div>
               </div>
 
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Description</label>
                 <textarea rows={2} value={form.description} onChange={e=>F('description',e.target.value)}
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Syllabus PDF URL</label>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Syllabus PDF URL</label>
                 <input type="url" value={form.syllabusUrl} onChange={e=>F('syllabusUrl',e.target.value)} placeholder="https://…"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>
             </div>
             <div className="flex gap-3 mt-6">
               <Button onClick={save} loading={saving} className="flex-1">{editing?'Update':'Create'}</Button>

@@ -61,28 +61,28 @@ export default function NoticesPage() {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Notice':'Post Notice'}</h3>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-5">{editing?'Edit Notice':'Post Notice'}</h3>
             {err && <p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
             <div className="space-y-4">
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Title *</label>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Title *</label>
                 <input type="text" value={form.title} onChange={e=>F('title',e.target.value)} placeholder="Notice title"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Description (optional)</label>
-                <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Description (optional)</label>
+                <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Category</label>
-                  <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Category</label>
+                  <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
                     {CATS.map(c=><option key={c} value={c}>{c.replace('_',' ')}</option>)}
                   </select></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Posted By</label>
-                  <input type="text" value={form.postedByName} onChange={e=>F('postedByName',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Posted By</label>
+                  <input type="text" value={form.postedByName} onChange={e=>F('postedByName',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
               </div>
               <div className="flex flex-wrap gap-4">
                 {[{k:'isPublished',l:'Published'},{k:'isPinned',l:'Pinned'},{k:'isUrgent',l:'Urgent'}].map(({k,l})=>(
                   <label key={k} className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form[k as keyof typeof form] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-blue-500"/>
-                    <span className="text-sm text-slate-300">{l}</span>
+                    <input type="checkbox" checked={form[k as keyof typeof form] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-green-600"/>
+                    <span className="text-sm font-medium text-slate-700">{l}</span>
                   </label>))}
               </div>
             </div>

@@ -46,32 +46,32 @@ export default function ClubsAdminPage() {
         action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Club</Button>}/>
 
       {open&&(<div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
-          <h3 className="text-lg font-bold text-white mb-4">{editing?'Edit':'Add'} Club</h3>
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">{editing?'Edit':'Add'} Club</h3>
           {err&&<p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-3">{err}</p>}
           <div className="space-y-3">
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Club Name *</label>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Club Name *</label>
               <input type="text" value={form.name} onChange={e=>{F('name',e.target.value);if(!editing)F('slug',toSlug(e.target.value));}}
-                placeholder="Programming Club" className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Slug *</label>
-              <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                placeholder="Programming Club" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Slug *</label>
+              <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
             {[{l:'Short Description',k:'shortDescription',ph:'One line description'},{l:'Logo URL',k:'logo',ph:'https://...'},{l:'Cover Image URL',k:'coverImage',ph:'https://...'},{l:'Faculty Advisor',k:'advisorName',ph:'Dr. Name'},{l:'President',k:'presidentName',ph:'Student name'},{l:'Email',k:'email',ph:'club@gstu.edu.bd'},{l:'Facebook URL',k:'facebookUrl',ph:'https://facebook.com/...'}].map(f=>(
-              <div key={f.k}><label className="block text-xs font-medium text-slate-400 mb-1">{f.l}</label>
+              <div key={f.k}><label className="block text-xs font-semibold text-slate-700 mb-1.5">{f.l}</label>
                 <input type="text" value={form[f.k as keyof typeof EMPTY] as string} onChange={e=>F(f.k as keyof typeof EMPTY,e.target.value)} placeholder={f.ph}
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
-              <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500"/></div>))}
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Description</label>
+              <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Founded Year</label>
-                <input type="number" value={form.foundedYear} onChange={e=>F('foundedYear',+e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Members</label>
-                <input type="number" value={form.memberCount} onChange={e=>F('memberCount',+e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Founded Year</label>
+                <input type="number" value={form.foundedYear} onChange={e=>F('foundedYear',+e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Members</label>
+                <input type="number" value={form.memberCount} onChange={e=>F('memberCount',+e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
             </div>
             <div className="flex gap-4">
               {[{k:'isActive',l:'Active'},{k:'isFeatured',l:'Featured'}].map(({k,l})=>(
                 <label key={k} className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form[k as keyof typeof EMPTY] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-blue-500"/>
-                  <span className="text-sm text-slate-300">{l}</span></label>))}
+                  <input type="checkbox" checked={form[k as keyof typeof EMPTY] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-green-600"/>
+                  <span className="text-sm font-medium text-slate-700">{l}</span></label>))}
             </div>
           </div>
           <div className="flex gap-3 mt-5">

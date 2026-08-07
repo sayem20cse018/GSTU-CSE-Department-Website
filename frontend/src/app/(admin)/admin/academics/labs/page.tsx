@@ -72,51 +72,51 @@ export default function AdminLabsPage() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit Lab':'New Lab'}</h3>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-5">{editing?'Edit Lab':'New Lab'}</h3>
             <div className="space-y-4">
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Lab Name</label>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Lab Name</label>
                 <input type="text" value={form.name}
                   onChange={e=>{F('name',e.target.value); if(!editing) F('slug',toSlug(e.target.value));}}
                   placeholder="Artificial Intelligence Lab"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Slug (URL)</label>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Slug (URL)</label>
                 <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} placeholder="ai-lab"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Location</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Location</label>
                   <input type="text" value={form.location} onChange={e=>F('location',e.target.value)} placeholder="Room 302, CSE Building"
-                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Lab Type</label>
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Lab Type</label>
                   <select value={form.labType} onChange={e=>F('labType',e.target.value)}
-                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
                     <option value="teaching">Teaching</option><option value="research">Research</option><option value="both">Both</option>
                   </select></div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 {[{label:'Capacity',key:'capacity'},{label:'Workstations',key:'workstations'}].map(f=>(
-                  <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
+                  <div key={f.key}><label className="block text-xs font-semibold text-slate-700 mb-1.5">{f.label}</label>
                     <input type="number" value={form[f.key as keyof typeof form] as number} onChange={e=>F(f.key as keyof typeof form,+e.target.value)}
-                      className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>))}
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>))}
               </div>
 
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">In-Charge</label>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">In-Charge</label>
                 <input type="text" value={form.inCharge} onChange={e=>F('inCharge',e.target.value)} placeholder="Dr. Mohammad Rahman"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Description</label>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Description</label>
                 <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)}
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
               {[{label:'Facilities (comma separated)',key:'facilities',placeholder:'AC, Projector, UPS, High-speed Internet'},{label:'Software Installed (comma separated)',key:'softwareInstalled',placeholder:'Python, TensorFlow, PyTorch'}].map(f=>(
-                <div key={f.key}><label className="block text-xs font-medium text-slate-400 mb-1">{f.label}</label>
+                <div key={f.key}><label className="block text-xs font-semibold text-slate-700 mb-1.5">{f.label}</label>
                   <input type="text" value={form[f.key as keyof typeof form] as string} onChange={e=>F(f.key as keyof typeof form,e.target.value)} placeholder={f.placeholder}
-                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-600"/></div>))}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-slate-400"/></div>))}
 
               <div className="flex gap-4">
                 {[{k:'isActive',l:'Active'},{k:'isFeatured',l:'Featured'}].map(f=>(
                   <label key={f.k} className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form[f.k as keyof typeof form] as boolean} onChange={e=>F(f.k as keyof typeof form,e.target.checked)} className="accent-blue-500"/>
+                    <input type="checkbox" checked={form[f.k as keyof typeof form] as boolean} onChange={e=>F(f.k as keyof typeof form,e.target.checked)} className="accent-green-600"/>
                     <span className="text-sm text-slate-300">{f.l}</span>
                   </label>))}
               </div>

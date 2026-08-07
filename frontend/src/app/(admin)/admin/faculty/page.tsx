@@ -96,7 +96,7 @@ export default function PeoplePage() {
     finally { setDelId(null); }
   }
 
-  const iCls = 'w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500';
+  const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500';
   const current = STAFF_TYPES.find(t => t.key === activeType)!;
 
   return (
@@ -139,8 +139,8 @@ export default function PeoplePage() {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
-            <h3 className="text-lg font-bold text-white mb-1">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-1">
               {editing ? 'Edit' : 'Add'} {current.icon} {current.label.replace(/s$/, '')}
             </h3>
             <p className="text-xs text-slate-500 mb-5">Fields marked * are required</p>
@@ -153,22 +153,22 @@ export default function PeoplePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Common fields */}
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Name *</label>
                   <input value={form.name} onChange={e=>F('name',e.target.value)} placeholder="Dr. Mohammad Rahman" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Email *</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email *</label>
                   <input type="email" value={form.email} onChange={e=>F('email',e.target.value)} placeholder="name@gstu.edu.bd" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Phone</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Phone</label>
                   <input value={form.phone} onChange={e=>F('phone',e.target.value)} placeholder="+880-XXX" className={iCls}/>
                 </div>
 
                 {/* Title — only for faculty/chairman */}
                 {(activeType === 'faculty') && (
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Title</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Title</label>
                     <select value={form.title} onChange={e=>F('title',e.target.value)} className={iCls}>
                       {['Dr.','Prof.','Mr.','Ms.','Engr.'].map(t=><option key={t} value={t}>{t}</option>)}
                     </select>
@@ -176,14 +176,14 @@ export default function PeoplePage() {
                 )}
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Designation</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Designation</label>
                   <select value={form.designation} onChange={e=>F('designation',e.target.value)} className={iCls}>
                     {DESIG.map(d=><option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Employment Status</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Employment Status</label>
                   <select value={form.employmentStatus} onChange={e=>F('employmentStatus',e.target.value)} className={iCls}>
                     {EMP_STATUS.map(s=><option key={s} value={s}>{s.replace('_',' ')}</option>)}
                   </select>
@@ -193,18 +193,18 @@ export default function PeoplePage() {
                 <input type="hidden" value={form.staffType}/>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Office Room</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Office Room</label>
                   <input value={form.officeRoom} onChange={e=>F('officeRoom',e.target.value)} placeholder="Room 302, CSE Building" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Sort Order</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Sort Order</label>
                   <input type="number" value={form.sortOrder} onChange={e=>F('sortOrder',+e.target.value)} className={iCls}/>
                 </div>
               </div>
 
               {/* Bio */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Short Bio</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Short Bio</label>
                 <textarea rows={2} value={form.shortBio} onChange={e=>F('shortBio',e.target.value)}
                   className={`${iCls} resize-none`}/>
               </div>
@@ -212,7 +212,7 @@ export default function PeoplePage() {
               {/* Research interests — faculty/chairman only */}
               {(activeType === 'faculty') && (
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Research Interests (comma-separated)</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Research Interests (comma-separated)</label>
                   <input value={form.researchInterests} onChange={e=>F('researchInterests',e.target.value)}
                     placeholder="Machine Learning, Computer Vision, NLP" className={iCls}/>
                 </div>
@@ -221,18 +221,18 @@ export default function PeoplePage() {
               {/* Online links — faculty/chairman only */}
               {(activeType === 'faculty') && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Google Scholar URL</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Google Scholar URL</label>
                     <input type="url" value={form.googleScholarUrl} onChange={e=>F('googleScholarUrl',e.target.value)} placeholder="https://scholar.google.com/…" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">LinkedIn URL</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">LinkedIn URL</label>
                     <input type="url" value={form.linkedinUrl} onChange={e=>F('linkedinUrl',e.target.value)} placeholder="https://linkedin.com/in/…" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">ORCID ID</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">ORCID ID</label>
                     <input value={form.orcidId} onChange={e=>F('orcidId',e.target.value)} placeholder="0000-0000-0000-0000" className={iCls}/></div>
                 </div>
               )}
 
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={form.isActive} onChange={e=>F('isActive',e.target.checked)} className="accent-green-500"/>
-                <span className="text-sm text-slate-300">Active</span>
+                <span className="text-sm font-medium text-slate-700">Active</span>
               </label>
             </div>
 

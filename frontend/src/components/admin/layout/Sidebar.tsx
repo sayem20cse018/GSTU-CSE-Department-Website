@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { NAV_GROUPS } from './nav-items';
 import { cn } from '@/lib/utils/cn';
@@ -10,9 +10,9 @@ import { cn } from '@/lib/utils/cn';
 interface SidebarProps { isOpen: boolean; onClose: () => void; }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const pathname = usePathname();
+  const pathname       = usePathname();
+  const searchParams   = useSearchParams();
   const { admin, hasPermission } = useAuth();
-  // Track which groups are collapsed (by group label)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   function toggle(group: string) {
@@ -21,6 +21,28 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       next.has(group) ? next.delete(group) : next.add(group);
       return next;
     });
+  }
+
+  /** Determine if a nav item is active, respecting query params */
+  function isItemActive(href: string): boolean {
+    const [hrefPath, hrefQuery] = href.split('?');
+
+    // Exact path match needed when item has query params (e.g. ?tab=history)
+    if (hrefQuery) {
+      if (pathname !== hrefPath) return false;
+      // Parse query params and check each key=value
+      const hrefParams = new URLSearchParams(hrefQuery);
+      for (const [key, val] of hrefParams.entries()) {
+        if (searchParams.get(key) !== val) return false;
+      }
+      return true;
+    }
+
+    // Dashboard: exact only
+    if (href === '/admin/dashboard') return pathname === href;
+
+    // All other plain paths: startsWith, but not matching siblings
+    return pathname === hrefPath || pathname.startsWith(hrefPath + '/');
   }
 
   return (
@@ -40,8 +62,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         {/* Brand */}
         <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-800 shrink-0">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: '#16a34a' }}>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-green-700">
             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -69,19 +90,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             if (!visible.length) return null;
 
             const isCollapsed = collapsed.has(group.group);
-            const hasActive = visible.some(item =>
-              pathname === item.href ||
-              (item.href !== '/admin/dashboard' && pathname.startsWith(item.href.split('?')[0]))
-            );
+            const hasActive   = visible.some(item => isItemActive(item.href));
 
             return (
               <div key={group.group} className="mb-1">
-                {/* Group header */}
+                {/* Group header — click to collapse */}
                 <button
                   onClick={() => toggle(group.group)}
                   className={cn(
-                    'w-full flex items-center justify-between px-3 py-1.5 text-left',
-                    'text-[10px] font-bold uppercase tracking-widest transition',
+                    'w-full flex items-center justify-between px-3 py-1.5 text-left rounded transition',
+                    'text-[10px] font-bold uppercase tracking-widest',
                     hasActive ? 'text-green-400' : 'text-gray-500 hover:text-gray-300',
                   )}>
                   {group.group}
@@ -95,24 +113,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {!isCollapsed && (
                   <ul className="mt-0.5 space-y-0.5">
                     {visible.map(item => {
-                      const isActive =
-                        pathname === item.href ||
-                        (item.href !== '/admin/dashboard' &&
-                          item.href.split('?')[0] !== '/admin/notices' &&
-                          pathname.startsWith(item.href.split('?')[0]));
-
+                      const active = isItemActive(item.href);
                       return (
                         <li key={item.href}>
                           <Link href={item.href} onClick={onClose}
                             className={cn(
                               'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all',
-                              isActive
+                              active
                                 ? 'bg-green-900/40 text-green-300 font-semibold border-l-2 border-green-500 pl-2.5'
                                 : 'text-gray-400 hover:text-white hover:bg-white/5',
                             )}>
                             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
-                              viewBox="0 0 24 24" strokeWidth={isActive ? 2.2 : 1.75}
-                              style={{ color: isActive ? '#4ade80' : 'currentColor' }}
+                              viewBox="0 0 24 24" strokeWidth={active ? 2.2 : 1.75}
+                              style={{ color: active ? '#4ade80' : 'currentColor' }}
                               aria-hidden="true">
                               {item.icon.split(' M').map((part, i) => (
                                 <path key={i} strokeLinecap="round" strokeLinejoin="round"
@@ -136,11 +149,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           })}
         </nav>
 
-        {/* Footer profile */}
+        {/* Footer */}
         <div className="shrink-0 px-3 py-3 border-t border-gray-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white"
-              style={{ background: '#16a34a' }}>
+            <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white bg-green-700">
               {admin?.name?.charAt(0).toUpperCase() ?? 'A'}
             </div>
             <div className="flex-1 min-w-0">

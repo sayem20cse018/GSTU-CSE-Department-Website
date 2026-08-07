@@ -54,46 +54,46 @@ export default function AdminEventsPage() {
         action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Event</Button>}/>
 
       {open&&(<div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-xl p-6 max-h-[92vh] overflow-y-auto">
-          <h3 className="text-lg font-bold text-white mb-5">{editing?'Edit':'Add'} Event</h3>
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-xl p-6 max-h-[92vh] overflow-y-auto">
+          <h3 className="text-lg font-bold text-slate-900 mb-5">{editing?'Edit':'Add'} Event</h3>
           {err&&<p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
           <div className="space-y-4">
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Title *</label>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Title *</label>
               <input value={form.title} onChange={e=>{F('title',e.target.value);if(!editing)F('slug',toSlug(e.target.value));}}
-                className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Slug *</label>
-              <input value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Short Description</label>
-              <textarea rows={2} value={form.shortDescription} onChange={e=>F('shortDescription',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Slug *</label>
+              <input value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Short Description</label>
+              <textarea rows={2} value={form.shortDescription} onChange={e=>F('shortDescription',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Type</label>
-                <select value={form.type} onChange={e=>F('type',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Type</label>
+                <select value={form.type} onChange={e=>F('type',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
                   {TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Mode</label>
-                <select value={form.mode} onChange={e=>F('mode',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Mode</label>
+                <select value={form.mode} onChange={e=>F('mode',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
                   {['in_person','online','hybrid'].map(m=><option key={m} value={m}>{m.replace('_',' ')}</option>)}</select></div>
             </div>
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Venue *</label>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Venue *</label>
               <input value={form.venue} onChange={e=>F('venue',e.target.value)} placeholder="Seminar Hall, CSE Building"
-                className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">Start Date *</label>
-                <input type="date" value={form.startDate} onChange={e=>F('startDate',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-              <div><label className="block text-xs font-medium text-slate-400 mb-1">End Date</label>
-                <input type="date" value={form.endDate} onChange={e=>F('endDate',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Start Date *</label>
+                <input type="date" value={form.startDate} onChange={e=>F('startDate',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">End Date</label>
+                <input type="date" value={form.endDate} onChange={e=>F('endDate',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
             </div>
             <ImageUpload
               label="Cover Image"
               value={form.coverImage}
               onChange={v => F('coverImage', v)}
             />
-            <div><label className="block text-xs font-medium text-slate-400 mb-1">Organizer</label>
-              <input value={form.organizerName} onChange={e=>F('organizerName',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Organizer</label>
+              <input value={form.organizerName} onChange={e=>F('organizerName',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
             <div className="flex gap-4">
               {[{k:'isPublished',l:'Published'},{k:'isFeatured',l:'Featured'}].map(({k,l})=>(
                 <label key={k} className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form[k as keyof typeof form] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-blue-500"/>
-                  <span className="text-sm text-slate-300">{l}</span></label>))}
+                  <input type="checkbox" checked={form[k as keyof typeof form] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-green-600"/>
+                  <span className="text-sm font-medium text-slate-700">{l}</span></label>))}
             </div>
           </div>
           <div className="flex gap-3 mt-6">

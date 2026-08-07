@@ -86,7 +86,7 @@ export default function AlumniAdminPage() {
     finally { setDelId(null); }
   }
 
-  const iCls = 'w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500';
   const statusColor: Record<string, 'success' | 'danger' | 'neutral'> = { approved:'success', rejected:'danger', pending:'neutral' };
 
   return (
@@ -98,7 +98,7 @@ export default function AlumniAdminPage() {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-white">{editing ? 'Edit Alumni' : 'Add Alumni'}</h3>
               <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs">
@@ -116,26 +116,26 @@ export default function AlumniAdminPage() {
               <div className="space-y-4">
                 <ImageUpload label="Photo" value={form.photo} onChange={v => F('photo', v)} previewRounded />
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="col-span-2"><label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
+                  <div className="col-span-2"><label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Name *</label>
                     <input value={form.name} onChange={e => F('name', e.target.value)} placeholder="Mohammad Rahman" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Email *</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Email *</label>
                     <input type="email" value={form.email} onChange={e => F('email', e.target.value)} placeholder="name@email.com" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Phone</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Phone</label>
                     <input value={form.phone} onChange={e => F('phone', e.target.value)} placeholder="+880-xxx" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Degree</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Degree</label>
                     <select value={form.degree} onChange={e => F('degree', e.target.value)} className={iCls}>
                       {DEGREES.map(d => <option key={d} value={d}>{d}</option>)}</select></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Batch Year</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Batch Year</label>
                     <input type="number" value={form.batchYear} onChange={e => F('batchYear', +e.target.value)} className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Graduation Year</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Graduation Year</label>
                     <input type="number" value={form.graduationYear} onChange={e => F('graduationYear', +e.target.value)} className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Student ID</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Student ID</label>
                     <input value={form.studentId} onChange={e => F('studentId', e.target.value)} placeholder="20CSE018" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">City</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">City</label>
                     <input value={form.currentCity} onChange={e => F('currentCity', e.target.value)} placeholder="Dhaka" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Country</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Country</label>
                     <input value={form.currentCountry} onChange={e => F('currentCountry', e.target.value)} placeholder="Bangladesh" className={iCls}/></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Approval Status</label>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Approval Status</label>
                     <select value={form.approvalStatus} onChange={e => F('approvalStatus', e.target.value)} className={iCls}>
                       {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
                 </div>
@@ -143,8 +143,8 @@ export default function AlumniAdminPage() {
                   {[['isProfilePublic','Public Profile'],['isFeatured','Featured'],['isVerified','Verified'],['willingToMentor','Can Mentor'],['willingToSpeak','Can Speak']].map(([k,l]) => (
                     <label key={k} className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={form[k as keyof FormType] as boolean}
-                        onChange={e => F(k as keyof FormType, e.target.checked)} className="accent-blue-500"/>
-                      <span className="text-sm text-slate-300">{l}</span>
+                        onChange={e => F(k as keyof FormType, e.target.checked)} className="accent-green-600"/>
+                      <span className="text-sm font-medium text-slate-700">{l}</span>
                     </label>
                   ))}
                 </div>
@@ -153,16 +153,16 @@ export default function AlumniAdminPage() {
 
             {tab === 'career' && (
               <div className="space-y-4">
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Current Designation</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Current Designation</label>
                   <input value={form.currentDesignation} onChange={e => F('currentDesignation', e.target.value)} placeholder="Senior Software Engineer" className={iCls}/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Current Organization</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Current Organization</label>
                   <input value={form.currentOrganization} onChange={e => F('currentOrganization', e.target.value)} placeholder="Google, BUET, etc." className={iCls}/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Industry</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Industry</label>
                   <select value={form.industry} onChange={e => F('industry', e.target.value)} className={iCls}>
                     {INDUSTRIES.map(i => <option key={i} value={i}>{i.replace(/_/g,' ')}</option>)}</select></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Mentorship Topics</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Mentorship Topics</label>
                   <input value={form.mentorshipTopics} onChange={e => F('mentorshipTopics', e.target.value)} placeholder="Web dev, competitive programming…" className={iCls}/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Testimonial / Quote</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Testimonial / Quote</label>
                   <textarea rows={4} value={form.testimonial} onChange={e => F('testimonial', e.target.value)}
                     placeholder="What this department meant to me…" className={`${iCls} resize-none`}/></div>
               </div>
@@ -170,11 +170,11 @@ export default function AlumniAdminPage() {
 
             {tab === 'social' && (
               <div className="space-y-4">
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">LinkedIn URL</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">LinkedIn URL</label>
                   <input type="url" value={form.linkedinUrl} onChange={e => F('linkedinUrl', e.target.value)} placeholder="https://linkedin.com/in/..." className={iCls}/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">GitHub URL</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">GitHub URL</label>
                   <input type="url" value={form.githubUrl} onChange={e => F('githubUrl', e.target.value)} placeholder="https://github.com/..." className={iCls}/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Personal Website</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Personal Website</label>
                   <input type="url" value={form.websiteUrl} onChange={e => F('websiteUrl', e.target.value)} placeholder="https://..." className={iCls}/></div>
               </div>
             )}

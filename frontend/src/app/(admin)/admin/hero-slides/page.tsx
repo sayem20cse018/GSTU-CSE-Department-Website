@@ -69,7 +69,7 @@ export default function AdminHeroSlidesPage() {
     finally { setDelId(null); }
   }
 
-  const iCls = 'w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500';
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -80,8 +80,8 @@ export default function AdminHeroSlidesPage() {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
-            <h3 className="text-lg font-bold text-white mb-5">{editing ? 'Edit Slide' : 'New Slide'}</h3>
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-5">{editing ? 'Edit Slide' : 'New Slide'}</h3>
             {err && <p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
 
             <div className="space-y-4">
@@ -90,46 +90,46 @@ export default function AdminHeroSlidesPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Tag (small label)</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tag (small label)</label>
                   <input value={form.tag} onChange={e => F('tag', e.target.value)} placeholder="Welcome to" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Overlay Opacity (0–100)</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Overlay Opacity (0–100)</label>
                   <input type="number" min={0} max={100} value={form.overlayOpacity} onChange={e => F('overlayOpacity', +e.target.value)} className={iCls}/>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Title *</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Title *</label>
                 <input value={form.title} onChange={e => F('title', e.target.value)} placeholder="Slide headline" className={iCls}/>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Subtitle *</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Subtitle *</label>
                 <textarea rows={3} value={form.subtitle} onChange={e => F('subtitle', e.target.value)} placeholder="Supporting text below the title" className={`${iCls} resize-none`}/>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Primary Button Label</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Primary Button Label</label>
                   <input value={form.primaryBtnLabel} onChange={e => F('primaryBtnLabel', e.target.value)} placeholder="Explore Programs" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Primary Button URL</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Primary Button URL</label>
                   <input value={form.primaryBtnHref} onChange={e => F('primaryBtnHref', e.target.value)} placeholder="/academics" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Secondary Button Label</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Secondary Button Label</label>
                   <input value={form.secondaryBtnLabel} onChange={e => F('secondaryBtnLabel', e.target.value)} placeholder="Our Research" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Secondary Button URL</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Secondary Button URL</label>
                   <input value={form.secondaryBtnHref} onChange={e => F('secondaryBtnHref', e.target.value)} placeholder="/research" className={iCls}/>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Text Alignment</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Text Alignment</label>
                   <select value={form.align} onChange={e => F('align', e.target.value as 'left' | 'center')}
                     className={iCls}>
                     <option value="left">Left</option>
@@ -137,14 +137,14 @@ export default function AdminHeroSlidesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Sort Order</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Sort Order</label>
                   <input type="number" value={form.sortOrder} onChange={e => F('sortOrder', +e.target.value)} className={iCls}/>
                 </div>
               </div>
 
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={form.isActive} onChange={e => F('isActive', e.target.checked)} className="accent-blue-500"/>
-                <span className="text-sm text-slate-300">Active (visible on homepage)</span>
+                <input type="checkbox" checked={form.isActive} onChange={e => F('isActive', e.target.checked)} className="accent-green-600"/>
+                <span className="text-sm font-medium text-slate-700">Active (visible on homepage)</span>
               </label>
             </div>
 

@@ -68,7 +68,7 @@ export default function AdminNewsPage() {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold text-white">{editing?'Edit Article':'Write Article'}</h3>
               <div className="flex rounded-lg border border-slate-200 overflow-hidden">
@@ -79,33 +79,33 @@ export default function AdminNewsPage() {
 
             {tab==='basic' && (
               <div className="space-y-4">
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Title *</label>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Title *</label>
                   <input type="text" value={form.title} onChange={e=>{F('title',e.target.value);if(!editing)F('slug',toSlug(e.target.value));}} placeholder="Article title"
-                    className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Slug *</label>
-                  <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Excerpt * (shown on cards)</label>
-                  <textarea rows={3} value={form.excerpt} onChange={e=>F('excerpt',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/></div>
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Slug *</label>
+                  <input type="text" value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Excerpt * (shown on cards)</label>
+                  <textarea rows={3} value={form.excerpt} onChange={e=>F('excerpt',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Category</label>
-                    <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Category</label>
+                    <select value={form.category} onChange={e=>F('category',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
                       {CATS.map(c=><option key={c} value={c}>{c}</option>)}
                     </select></div>
-                  <div><label className="block text-xs font-medium text-slate-400 mb-1">Author</label>
-                    <input type="text" value={form.authorName} onChange={e=>F('authorName',e.target.value)} className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Author</label>
+                    <input type="text" value={form.authorName} onChange={e=>F('authorName',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
                 </div>
                 <ImageUpload
                   label="Cover Image"
                   value={form.coverImage}
                   onChange={v => F('coverImage', v)}
                 />
-                <div><label className="block text-xs font-medium text-slate-400 mb-1">Tags (comma separated)</label>
-                  <input type="text" value={form.tags} onChange={e=>F('tags',e.target.value)} placeholder="AI, Research, Students" className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"/></div>
+                <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Tags (comma separated)</label>
+                  <input type="text" value={form.tags} onChange={e=>F('tags',e.target.value)} placeholder="AI, Research, Students" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
                 <div className="flex gap-4">
                   {[{k:'isPublished',l:'Published'},{k:'isFeatured',l:'Featured (homepage)'}].map(({k,l})=>(
                     <label key={k} className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={form[k as keyof typeof form] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-blue-500"/>
-                      <span className="text-sm text-slate-300">{l}</span>
+                      <input type="checkbox" checked={form[k as keyof typeof form] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-green-600"/>
+                      <span className="text-sm font-medium text-slate-700">{l}</span>
                     </label>))}
                 </div>
               </div>
@@ -113,9 +113,9 @@ export default function AdminNewsPage() {
 
             {tab==='content' && (
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Full Article Content (HTML or Markdown)</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Article Content (HTML or Markdown)</label>
                 <textarea rows={16} value={form.content} onChange={e=>F('content',e.target.value)} placeholder="Write the full article content here…"
-                  className="w-full bg-white/5 border border-slate-200 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"/>
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/>
               </div>
             )}
 
