@@ -200,6 +200,10 @@ export default function SettingsPage() {
           {tab === 'account' && (
             <>
               <p className={sectionLabel}>Account & Branding</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
+                ℹ️ Logo and department name set in <strong>Identity</strong> tab are automatically shown on the login page. No need to set them again here.
+                You can optionally override the logo here if needed.
+              </div>
 
               {/* Dept Logo */}
               <div>

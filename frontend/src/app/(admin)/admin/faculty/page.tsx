@@ -12,9 +12,10 @@ import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fe
 const DESIG     = ['Professor','Associate Professor','Assistant Professor','Lecturer','Senior Lecturer','Adjunct Faculty','Administrative Officer','Section Officer','Assistant Officer','System Analyst'];
 const EMP_STATUS = ['full_time','part_time','on_leave','retired'];
 const STAFF_TYPES = [
-  { key: 'faculty',  label: 'Faculty Members',  icon: '👨‍🏫' },
-  { key: 'staff',    label: 'Staff',            icon: '🏢' },
-  { key: 'officer',  label: 'Officers',         icon: '📋' },
+  { key: 'faculty',   label: 'Faculty Members', icon: '👨‍🏫' },
+  { key: 'chairman',  label: 'Chairman List',   icon: '🎓' },
+  { key: 'staff',     label: 'Staff',           icon: '🏢' },
+  { key: 'officer',   label: 'Officers',        icon: '📋' },
 ] as const;
 
 type StaffType = typeof STAFF_TYPES[number]['key'];
@@ -24,6 +25,7 @@ const EMPTY = {
   shortBio:'', officeRoom:'', researchInterests:'', googleScholarUrl:'', linkedinUrl:'',
   orcidId:'', websiteUrl:'', isActive:true, sortOrder:0, staffType:'faculty' as StaffType,
   employmentStatus:'full_time',
+  chairmanFrom:'', chairmanTo:'',  // Chairman List specific
 };
 
 interface FacultyMember {
@@ -32,6 +34,7 @@ interface FacultyMember {
   researchInterests:string[]; googleScholarUrl?:string; linkedinUrl?:string;
   orcidId?:string; isActive:boolean; sortOrder:number;
   staffType:string; employmentStatus:string;
+  chairmanFrom?:string; chairmanTo?:string;
 }
 
 export default function PeoplePage() {
@@ -72,6 +75,8 @@ export default function PeoplePage() {
       isActive: m.isActive, sortOrder: m.sortOrder,
       staffType: (m.staffType || 'faculty') as StaffType,
       employmentStatus: m.employmentStatus || 'full_time',
+      chairmanFrom: m.chairmanFrom ? m.chairmanFrom.slice(0,10) : '',
+      chairmanTo:   m.chairmanTo   ? m.chairmanTo.slice(0,10)   : '',
     });
     setErr(''); setOpen(true);
   }
@@ -234,6 +239,24 @@ export default function PeoplePage() {
                 <input type="checkbox" checked={form.isActive} onChange={e=>F('isActive',e.target.checked)} className="accent-green-500"/>
                 <span className="text-sm font-medium text-slate-700">Active</span>
               </label>
+
+              {/* Chairman-specific: service period */}
+              {activeType === 'chairman' && (
+                <div className="border-t border-slate-100 pt-4 space-y-3">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Chairman Service Period</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">From Date</label>
+                      <input type="date" value={form.chairmanFrom} onChange={e=>F('chairmanFrom',e.target.value)} className={iCls}/>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">To Date <span className="text-slate-400 font-normal">(leave blank if current)</span></label>
+                      <input type="date" value={form.chairmanTo} onChange={e=>F('chairmanTo',e.target.value)} className={iCls}/>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-400">Leave "To Date" empty if this person is the current chairman.</p>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 mt-6">
@@ -257,6 +280,9 @@ export default function PeoplePage() {
               <tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
                 <th className="text-left px-5 py-3">Person</th>
                 <th className="text-left px-4 py-3 hidden md:table-cell">Designation</th>
+                {activeType === 'chairman' && (
+                  <th className="text-center px-4 py-3 hidden md:table-cell">Service Period</th>
+                )}
                 <th className="text-center px-4 py-3 hidden sm:table-cell">Status</th>
                 <th className="text-right px-5 py-3">Actions</th>
               </tr>
@@ -281,6 +307,15 @@ export default function PeoplePage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell text-slate-600 text-xs">{m.designation}</td>
+                  {activeType === 'chairman' && (
+                    <td className="px-4 py-3 text-center hidden md:table-cell">
+                      <span className="text-xs text-slate-600">
+                        {m.chairmanFrom ? new Date(m.chairmanFrom).toLocaleDateString('en-GB') : '—'}
+                        {' → '}
+                        {m.chairmanTo ? new Date(m.chairmanTo).toLocaleDateString('en-GB') : <span className="text-green-600 font-semibold">Present</span>}
+                      </span>
+                    </td>
+                  )}
                   <td className="px-4 py-3 text-center hidden sm:table-cell">
                     <Badge variant={m.isActive ? 'success' : 'neutral'}>
                       {m.isActive ? 'Active' : 'Inactive'}

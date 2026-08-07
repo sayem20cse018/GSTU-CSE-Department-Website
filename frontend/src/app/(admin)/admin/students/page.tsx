@@ -3,14 +3,13 @@ import Link from 'next/link';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 
 const SECTIONS = [
-  { icon: '📅', label: 'Class Routine',      desc: 'Upload class schedule PDF/image',         href: '/admin/academics/resources?type=routine',       color: 'bg-blue-50 border-blue-200 text-blue-700' },
-  { icon: '📝', label: 'Exam Routine',        desc: 'Upload exam schedule',                    href: '/admin/academics/resources?type=exam_schedule',  color: 'bg-violet-50 border-violet-200 text-violet-700' },
-  { icon: '📊', label: 'Results',             desc: 'Publish semester results',                href: '/admin/academics/resources?type=result',         color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-  { icon: '📆', label: 'Academic Calendar',   desc: 'Upload academic year calendar',           href: '/admin/academics/resources?type=calendar',       color: 'bg-amber-50 border-amber-200 text-amber-700' },
-  { icon: '🎓', label: 'Scholarships',        desc: 'Manage scholarship information',          href: '/admin/notices?cat=scholarship',                  color: 'bg-rose-50 border-rose-200 text-rose-700' },
-  { icon: '🤝', label: 'Clubs & Societies',   desc: 'Manage student clubs',                    href: '/admin/clubs',                                    color: 'bg-teal-50 border-teal-200 text-teal-700' },
-  { icon: '💼', label: 'Internship',          desc: 'Manage internship information',           href: '/admin/notices?cat=general',                     color: 'bg-indigo-50 border-indigo-200 text-indigo-700' },
-  { icon: '📚', label: 'Thesis & Projects',   desc: 'Manage thesis guidelines and templates',  href: '/admin/academics/resources?type=guideline',      color: 'bg-orange-50 border-orange-200 text-orange-700' },
+  { icon: '📅', label: 'Class Routine',    desc: 'Upload class schedule PDF/image',       href: '/admin/academics/resources?type=routine',      color: 'bg-blue-50 border-blue-200 text-blue-700' },
+  { icon: '📝', label: 'Exam Routine',     desc: 'Upload exam schedule',                  href: '/admin/academics/resources?type=exam_schedule', color: 'bg-violet-50 border-violet-200 text-violet-700' },
+  { icon: '📊', label: 'Results',          desc: 'Publish semester results',              href: '/admin/academics/resources?type=result',        color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+  { icon: '🎓', label: 'Scholarships',     desc: 'Manage scholarship notices',            href: '/admin/notices?cat=scholarship',                color: 'bg-rose-50 border-rose-200 text-rose-700' },
+  { icon: '🤝', label: 'Clubs & Societies',desc: 'Manage student clubs',                  href: '/admin/clubs',                                  color: 'bg-teal-50 border-teal-200 text-teal-700' },
+  { icon: '💼', label: 'Internship',       desc: 'Manage internship information',         href: '/admin/notices?cat=general',                   color: 'bg-indigo-50 border-indigo-200 text-indigo-700' },
+  { icon: '📚', label: 'Thesis & Projects',desc: 'Thesis guidelines and templates',       href: '/admin/academics/resources?type=guideline',    color: 'bg-orange-50 border-orange-200 text-orange-700' },
 ];
 
 export default function StudentsAdminPage() {

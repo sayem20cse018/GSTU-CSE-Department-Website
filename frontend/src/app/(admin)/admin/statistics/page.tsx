@@ -45,7 +45,7 @@ export default function StatisticsAdminPage() {
         <div className="space-y-3">
           {list.map(s=>(
             <div key={s._id}
-              className={cn('bg-slate-900 border rounded-xl p-5 transition', editing?._id===s._id?'border-blue-400':'border-slate-200')}>
+              className={cn('bg-white border rounded-xl p-5 shadow-sm transition', editing?._id===s._id?'border-blue-400':'border-slate-200')}>
               {editing?._id===s._id ? (
                 /* Edit mode */
                 <div className="space-y-3">
@@ -60,7 +60,7 @@ export default function StatisticsAdminPage() {
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={form.isVisible} onChange={e=>setForm(p=>({...p,isVisible:e.target.checked}))} className="accent-green-600"/>
-                      <span className="text-sm text-slate-300">Visible on homepage</span>
+                      <span className="text-sm font-medium text-slate-700">Visible on homepage</span>
                     </label>
                   </div>
                   <div className="flex gap-2">
@@ -74,12 +74,12 @@ export default function StatisticsAdminPage() {
                   <div className="flex items-center gap-4">
                     <span className="text-3xl w-10 text-center" aria-hidden="true">{s.icon}</span>
                     <div>
-                      <p className="font-bold text-white text-lg leading-none">{s.value}</p>
-                      <p className="text-sm text-slate-400 mt-0.5">{s.label}</p>
+                      <p className="font-bold text-slate-900 text-lg leading-none">{s.value}</p>
+                      <p className="text-sm text-slate-500 mt-0.5">{s.label}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', s.isVisible?'bg-emerald-500/20 text-emerald-400':'bg-slate-700 text-slate-400')}>
+                    <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', s.isVisible?'bg-emerald-100 text-emerald-700':'bg-slate-100 text-slate-500')}>
                       {s.isVisible?'Visible':'Hidden'}
                     </span>
                     <Button size="sm" variant="secondary" onClick={()=>openEdit(s)}>Edit</Button>
@@ -93,7 +93,7 @@ export default function StatisticsAdminPage() {
 
       {/* Info */}
       <div className="mt-6 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-        <p className="text-sm text-blue-300">
+        <p className="text-sm text-blue-700">
           💡 Changes take effect immediately on the public homepage. Statistics are cached for 1 hour.
         </p>
       </div>

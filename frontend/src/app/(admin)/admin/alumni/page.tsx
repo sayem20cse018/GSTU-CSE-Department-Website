@@ -10,9 +10,10 @@ import { cn }      from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
 
-const DEGREES   = ['BSc', 'MSc', 'PhD'];
+const DEGREES    = ['BSc', 'MSc', 'PhD'];
 const INDUSTRIES = ['software_engineering','data_science_ml','research_academia','entrepreneurship','government','finance_fintech','cybersecurity','product_management','consulting','higher_education','other'];
-const STATUSES  = ['pending', 'approved', 'rejected'];
+const STATUSES   = ['pending', 'approved', 'rejected'];
+const ALUMNI_ROLES = ['member','executive','president','vice_president','secretary','treasurer','committee'];
 
 const EMPTY = {
   name:'', email:'', photo:'', phone:'', currentCity:'', currentCountry:'Bangladesh',
@@ -22,6 +23,7 @@ const EMPTY = {
   testimonial:'', linkedinUrl:'', githubUrl:'', websiteUrl:'',
   isProfilePublic:true, isFeatured:false, isVerified:false, approvalStatus:'approved',
   willingToMentor:false, willingToSpeak:false, mentorshipTopics:'',
+  associationRole:'member', isDistinguished:false,
 };
 
 interface Alumnus {
@@ -100,7 +102,7 @@ export default function AlumniAdminPage() {
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-white">{editing ? 'Edit Alumni' : 'Add Alumni'}</h3>
+              <h3 className="text-lg font-bold text-slate-900">{editing ? 'Edit Alumni' : 'Add Alumni'}</h3>
               <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs">
                 {(['basic','career','social'] as const).map(t => (
                   <button key={t} onClick={() => setTab(t)}
@@ -138,9 +140,12 @@ export default function AlumniAdminPage() {
                   <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Approval Status</label>
                     <select value={form.approvalStatus} onChange={e => F('approvalStatus', e.target.value)} className={iCls}>
                       {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Association Role</label>
+                    <select value={form.associationRole} onChange={e => F('associationRole', e.target.value)} className={iCls}>
+                      {ALUMNI_ROLES.map(r => <option key={r} value={r}>{r.replace(/_/g,' ')}</option>)}</select></div>
                 </div>
                 <div className="flex flex-wrap gap-4">
-                  {[['isProfilePublic','Public Profile'],['isFeatured','Featured'],['isVerified','Verified'],['willingToMentor','Can Mentor'],['willingToSpeak','Can Speak']].map(([k,l]) => (
+                  {[['isProfilePublic','Public Profile'],['isFeatured','Featured'],['isDistinguished','Distinguished Alumni'],['isVerified','Verified'],['willingToMentor','Can Mentor'],['willingToSpeak','Can Speak']].map(([k,l]) => (
                     <label key={k} className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={form[k as keyof FormType] as boolean}
                         onChange={e => F(k as keyof FormType, e.target.checked)} className="accent-green-600"/>
@@ -216,18 +221,18 @@ export default function AlumniAdminPage() {
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-white">{a.name}</p>
+                        <p className="font-medium text-slate-900">{a.name}</p>
                         <p className="text-xs text-slate-500">{a.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell">
-                    <p className="text-white text-xs line-clamp-1">{a.currentDesignation || '—'}</p>
+                    <p className="text-slate-700 text-xs line-clamp-1">{a.currentDesignation || '—'}</p>
                     <p className="text-slate-500 text-xs line-clamp-1">{a.currentOrganization || ''}</p>
                   </td>
                   <td className="px-4 py-3 text-center hidden sm:table-cell">
-                    <span className="text-xs text-slate-400">{a.batchYear}–{a.graduationYear}</span>
-                    <br/><span className="text-xs font-bold text-blue-400">{a.degree}</span>
+                    <span className="text-xs text-slate-500">{a.batchYear}–{a.graduationYear}</span>
+                    <br/><span className="text-xs font-bold text-green-700">{a.degree}</span>
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex flex-col gap-1 items-center">
