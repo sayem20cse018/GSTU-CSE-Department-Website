@@ -1,89 +1,55 @@
 import type { Metadata } from 'next';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 import OverviewStats from '@/components/admin/dashboard/OverviewStats';
+import { NAV_GROUPS } from '@/components/admin/layout/nav-items';
 
 export const metadata: Metadata = { title: 'Dashboard — GSTU CSE Admin' };
 
-const CMS_MODULES = [
-  {
-    group: 'About',
-    color: 'border-blue-200 bg-blue-50',
-    textColor: 'text-blue-900',
-    iconBg: 'bg-blue-100',
-    items: [
-      { label: 'About Dept',       href: '/admin/about',                         icon: '🏛️' },
-      { label: "Chairman's Msg",   href: '/admin/settings?tab=chairman',          icon: '👤' },
-    ],
-  },
-  {
-    group: 'Academics',
-    color: 'border-violet-200 bg-violet-50',
-    textColor: 'text-violet-900',
-    iconBg: 'bg-violet-100',
-    items: [
-      { label: 'Programs',        href: '/admin/academics',                       icon: '🎓' },
-      { label: 'Courses',         href: '/admin/academics/courses',               icon: '📚' },
-      { label: 'Resources',       href: '/admin/academics/resources',             icon: '📁' },
-      { label: 'Labs',            href: '/admin/academics/labs',                  icon: '🔬' },
-    ],
-  },
-  {
-    group: 'People',
-    color: 'border-emerald-200 bg-emerald-50',
-    textColor: 'text-emerald-900',
-    iconBg: 'bg-emerald-100',
-    items: [
-      { label: 'Faculty & Staff', href: '/admin/faculty',                         icon: '👨‍🏫' },
-      { label: 'Alumni',          href: '/admin/alumni',                          icon: '🎓' },
-    ],
-  },
-  {
-    group: 'Students',
-    color: 'border-amber-200 bg-amber-50',
-    textColor: 'text-amber-900',
-    iconBg: 'bg-amber-100',
-    items: [
-      { label: 'Resources',       href: '/admin/students',                        icon: '📋' },
-      { label: 'Clubs',           href: '/admin/clubs',                           icon: '🤝' },
-    ],
-  },
-  {
-    group: 'Content',
-    color: 'border-rose-200 bg-rose-50',
-    textColor: 'text-rose-900',
-    iconBg: 'bg-rose-100',
-    items: [
-      { label: 'Hero Slides',     href: '/admin/hero-slides',                     icon: '🖼️' },
-      { label: 'Notices',         href: '/admin/notices',                         icon: '📢' },
-      { label: 'News',            href: '/admin/news',                            icon: '📰' },
-      { label: 'Events',          href: '/admin/events',                          icon: '📅' },
-      { label: 'Achievements',    href: '/admin/achievements',                    icon: '🏆' },
-      { label: 'Gallery',         href: '/admin/gallery',                         icon: '📷' },
-      { label: 'Forms',           href: '/admin/forms',                           icon: '📝' },
-    ],
-  },
-  {
-    group: 'Settings',
-    color: 'border-slate-200 bg-slate-50',
-    textColor: 'text-slate-900',
-    iconBg: 'bg-slate-100',
-    items: [
-      { label: 'Statistics',      href: '/admin/statistics',                      icon: '📊' },
-      { label: 'Site Settings',   href: '/admin/settings',                        icon: '⚙️' },
-    ],
-  },
-];
+// Group color palette
+const GROUP_COLORS: Record<string, { border: string; bg: string; text: string; icon: string }> = {
+  'Overview':                 { border: 'border-slate-300',   bg: 'bg-slate-50',    text: 'text-slate-800',   icon: 'bg-slate-100' },
+  'About':                    { border: 'border-blue-200',    bg: 'bg-blue-50',     text: 'text-blue-900',    icon: 'bg-blue-100' },
+  'Academics':                { border: 'border-violet-200',  bg: 'bg-violet-50',   text: 'text-violet-900',  icon: 'bg-violet-100' },
+  'Research & Publications':  { border: 'border-cyan-200',    bg: 'bg-cyan-50',     text: 'text-cyan-900',    icon: 'bg-cyan-100' },
+  'Achievements':             { border: 'border-yellow-200',  bg: 'bg-yellow-50',   text: 'text-yellow-900',  icon: 'bg-yellow-100' },
+  'People':                   { border: 'border-emerald-200', bg: 'bg-emerald-50',  text: 'text-emerald-900', icon: 'bg-emerald-100' },
+  'Students':                 { border: 'border-amber-200',   bg: 'bg-amber-50',    text: 'text-amber-900',   icon: 'bg-amber-100' },
+  'Admissions':               { border: 'border-orange-200',  bg: 'bg-orange-50',   text: 'text-orange-900',  icon: 'bg-orange-100' },
+  'Content':                  { border: 'border-rose-200',    bg: 'bg-rose-50',     text: 'text-rose-900',    icon: 'bg-rose-100' },
+  'Configuration':            { border: 'border-gray-200',    bg: 'bg-gray-50',     text: 'text-gray-800',    icon: 'bg-gray-100' },
+};
+
+// Map group label → emoji icon for each item (best-effort)
+const ICON_MAP: Record<string, string> = {
+  'Dashboard': '🏠',
+  'About Department': '🏛️',
+  'Programs': '🎓', 'Courses': '📚', 'Academic Calendar': '📅',
+  'Syllabus': '📖', 'Laboratories': '🔬', 'Resources': '📁',
+  'Research Areas': '🔭', 'Publications': '📰',
+  'Achievements': '🏆',
+  'Faculty & Staff': '👨‍🏫', 'Alumni': '🎓',
+  'Student Resources': '📋', 'Clubs & Societies': '🤝',
+  'Admission Notices': '📢',
+  'Hero Slides': '🖼️', 'Notices': '🔔', 'News': '📰',
+  'Events': '📅', 'Gallery': '📷', 'Forms': '📝',
+  'Statistics': '📊', 'Site Settings': '⚙️',
+};
 
 export default function DashboardPage() {
+  // Auto-generate from NAV_GROUPS — always in sync with sidebar
+  const modules = NAV_GROUPS.filter(g => g.group !== 'Overview');
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <AdminPageTitle title="Dashboard" />
 
-      {/* Welcome */}
+      {/* Welcome banner */}
       <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
         <div className="flex-1">
           <h2 className="text-lg font-bold">GSTU CSE — Content Management System</h2>
-          <p className="text-gray-400 text-sm mt-1">All website content is controlled from this panel. Select a module to start managing.</p>
+          <p className="text-gray-400 text-sm mt-1">
+            All website content is controlled from this panel. Changes are reflected live on the public site.
+          </p>
         </div>
         <a href="/" target="_blank" rel="noopener noreferrer"
           className="shrink-0 text-xs font-semibold px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 transition">
@@ -97,28 +63,56 @@ export default function DashboardPage() {
         <OverviewStats />
       </section>
 
-      {/* CMS Modules */}
+      {/* CMS Modules — auto-generated from NAV_GROUPS (SSOT) */}
       <section>
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">All CMS Modules</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">All CMS Modules</h3>
+          <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            {NAV_GROUPS.reduce((acc, g) => acc + g.items.length, 0)} modules
+          </span>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {CMS_MODULES.map(group => (
-            <div key={group.group} className={`border-2 rounded-2xl p-4 ${group.color}`}>
-              <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${group.textColor}`}>
-                {group.group}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {group.items.map(item => (
-                  <a key={item.label} href={item.href}
-                    className={`flex items-center gap-2 p-2.5 rounded-xl bg-white border border-transparent hover:border-slate-200 hover:shadow-sm transition group`}>
-                    <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-base shrink-0 ${group.iconBg}`}>
-                      {item.icon}
-                    </span>
-                    <span className="text-xs font-semibold text-slate-900 truncate">{item.label}</span>
-                  </a>
-                ))}
+          {modules.map(group => {
+            const c = GROUP_COLORS[group.group] ?? GROUP_COLORS['Configuration'];
+            return (
+              <div key={group.group} className={`border-2 rounded-2xl p-4 ${c.border} ${c.bg}`}>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${c.text}`}>
+                  {group.group}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {group.items.map(item => (
+                    <a key={item.href} href={item.href}
+                      className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-transparent
+                                 hover:border-slate-200 hover:shadow-sm transition-all duration-150 group">
+                      <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-sm shrink-0 ${c.icon}`}>
+                        {ICON_MAP[item.label] ?? '📄'}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-slate-900 truncate">{item.label}</p>
+                        {item.description && (
+                          <p className="text-[10px] text-slate-400 truncate hidden group-hover:block">{item.description}</p>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Quick tips */}
+      <section className="bg-green-50 border border-green-200 rounded-2xl p-5">
+        <h3 className="font-bold text-green-900 text-sm mb-3">💡 Single Source of Truth</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-green-800">
+          <p>✅ <strong>About text & photos</strong> → Settings → About Department</p>
+          <p>✅ <strong>Chairman message</strong> → Settings → About Department → Chairman tab</p>
+          <p>✅ <strong>Header & Footer</strong> → Settings → Identity + Contact</p>
+          <p>✅ <strong>Social links</strong> → Settings → Social</p>
+          <p>✅ <strong>Homepage sections</strong> → Each respective module above</p>
+          <p>✅ <strong>Login page branding</strong> → Settings → Identity (auto-synced)</p>
         </div>
       </section>
     </div>
