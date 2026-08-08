@@ -110,7 +110,10 @@ export class Settings {
 
   // ── Navigation control ─────────────────────────────────────────────────────
   @Prop({ type: [String], default: [] })
-  hiddenNavItems: string[];   // hrefs to hide from public nav
+  hiddenNavItems: string[];
+
+  @Prop({ default: '[]' })
+  customNavItems: string;   // JSON array of CustomNavItem
 }
 
 export const SettingsSchema = SchemaFactory.createForClass(Settings);

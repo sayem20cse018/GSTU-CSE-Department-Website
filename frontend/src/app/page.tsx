@@ -3,6 +3,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import type { Metadata } from 'next';
+import SiteHeader               from '@/components/layout/SiteHeader';
+import Navbar                   from '@/components/layout/Navbar';
+import Footer                   from '@/components/layout/Footer';
+import ScrollToTop              from '@/components/ui/ScrollToTop';
 import HeroSlider               from '@/components/sections/HeroSlider';
 import AboutSection             from '@/components/sections/AboutSection';
 import ChairmanMessage          from '@/components/sections/ChairmanMessage';
@@ -23,17 +27,23 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <HeroSlider />
-      <AboutSection />
-      <ChairmanMessage />
-      <AcademicProgramsSection />
-      <NoticesSection />
-      <NewsSection />
-      <AchievementsSection />
-      <UpcomingEventsSection />
-      <ClubsSection />
-      <FacultyPreview />
-      <DepartmentStats />
+      <SiteHeader />
+      <Navbar />
+      <main>
+        <HeroSlider />
+        <AboutSection />
+        <ChairmanMessage />
+        <AcademicProgramsSection />
+        <NoticesSection />
+        <NewsSection />
+        <AchievementsSection />
+        <UpcomingEventsSection />
+        <ClubsSection />
+        <FacultyPreview />
+        <DepartmentStats />
+      </main>
+      <Footer />
+      <ScrollToTop />
     </>
   );
 }

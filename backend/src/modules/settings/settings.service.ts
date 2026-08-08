@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
-  IsOptional, IsString, IsNumber, MaxLength,
+  IsOptional, IsString, IsNumber, IsArray, MaxLength,
 } from 'class-validator';
 import { Settings, SettingsDocument } from './schemas/settings.schema';
 
@@ -107,6 +107,10 @@ export class UpdateSettingsDto {
   // Nav control
   @IsOptional() @IsArray() @IsString({ each: true })
   hiddenNavItems?: string[];
+
+  // Custom nav items (JSON string)
+  @IsOptional() @IsString() @MaxLength(20_000)
+  customNavItems?: string;
 }
 
 const SINGLETON_KEY = 'site_settings';
