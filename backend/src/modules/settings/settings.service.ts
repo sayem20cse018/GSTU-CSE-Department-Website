@@ -103,6 +103,10 @@ export class UpdateSettingsDto {
 
   @IsOptional() @IsString() @MaxLength(5_000_000)
   aboutImage4?: string;
+
+  // Nav control
+  @IsOptional() @IsArray() @IsString({ each: true })
+  hiddenNavItems?: string[];
 }
 
 const SINGLETON_KEY = 'site_settings';

@@ -120,9 +120,21 @@ export default function Navbar() {
   const [dropdown,     setDropdown]     = useState<DropdownState | null>(null);
   const [mobileExpand, setMobileExpand] = useState<string | null>(null);
   const [mounted,      setMounted]      = useState(false);
+  const [hiddenItems,  setHiddenItems]  = useState<string[]>([]);
 
   const pathname = usePathname();
   const navRef   = useRef<HTMLElement>(null);
+
+  // Fetch hidden nav items from settings
+  useEffect(() => {
+    fetch('/api/public/settings')
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((d: { data?: { hiddenNavItems?: string[] } }) => {
+        const hidden = d?.data?.hiddenNavItems;
+        if (Array.isArray(hidden)) setHiddenItems(hidden);
+      })
+      .catch(() => {});
+  }, []);
   const btnRefs  = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   useEffect(() => { setMounted(true); }, []);
@@ -212,7 +224,7 @@ export default function Navbar() {
 
             {/* Desktop nav */}
             <div className="hidden lg:flex items-center flex-1 h-full">
-              {NAV_LINKS.map((link) => {
+              {NAV_LINKS.filter(link => !hiddenItems.includes(link.href)).map((link) => {
                 const isActive = pathname === link.href ||
                   (link.href !== '/' && pathname.startsWith(link.href));
                 const isOpen = dropdown?.label === link.label;
@@ -293,7 +305,7 @@ export default function Navbar() {
                 <p className="text-[10px] mt-0.5" style={{ color: '#64748b' }}>{SITE.university}</p>
               </div>
 
-              {NAV_LINKS.map((link) => {
+              {NAV_LINKS.filter(link => !hiddenItems.includes(link.href)).map((link) => {
                 if (hasChildren(link)) {
                   const expanded = mobileExpand === link.label;
                   return (

@@ -135,12 +135,11 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
 
 // ─── Main HeroSlider ──────────────────────────────────────────────────────────
 export default function HeroSlider() {
-  // Start with empty slides — API data always takes priority
-  // FALLBACK_SLIDES shown only after API confirms no slides exist in DB
-  const [slides,   setSlides]   = useState<Slide[]>([]);
-  const [apiDone,  setApiDone]  = useState(false);
-  const [current,  setCurrent]  = useState(0);
-  const [paused,   setPaused]   = useState(false);
+  // Start with FALLBACK_SLIDES immediately — no blank flash on load
+  // API data replaces them when ready
+  const [slides,  setSlides]  = useState<Slide[]>(FALLBACK_SLIDES);
+  const [current, setCurrent] = useState(0);
+  const [paused,  setPaused]  = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -148,19 +147,14 @@ export default function HeroSlider() {
       .then(r => r.ok ? r.json() : Promise.reject())
       .then((d: { data?: ApiSlide[] }) => {
         const arr = d?.data;
+        // Only replace if API has real slides
         if (Array.isArray(arr) && arr.length) {
           setSlides(arr.map(apiToSlide));
-        } else {
-          // No slides in DB → show static fallback
-          setSlides(FALLBACK_SLIDES);
+          setCurrent(0);
         }
-        setApiDone(true);
+        // If API returns empty → keep FALLBACK_SLIDES showing
       })
-      .catch(() => {
-        // Network error → show static fallback
-        setSlides(FALLBACK_SLIDES);
-        setApiDone(true);
-      });
+      .catch(() => { /* keep FALLBACK_SLIDES */ });
   }, []);
 
   const total = slides.length;
@@ -219,18 +213,7 @@ export default function HeroSlider() {
           <div key={current} className="slide-enter">
             <SlideContent slide={slides[current]} active />
           </div>
-        ) : (
-          /* Loading skeleton while API fetch completes */
-          <div className="animate-pulse space-y-4 max-w-2xl">
-            <div className="h-4 bg-white/10 rounded w-32"/>
-            <div className="h-10 bg-white/10 rounded w-96"/>
-            <div className="h-6 bg-white/10 rounded w-80"/>
-            <div className="flex gap-3 mt-6">
-              <div className="h-10 bg-white/10 rounded w-32"/>
-              <div className="h-10 bg-white/10 rounded w-28"/>
-            </div>
-          </div>
-        )}
+        ) : null}
       </div>
 
       {/* ── Left arrow ── */}

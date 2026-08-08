@@ -97,16 +97,20 @@ export class Settings {
 
   // ── About Section Images ───────────────────────────────────────────────────
   @Prop({ default: '' })
-  aboutImage1: string;          // photo 1 (large, col-span-2)
+  aboutImage1: string;
 
   @Prop({ default: '' })
-  aboutImage2: string;          // photo 2
+  aboutImage2: string;
 
   @Prop({ default: '' })
-  aboutImage3: string;          // photo 3
+  aboutImage3: string;
 
   @Prop({ default: '' })
-  aboutImage4: string;          // photo 4 (wide, col-span-2)
+  aboutImage4: string;
+
+  // ── Navigation control ─────────────────────────────────────────────────────
+  @Prop({ type: [String], default: [] })
+  hiddenNavItems: string[];   // hrefs to hide from public nav
 }
 
 export const SettingsSchema = SchemaFactory.createForClass(Settings);

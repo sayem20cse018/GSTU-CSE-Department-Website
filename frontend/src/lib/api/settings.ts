@@ -41,6 +41,7 @@ export interface SiteSettings {
   aboutImage2?: string;
   aboutImage3?: string;
   aboutImage4?: string;
+  hiddenNavItems?: string[];
 }
 
 // Fallback from hardcoded constants — used when backend is unreachable

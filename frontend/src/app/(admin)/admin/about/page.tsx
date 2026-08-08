@@ -156,14 +156,24 @@ export default function AboutAdminPage() {
           </>)}
 
           {tab === 'photos' && (<>
-            <p className={sec}>About Section Photos — 4 images in homepage photo grid</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <PhotoUpload label="Photo 1 — Large (top-left)"     value={form.aboutImage1 ?? ''} onChange={v => F('aboutImage1', v)}/>
-              <PhotoUpload label="Photo 2 — Small (top-right)"    value={form.aboutImage2 ?? ''} onChange={v => F('aboutImage2', v)}/>
-              <PhotoUpload label="Photo 3 — Small (bottom-right)" value={form.aboutImage3 ?? ''} onChange={v => F('aboutImage3', v)}/>
-              <PhotoUpload label="Photo 4 — Wide (bottom)"        value={form.aboutImage4 ?? ''} onChange={v => F('aboutImage4', v)}/>
+            <p className={sec}>About Section Photos — shown in homepage grid (top-left is largest)</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {([
+                ['Photo 1', 'Large top-left', 'aboutImage1'],
+                ['Photo 2', 'Small top-right', 'aboutImage2'],
+                ['Photo 3', 'Small bottom-right', 'aboutImage3'],
+                ['Photo 4', 'Wide bottom', 'aboutImage4'],
+              ] as [string, string, keyof SiteSettings][]).map(([num, pos, key]) => (
+                <div key={key} className="border border-slate-200 rounded-xl p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900">{num}</span>
+                    <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{pos}</span>
+                  </div>
+                  <PhotoUpload label="" value={(form[key] as string) ?? ''} onChange={v => F(key, v)}/>
+                </div>
+              ))}
             </div>
-            <p className="text-xs text-slate-400">Recommended: 800×600px or larger.</p>
+            <p className="text-xs text-slate-400 mt-1">Recommended: 800×600px or larger. Leave empty to use placeholder.</p>
           </>)}
 
           {tab === 'chairman' && (<>

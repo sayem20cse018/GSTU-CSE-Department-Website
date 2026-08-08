@@ -3,11 +3,10 @@ import Link from 'next/link';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 
 const SECTIONS = [
-  { icon: '📢', label: 'Admission Notices',  desc: 'Post and manage all admission notices',          href: '/admin/notices',                            color: 'bg-amber-50 border-amber-200 text-amber-800' },
-  { icon: '📋', label: 'Requirements / Fees',desc: 'Upload requirements & fee structure PDFs',       href: '/admin/academics/resources?type=guideline',  color: 'bg-rose-50 border-rose-200 text-rose-800' },
-  { icon: '🎓', label: 'BSc Program Info',   desc: 'Edit undergraduate program details',             href: '/admin/academics',                           color: 'bg-blue-50 border-blue-200 text-blue-800' },
-  { icon: '📖', label: 'MSc / PhD Info',     desc: 'Edit graduate and doctoral program details',     href: '/admin/academics',                           color: 'bg-violet-50 border-violet-200 text-violet-800' },
-  { icon: '📅', label: 'Academic Calendar',  desc: 'Upload academic session calendar PDF',           href: '/admin/academics/calendar',                  color: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
+  { icon: '🎓', label: 'Programs (UG + PG)',  desc: 'Edit BSc, MSc, MPhil, PhD program details', href: '/admin/admissions/undergraduate', color: 'bg-blue-50 border-blue-200 text-blue-800' },
+  { icon: '📢', label: 'Admission Notices',   desc: 'Post and manage all admission notices',        href: '/admin/notices',                            color: 'bg-amber-50 border-amber-200 text-amber-800' },
+  { icon: '📋', label: 'Requirements / Fees', desc: 'Upload requirements & fee structure PDFs',     href: '/admin/academics/resources?type=guideline',  color: 'bg-rose-50 border-rose-200 text-rose-800' },
+  { icon: '📅', label: 'Academic Calendar',   desc: 'Upload academic session calendar PDF',         href: '/admin/academics/calendar',                  color: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
 ];
 
 export default function AdmissionsAdminPage() {
