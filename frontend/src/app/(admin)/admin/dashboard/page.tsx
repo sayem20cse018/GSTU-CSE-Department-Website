@@ -5,18 +5,18 @@ import { NAV_GROUPS } from '@/components/admin/layout/nav-items';
 
 export const metadata: Metadata = { title: 'Dashboard — GSTU CSE Admin' };
 
-// Group color palette
+// Group color palette — green-toned right side theme
 const GROUP_COLORS: Record<string, { border: string; bg: string; text: string; icon: string }> = {
-  'Overview':                 { border: 'border-slate-300',   bg: 'bg-slate-50',    text: 'text-slate-800',   icon: 'bg-slate-100' },
-  'About':                    { border: 'border-blue-200',    bg: 'bg-blue-50',     text: 'text-blue-900',    icon: 'bg-blue-100' },
-  'Academics':                { border: 'border-violet-200',  bg: 'bg-violet-50',   text: 'text-violet-900',  icon: 'bg-violet-100' },
+  'Overview':                 { border: 'border-green-200',   bg: 'bg-green-50',    text: 'text-green-900',   icon: 'bg-green-100' },
+  'About':                    { border: 'border-emerald-200', bg: 'bg-emerald-50',  text: 'text-emerald-900', icon: 'bg-emerald-100' },
+  'Academics':                { border: 'border-teal-200',    bg: 'bg-teal-50',     text: 'text-teal-900',    icon: 'bg-teal-100' },
   'Research & Publications':  { border: 'border-cyan-200',    bg: 'bg-cyan-50',     text: 'text-cyan-900',    icon: 'bg-cyan-100' },
-  'Achievements':             { border: 'border-yellow-200',  bg: 'bg-yellow-50',   text: 'text-yellow-900',  icon: 'bg-yellow-100' },
-  'People':                   { border: 'border-emerald-200', bg: 'bg-emerald-50',  text: 'text-emerald-900', icon: 'bg-emerald-100' },
-  'Students':                 { border: 'border-amber-200',   bg: 'bg-amber-50',    text: 'text-amber-900',   icon: 'bg-amber-100' },
-  'Admissions':               { border: 'border-orange-200',  bg: 'bg-orange-50',   text: 'text-orange-900',  icon: 'bg-orange-100' },
-  'Content':                  { border: 'border-rose-200',    bg: 'bg-rose-50',     text: 'text-rose-900',    icon: 'bg-rose-100' },
-  'Configuration':            { border: 'border-gray-200',    bg: 'bg-gray-50',     text: 'text-gray-800',    icon: 'bg-gray-100' },
+  'Achievements':             { border: 'border-lime-200',    bg: 'bg-lime-50',     text: 'text-lime-900',    icon: 'bg-lime-100' },
+  'People':                   { border: 'border-green-300',   bg: 'bg-green-50',    text: 'text-green-900',   icon: 'bg-green-200' },
+  'Students':                 { border: 'border-emerald-300', bg: 'bg-emerald-50',  text: 'text-emerald-900', icon: 'bg-emerald-200' },
+  'Admissions':               { border: 'border-teal-200',    bg: 'bg-teal-50',     text: 'text-teal-900',    icon: 'bg-teal-100' },
+  'Content':                  { border: 'border-green-200',   bg: 'bg-green-50',    text: 'text-green-800',   icon: 'bg-green-100' },
+  'Configuration':            { border: 'border-slate-200',   bg: 'bg-slate-50',    text: 'text-slate-800',   icon: 'bg-slate-100' },
 };
 
 // Map group label → emoji icon for each item (best-effort)
@@ -44,7 +44,8 @@ export default function DashboardPage() {
       <AdminPageTitle title="Dashboard" />
 
       {/* Welcome banner */}
-      <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+      <div className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 text-white"
+        style={{ background: 'linear-gradient(135deg, #052e16 0%, #0b3d1f 50%, #166534 100%)' }}>
         <div className="flex-1">
           <h2 className="text-lg font-bold">GSTU CSE — Content Management System</h2>
           <p className="text-gray-400 text-sm mt-1">
@@ -84,7 +85,7 @@ export default function DashboardPage() {
                   {group.items.map(item => (
                     <a key={item.href} href={item.href}
                       className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-transparent
-                                 hover:border-slate-200 hover:shadow-sm transition-all duration-150 group">
+                                 hover:border-green-300 hover:shadow-sm hover:bg-green-50/50 transition-all duration-150 group">
                       <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-sm shrink-0 ${c.icon}`}>
                         {ICON_MAP[item.label] ?? '📄'}
                       </span>
