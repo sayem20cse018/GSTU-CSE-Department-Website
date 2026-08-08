@@ -198,12 +198,12 @@ export default function HeroSlider() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* ── Slide backgrounds (all stacked, only active is visible) ────── */}
+      {/* ── Slide backgrounds ── */}
       {slides.map((slide, i) => (
         <SlideBackground key={slide.id} slide={slide} active={i === current} />
       ))}
 
-      {/* ── Grid pattern overlay ─────────────────────────────────────────── */}
+      {/* ── Grid pattern overlay ── */}
       <div
         className="absolute inset-0 z-[1] opacity-[0.03] pointer-events-none"
         aria-hidden="true"
@@ -213,64 +213,64 @@ export default function HeroSlider() {
         }}
       />
 
-      {/* ── Slide content ─────────────────────────────────────────────────── */}
+      {/* ── Slide content ── */}
       <div className="relative z-[2] h-full container-custom flex flex-col justify-center">
-        {/* Animated key forces re-mount → re-animation on slide change */}
-        <div key={current} className="slide-enter">
-          <SlideContent slide={slides[current]} active />
-        </div>
+        {slides.length > 0 && slides[current] ? (
+          <div key={current} className="slide-enter">
+            <SlideContent slide={slides[current]} active />
+          </div>
+        ) : (
+          /* Loading skeleton while API fetch completes */
+          <div className="animate-pulse space-y-4 max-w-2xl">
+            <div className="h-4 bg-white/10 rounded w-32"/>
+            <div className="h-10 bg-white/10 rounded w-96"/>
+            <div className="h-6 bg-white/10 rounded w-80"/>
+            <div className="flex gap-3 mt-6">
+              <div className="h-10 bg-white/10 rounded w-32"/>
+              <div className="h-10 bg-white/10 rounded w-28"/>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ── Left arrow ────────────────────────────────────────────────────── */}
-      <button
-        onClick={prev}
-        aria-label="Previous slide"
+      {/* ── Left arrow ── */}
+      {slides.length > 1 && (
+      <button onClick={prev} aria-label="Previous slide"
         className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[4]
                    w-11 h-11 rounded-full bg-black/30 hover:bg-black/60 border border-white/20
                    hover:border-white/50 text-white flex items-center justify-center
-                   transition-all backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-white"
-      >
+                   transition-all backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-white">
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
         </svg>
       </button>
+      )}
 
-      {/* ── Right arrow ───────────────────────────────────────────────────── */}
-      <button
-        onClick={next}
-        aria-label="Next slide"
+      {/* ── Right arrow ── */}
+      {slides.length > 1 && (
+      <button onClick={next} aria-label="Next slide"
         className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-[4]
                    w-11 h-11 rounded-full bg-black/30 hover:bg-black/60 border border-white/20
                    hover:border-white/50 text-white flex items-center justify-center
-                   transition-all backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-white"
-      >
+                   transition-all backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-white">
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
         </svg>
       </button>
+      )}
 
-      {/* ── Dot indicators ───────────────────────────────────────────────── */}
-      <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4] flex items-center gap-2"
-        role="tablist"
-        aria-label="Slide indicators"
-      >
+      {/* ── Dot indicators ── */}
+      {slides.length > 1 && (
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4] flex items-center gap-2"
+        role="tablist" aria-label="Slide indicators">
         {slides.map((slide, i) => (
-          <button
-            key={slide.id}
-            role="tab"
-            aria-selected={i === current}
-            aria-label={`Go to slide ${i + 1}`}
-            onClick={() => goTo(i)}
-            className={cn(
-              'transition-all duration-300 rounded-full focus-visible:ring-2 focus-visible:ring-white',
-              i === current
-                ? 'w-8 h-2.5 bg-white'
-                : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/70',
-            )}
-          />
+          <button key={slide.id} role="tab" aria-selected={i === current}
+            aria-label={`Go to slide ${i + 1}`} onClick={() => goTo(i)}
+            className={cn('transition-all duration-300 rounded-full focus-visible:ring-2 focus-visible:ring-white',
+              i === current ? 'w-8 h-2.5 bg-white' : 'w-2.5 h-2.5 bg-white/40 hover:bg-white/70')}/>
         ))}
       </div>
+      )}
 
       {/* ── Progress bar ──────────────────────────────────────────────────── */}
       {!paused && (
