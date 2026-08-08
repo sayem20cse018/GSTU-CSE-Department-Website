@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 import { adminGet, adminPatch, adminPost } from '@/lib/api/admin-fetch';
+import { useAuth } from '@/context/AuthContext';
 import type { SiteSettings } from '@/lib/api/settings';
 import { SETTINGS_FALLBACK } from '@/lib/api/settings';
 
@@ -26,7 +27,14 @@ export default function SettingsPage() {
   const [error,   setError]   = useState('');
   const [tab,     setTab]     = useState<Tab>('identity');
 
+  const { admin } = useAuth();
+
   // Account change state
+  const [profForm, setProfForm] = useState({ name: '', email: '' });
+  const [profSaving, setProfSave] = useState(false);
+  const [profMsg,   setProfMsg]   = useState('');
+  const [profErr,   setProfErr]   = useState('');
+
   const [pwForm,  setPwForm]  = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [pwSaving, setPwSave] = useState(false);
   const [pwMsg,   setPwMsg]   = useState('');
@@ -38,7 +46,9 @@ export default function SettingsPage() {
       .then(d => setForm({ ...SETTINGS_FALLBACK, ...d }))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+    // Pre-fill profile form with current admin info
+    if (admin) setProfForm({ name: admin.name ?? '', email: admin.email ?? '' });
+  }, [admin]);
 
   const F = (k: keyof SiteSettings, v: string | number) => {
     setForm(p => ({ ...p, [k]: v })); setSaved(false);
@@ -62,14 +72,25 @@ export default function SettingsPage() {
     setPwErr(''); setPwMsg('');
     if (!pwForm.currentPassword || !pwForm.newPassword) { setPwErr('All fields are required.'); return; }
     if (pwForm.newPassword !== pwForm.confirmPassword) { setPwErr('New passwords do not match.'); return; }
-    if (pwForm.newPassword.length < 8) { setPwErr('New password must be at least 8 characters.'); return; }
+    if (pwForm.newPassword.length < 8) { setPwErr('Minimum 8 characters.'); return; }
     setPwSave(true);
     try {
       await adminPost('/auth/change-password', { currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword });
-      setPwMsg('Password changed successfully!');
+      setPwMsg('Password changed!');
       setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (e) { setPwErr(e instanceof Error ? e.message : 'Failed to change password'); }
+    } catch (e) { setPwErr(e instanceof Error ? e.message : 'Failed'); }
     finally { setPwSave(false); }
+  }
+
+  async function updateProfile() {
+    setProfErr(''); setProfMsg('');
+    if (!profForm.name.trim()) { setProfErr('Name is required.'); return; }
+    setProfSave(true);
+    try {
+      await adminPatch('/auth/update-profile', { name: profForm.name, email: profForm.email || undefined });
+      setProfMsg('Profile updated!');
+    } catch (e) { setProfErr(e instanceof Error ? e.message : 'Failed'); }
+    finally { setProfSave(false); }
   }
 
   return (
@@ -199,19 +220,38 @@ export default function SettingsPage() {
           {/* ── ACCOUNT ── */}
           {tab === 'account' && (
             <>
-              <p className={sectionLabel}>Change Password</p>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700 mb-2">
-                ℹ️ Logo & department name are managed in the <strong>Identity</strong> tab — they auto-appear on the login page.
+              {/* Profile update */}
+              <p className={sectionLabel}>Profile Information</p>
+              <div>
+                <label className={lCls}>Display Name</label>
+                <input value={profForm.name} onChange={e => setProfForm(p => ({ ...p, name: e.target.value }))}
+                  placeholder="Admin Name" className={iCls}/>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-                ⚠️ Changing your password will require you to log in again.
+              <div>
+                <label className={lCls}>Email (Login Username)</label>
+                <input type="email" value={profForm.email} onChange={e => setProfForm(p => ({ ...p, email: e.target.value }))}
+                  placeholder="admin@example.com" className={iCls}/>
+                <p className="text-xs text-slate-400 mt-1">⚠️ Changing email will change your login username.</p>
               </div>
+              {profErr && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{profErr}</p>}
+              {profMsg && <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">✓ {profMsg}</p>}
+              <button onClick={updateProfile} disabled={profSaving}
+                className="w-full py-2.5 rounded-lg text-sm font-bold text-white disabled:opacity-50 transition bg-green-700 hover:bg-green-600">
+                {profSaving ? 'Saving…' : 'Update Profile'}
+              </button>
 
+              {/* Password change */}
+              <div className="border-t border-slate-100 pt-5 mt-2">
+                <p className={sectionLabel}>Change Password</p>
+              </div>
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800">
+                ⚠️ After changing password you will need to log in again.
+              </div>
               <div>
                 <label className={lCls}>Current Password</label>
                 <input type="password" value={pwForm.currentPassword}
                   onChange={e => setPwForm(p => ({ ...p, currentPassword: e.target.value }))}
-                  placeholder="Enter current password" className={iCls} autoComplete="current-password"/>
+                  placeholder="Current password" className={iCls} autoComplete="current-password"/>
               </div>
               <div>
                 <label className={lCls}>New Password</label>
@@ -225,12 +265,10 @@ export default function SettingsPage() {
                   onChange={e => setPwForm(p => ({ ...p, confirmPassword: e.target.value }))}
                   placeholder="Repeat new password" className={iCls} autoComplete="new-password"/>
               </div>
-
               {pwErr && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{pwErr}</p>}
               {pwMsg && <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">✓ {pwMsg}</p>}
-
               <button onClick={changePassword} disabled={pwSaving}
-                className="w-full py-2.5 rounded-lg text-sm font-bold text-white disabled:opacity-50 transition bg-green-700 hover:bg-green-600">
+                className="w-full py-2.5 rounded-lg text-sm font-bold text-white disabled:opacity-50 transition bg-slate-700 hover:bg-slate-600">
                 {pwSaving ? 'Changing…' : 'Change Password'}
               </button>
             </>

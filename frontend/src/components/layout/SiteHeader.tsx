@@ -160,22 +160,24 @@ export default async function SiteHeader() {
       </header>
 
       {/* ═══════════════════════ MOBILE ═══════════════════════════════ */}
-      <header className="flex md:hidden items-center justify-between px-4 bg-white" style={{ height:'60px', borderBottom:'3px solid #1a7a3c' }}>
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full border-2 overflow-hidden bg-white flex items-center justify-center shadow" style={{ borderColor:'#1a7a3c' }}>
+      <header className="flex md:hidden items-center justify-between px-4 bg-white" style={{ height:'64px', borderBottom:'3px solid #1a7a3c' }}>
+        <Link href="/" className="flex items-center gap-3">
+          {/* Bigger logo on mobile */}
+          <div className="w-12 h-12 rounded-full border-2 overflow-hidden bg-white flex items-center justify-center shadow" style={{ borderColor:'#1a7a3c' }}>
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={s.deptLogo} alt="" className="w-full h-full object-contain p-0.5"/>
-              : <svg viewBox="0 0 80 80" className="w-7 h-7" fill="none">
+              ? <img src={s.deptLogo} alt={s.deptShortName} className="w-full h-full object-contain p-0.5"/>
+              : <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
                   <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
-                  <text x="40" y="44" textAnchor="middle" dominantBaseline="middle" fontSize="12" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
+                  <text x="40" y="40" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
+                  <text x="40" y="58" textAnchor="middle" dominantBaseline="middle" fontSize="5" fill="white" opacity="0.8" style={{fontFamily:'Arial,sans-serif',letterSpacing:'1px'}}>GSTU</text>
                 </svg>
             }
           </div>
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500" style={{ fontFamily:'var(--font-montserrat)' }}>Dept. of</p>
-            <p className="font-black leading-tight uppercase text-sm" style={{ fontFamily:'var(--font-montserrat)', color:'#1a7a3c' }}>{deptCore}</p>
-          </div>
+          {/* Show only dept core name — no duplicate "Dept. of" label */}
+          <p className="font-black leading-tight uppercase text-sm" style={{ fontFamily:'var(--font-montserrat)', color:'#1a7a3c' }}>
+            {deptCore}
+          </p>
         </Link>
         <div className="flex items-center gap-1.5">
           <Link href="/student/login" className="text-[11px] font-semibold px-2.5 py-1.5 rounded border text-green-800" style={{ borderColor:'#1a7a3c' }}>Login</Link>

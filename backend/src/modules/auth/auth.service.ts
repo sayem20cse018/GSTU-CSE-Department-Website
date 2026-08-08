@@ -132,6 +132,30 @@ export class AuthService {
     return this.sanitizeAdmin(admin);
   }
 
+  // ─── Update profile (name/email) ───────────────────────────────────────────
+  async updateProfile(
+    adminId: string,
+    dto: { name?: string; email?: string },
+  ): Promise<{ message: string; admin: AdminProfile }> {
+    const update: Record<string, string> = {};
+    if (dto.name?.trim())  update.name  = dto.name.trim();
+    if (dto.email?.trim()) update.email = dto.email.toLowerCase().trim();
+
+    if (Object.keys(update).length === 0) {
+      throw new BadRequestException('No fields to update');
+    }
+
+    // Check email uniqueness if changing
+    if (update.email) {
+      const existing = await this.adminModel.findOne({ email: update.email, _id: { $ne: adminId } });
+      if (existing) throw new BadRequestException('Email already in use');
+    }
+
+    const admin = await this.adminModel.findByIdAndUpdate(adminId, { $set: update }, { new: true }).exec();
+    if (!admin) throw new NotFoundException('Admin not found');
+    return { message: 'Profile updated successfully', admin: this.sanitizeAdmin(admin) };
+  }
+
   // ─── Change password ────────────────────────────────────────────────────────
   async changePassword(
     adminId: string,

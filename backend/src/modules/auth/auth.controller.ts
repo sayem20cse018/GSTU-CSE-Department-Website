@@ -24,6 +24,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -67,6 +68,22 @@ export class AuthController {
   @ApiOperation({ summary: 'Get currently authenticated admin profile' })
   async getMe(@CurrentUser() admin: AdminDocument) {
     return this.authService.getProfile((admin._id as { toString(): string }).toString());
+  }
+
+  // ─── PATCH /api/auth/update-profile ────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Patch('update-profile')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update admin name and/or email' })
+  async updateProfile(
+    @CurrentUser() admin: AdminDocument,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    return this.authService.updateProfile(
+      (admin._id as { toString(): string }).toString(),
+      dto,
+    );
   }
 
   // ─── PATCH /api/auth/change-password ────────────────────────────────────
