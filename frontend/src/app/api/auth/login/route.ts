@@ -22,12 +22,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Forward to NestJS
-    const backendRes = await fetch(`${BACKEND}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: body.email, password: body.password }),
-    });
+    // Forward to NestJS — with timeout to avoid Vercel function hanging
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
+
+    let backendRes: Response;
+    try {
+      backendRes = await fetch(`${BACKEND}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: body.email, password: body.password }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const data = await backendRes.json() as {
       success: boolean;

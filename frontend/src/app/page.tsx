@@ -6,6 +6,10 @@ import HeroSlider               from '@/components/sections/HeroSlider';
 import AboutSection             from '@/components/sections/AboutSection';
 import ChairmanMessage          from '@/components/sections/ChairmanMessage';
 import AcademicProgramsSection  from '@/components/sections/AcademicProgramsSection';
+
+// Force fresh render on every request — prevents stale logo/hero on refresh
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import NoticesSection           from '@/components/sections/NoticesSection';
 import NewsSection              from '@/components/sections/NewsSection';
 import AchievementsSection      from '@/components/sections/AchievementsSection';

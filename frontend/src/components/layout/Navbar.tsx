@@ -210,17 +210,9 @@ export default function Navbar() {
         <div className="container-custom">
           <div className="flex items-center justify-between h-[3.25rem]">
 
-            {/* Mobile logo */}
-            <Link href="/" className="flex lg:hidden items-center gap-2">
-              <div className="w-7 h-7 rounded-full border flex items-center justify-center"
-                style={{ background: '#1a7a3c', borderColor: '#1a7a3c' }}>
-                <svg className="w-4 h-4 text-white" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                  <path d="M20 4L6 12v9c0 7.18 5.927 13.905 14 15.354C28.073 34.905 34 28.18 34 21v-9L20 4z"
-                    fill="none" stroke="white" strokeWidth="3" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <span className="text-sm font-bold text-slate-900">{SITE.shortName}</span>
-            </Link>
+            {/* Mobile hamburger only — no logo (SiteHeader already shows it) */}
+            <div className="flex lg:hidden items-center gap-2">
+            
 
             {/* Desktop nav */}
             <div className="hidden lg:flex items-center flex-1 h-full">

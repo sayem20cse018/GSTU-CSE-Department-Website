@@ -71,7 +71,7 @@ export async function fetchSettings(): Promise<SiteSettings> {
   try {
     const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
     const r = await fetch(`${api}/settings`, {
-      next: { revalidate: 30, tags: ['settings'] },
+      cache: 'no-store',   // always fresh — no stale logo/name on refresh
     });
     if (!r.ok) return SETTINGS_FALLBACK;
     const d = await r.json() as { data?: SiteSettings; success?: boolean } | SiteSettings;

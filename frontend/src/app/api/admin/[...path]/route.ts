@@ -54,7 +54,17 @@ async function handler(
       if (text) backendReq.body = text;
     }
 
-    const backendRes = await fetch(backendUrl, backendReq);
+    // Timeout: 28s (Vercel function max is 30s)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 28000);
+    backendReq.signal = controller.signal as AbortSignal;
+
+    let backendRes: Response;
+    try {
+      backendRes = await fetch(backendUrl, backendReq);
+    } finally {
+      clearTimeout(timeout);
+    }
 
     // 204 No Content (DELETE success)
     if (backendRes.status === 204) {
