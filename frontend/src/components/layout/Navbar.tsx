@@ -210,9 +210,8 @@ export default function Navbar() {
         <div className="container-custom">
           <div className="flex items-center justify-between h-[3.25rem]">
 
-            {/* Mobile hamburger only — no logo (SiteHeader already shows it) */}
-            <div className="flex lg:hidden items-center gap-2">
-            
+            {/* Spacer for mobile — no logo here (SiteHeader already shows it) */}
+            <div className="flex lg:hidden items-center gap-2"/>
 
             {/* Desktop nav */}
             <div className="hidden lg:flex items-center flex-1 h-full">
