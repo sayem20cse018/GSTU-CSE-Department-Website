@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono, Oswald, Montserrat } from 'next/font/google';
+import { Inter, JetBrains_Mono, Oswald, Montserrat, Noto_Sans_Bengali } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
@@ -31,7 +31,16 @@ const montserrat = Montserrat({
   variable: '--font-montserrat',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],   // 800 = ExtraBold
+  weight: ['400', '500', '600', '700', '800'],
+});
+
+// Noto Sans Bengali — auto-applied to all Bengali text via CSS unicode-range
+const notoSansBengali = Noto_Sans_Bengali({
+  variable: '--font-bengali',
+  subsets: ['bengali'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -44,7 +53,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${oswald.variable} ${montserrat.variable} scroll-smooth`}>
+    <html lang="bn" className={`${inter.variable} ${jetbrainsMono.variable} ${oswald.variable} ${montserrat.variable} ${notoSansBengali.variable} scroll-smooth`}>
       <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased"
         style={{ fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif' }}>
         <AuthProvider>{children}</AuthProvider>

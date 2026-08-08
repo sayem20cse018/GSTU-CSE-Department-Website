@@ -135,12 +135,14 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
 
 // ─── Main HeroSlider ──────────────────────────────────────────────────────────
 export default function HeroSlider() {
-  const [slides,  setSlides]  = useState<Slide[]>(FALLBACK_SLIDES);
-  const [current, setCurrent] = useState(0);
-  const [paused,  setPaused]  = useState(false);
+  // Start with empty slides — API data always takes priority
+  // FALLBACK_SLIDES shown only after API confirms no slides exist in DB
+  const [slides,   setSlides]   = useState<Slide[]>([]);
+  const [apiDone,  setApiDone]  = useState(false);
+  const [current,  setCurrent]  = useState(0);
+  const [paused,   setPaused]   = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch slides from API on mount; use server-side proxy so it works in production
   useEffect(() => {
     fetch('/api/public/hero-slides')
       .then(r => r.ok ? r.json() : Promise.reject())
@@ -148,10 +150,17 @@ export default function HeroSlider() {
         const arr = d?.data;
         if (Array.isArray(arr) && arr.length) {
           setSlides(arr.map(apiToSlide));
-          setCurrent(0);
+        } else {
+          // No slides in DB → show static fallback
+          setSlides(FALLBACK_SLIDES);
         }
+        setApiDone(true);
       })
-      .catch(() => { /* keep static FALLBACK_SLIDES */ });
+      .catch(() => {
+        // Network error → show static fallback
+        setSlides(FALLBACK_SLIDES);
+        setApiDone(true);
+      });
   }, []);
 
   const total = slides.length;
