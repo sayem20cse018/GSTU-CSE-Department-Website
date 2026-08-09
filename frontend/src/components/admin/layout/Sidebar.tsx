@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -9,11 +9,32 @@ import { cn } from '@/lib/utils/cn';
 
 interface SidebarProps { isOpen: boolean; onClose: () => void; }
 
+/** Fetch dept name + logo from settings (cached in module scope) */
+let _cachedBrand: { name: string; logo: string } | null = null;
+async function fetchBrand() {
+  if (_cachedBrand) return _cachedBrand;
+  try {
+    const r = await fetch('/api/public/settings', { cache: 'no-store' });
+    if (!r.ok) return null;
+    const d = await r.json() as { data?: { deptShortName?: string; universityShortName?: string; deptLogo?: string } };
+    const s = d.data;
+    _cachedBrand = { name: s?.deptShortName ?? 'CSE Dept.', logo: s?.deptLogo ?? '' };
+    return _cachedBrand;
+  } catch { return null; }
+}
+
+interface SidebarProps { isOpen: boolean; onClose: () => void; }
+
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname       = usePathname();
   const searchParams   = useSearchParams();
   const { admin, hasPermission } = useAuth();
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [brand, setBrand] = useState<{ name: string; logo: string } | null>(null);
+
+  useEffect(() => {
+    fetchBrand().then(b => { if (b) setBrand(b); });
+  }, []);
 
   function toggle(group: string) {
     setCollapsed(prev => {
@@ -76,14 +97,21 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         {/* Brand */}
         <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-800 shrink-0">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-green-700">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden bg-green-700">
+            {brand?.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={brand.logo} alt="" className="w-full h-full object-contain p-0.5"/>
+            ) : (
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-white leading-none">GSTU CSE</p>
+            <p className="text-sm font-bold text-white leading-none truncate">
+              {brand?.name ?? 'GSTU CSE'}
+            </p>
             <p className="text-[10px] text-gray-500 mt-0.5">Content Management</p>
           </div>
           <button onClick={onClose}

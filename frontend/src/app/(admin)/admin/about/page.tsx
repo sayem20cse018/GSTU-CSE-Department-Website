@@ -54,7 +54,7 @@ function PhotoUpload({ label, value, onChange }: { label: string; value: string;
             {busy ? 'Processing…' : '📷 Upload Image'}
           </button>
           {value && (
-            <button type="button" onClick={() => onChange('')}
+            <button type="button" onClick={() => onChange('__CLEAR__')}
               className="ml-2 text-xs text-red-500 hover:text-red-700">× Remove</button>
           )}
         </div>

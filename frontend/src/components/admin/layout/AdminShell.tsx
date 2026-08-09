@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Topbar  from './Topbar';
-import { AdminPageProvider, useAdminPage } from '@/context/AdminPageContext';
+import { AdminPageProvider } from '@/context/AdminPageContext';
+import { ToastProvider }     from '@/components/admin/ui/Toast';
 
 function ShellInner({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,8 +14,10 @@ function ShellInner({ children }: { children: React.ReactNode }) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}/>
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Topbar onMenuClick={() => setSidebarOpen(true)}/>
-        {/* Right side: light green tinted background */}
-        <main className="flex-1 overflow-y-auto" style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #dcfce7 30%, #f0fdf4 100%)' }}>
+        <main
+          className="flex-1 overflow-y-auto"
+          style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #dcfce7 30%, #f0fdf4 100%)' }}
+        >
           {children}
         </main>
       </div>
@@ -25,7 +28,9 @@ function ShellInner({ children }: { children: React.ReactNode }) {
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <AdminPageProvider>
-      <ShellInner>{children}</ShellInner>
+      <ToastProvider>
+        <ShellInner>{children}</ShellInner>
+      </ToastProvider>
     </AdminPageProvider>
   );
 }

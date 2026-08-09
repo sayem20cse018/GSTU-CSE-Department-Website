@@ -1,10 +1,15 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 import PageHeader from '@/components/admin/ui/PageHeader';
 import Button     from '@/components/admin/ui/Button';
 import Badge      from '@/components/admin/ui/Badge';
 import EmptyState from '@/components/admin/ui/EmptyState';
+import SearchInput from '@/components/admin/ui/SearchInput';
+import Pagination  from '@/components/admin/ui/Pagination';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import { Input, Select, Checkbox } from '@/components/admin/ui/FormFields';
 import { cn }     from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
@@ -13,6 +18,9 @@ const CATS = ['general','academic','admission','scholarship','workshop_seminar',
 const EMPTY = { title:'', description:'', category:'general', targetAudience:['all'], isPublished:false, isPinned:false, isUrgent:false, postedByName:'Admin' };
 
 interface Notice { id:string; title:string; category:string; isPublished:boolean; isPinned:boolean; isUrgent:boolean; publishedAt?:string; createdAt:string; description?:string; postedByName?:string }
+
+const CATS_OPTIONS = CATS.map(c => ({ value: c, label: c.replace('_',' ') }));
+const PAGE_SIZE = 12;
 
 export default function NoticesPage() {
   const [list, setList]       = useState<Notice[]>([]);
@@ -23,13 +31,28 @@ export default function NoticesPage() {
   const [saving, setSaving]   = useState(false);
   const [delId, setDelId]     = useState<string|null>(null);
   const [err, setErr]         = useState('');
+  const [query, setQuery]     = useState('');
+  const [catFilter, setCatFilter] = useState('');
+  const [page, setPage]       = useState(1);
+
+  const toast = useToast();
+  const { confirm, ConfirmDialog } = useConfirm();
 
   const load = useCallback(async () => {
     setLoading(true);
     try { setList(await adminGet<Notice[]>('/notices?admin=true')); }
-    catch { setList([]); } finally { setLoading(false); }
-  }, []);
+    catch { toast.error('Failed to load notices'); setList([]); } finally { setLoading(false); }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [load]);
+
+  const filtered = useMemo(() => {
+    let items = list;
+    if (query)     items = items.filter(n => n.title.toLowerCase().includes(query.toLowerCase()));
+    if (catFilter) items = items.filter(n => n.category === catFilter);
+    return items;
+  }, [list, query, catFilter]);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paged = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
 
   const F = (k: keyof typeof EMPTY, v: unknown) => setForm(p => ({ ...p, [k]: v }));
   function openEdit(n: Notice) { setEditing(n); setForm({ title:n.title, description:n.description??'', category:n.category, targetAudience:['all'], isPublished:n.isPublished, isPinned:n.isPinned, isUrgent:n.isUrgent, postedByName:n.postedByName??'Admin' }); setErr(''); setOpen(true); }
@@ -38,26 +61,35 @@ export default function NoticesPage() {
     if (!form.title.trim()) { setErr('Title is required.'); return; }
     setSaving(true); setErr('');
     try {
-      if (editing) await adminPatch(`/notices/${editing.id}`, form);
-      else await adminPost('/notices', form);
+      if (editing) { await adminPatch(`/notices/${editing.id}`, form); toast.success('Notice updated!'); }
+      else          { await adminPost('/notices', form);                toast.success('Notice posted!'); }
       setOpen(false); load();
-    } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
+    } catch (e) { const msg = e instanceof Error ? e.message : 'Save failed'; setErr(msg); toast.error(msg); }
     finally { setSaving(false); }
   }
 
-  async function del(id: string) {
-    if (!confirm('Delete this notice?')) return;
-    setDelId(id);
-    try { await adminDelete(`/notices/${id}`); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : 'Delete failed'); }
+  async function del(notice: Notice) {
+    const ok = await confirm({ title: 'Delete notice?', description: `"${notice.title}" will be permanently removed.`, confirmLabel: 'Delete' });
+    if (!ok) return;
+    setDelId(notice.id);
+    try { await adminDelete(`/notices/${notice.id}`); toast.success('Notice deleted'); load(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : 'Delete failed'); }
     finally { setDelId(null); }
   }
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <AdminPageTitle title="Manage Notices" />
+      {ConfirmDialog}
       <PageHeader title="Notices" description={`${list.length} notice${list.length!==1?'s':''}`}
         action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true)}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Post Notice</Button>}/>
+
+      {/* Search + filter */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4 items-start sm:items-center">
+        <SearchInput value={query} onChange={v=>{setQuery(v);setPage(1);}} placeholder="Search notices…" className="sm:max-w-xs"/>
+        <Select value={catFilter} onChange={e=>{setCatFilter(e.target.value);setPage(1);}} options={[{value:'',label:'All categories'},...CATS_OPTIONS]} className="sm:w-48"/>
+        {(query||catFilter) && <p className="text-xs text-slate-500">{filtered.length} result{filtered.length!==1?'s':''}</p>}
+      </div>
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
@@ -95,10 +127,10 @@ export default function NoticesPage() {
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
-        : list.length===0 ? <EmptyState title="No notices yet" description="Post the first notice."/>
+        : paged.length===0 ? <EmptyState title={query||catFilter ? 'No results' : 'No notices yet'} description={query||catFilter ? 'Try different filters.' : 'Post the first notice.'} action={!query&&!catFilter ? <Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true)}}>Post Notice</Button> : undefined}/>
         : (
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+            <thead><tr className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500 font-semibold uppercase tracking-wider">
               <th className="text-left px-5 py-3">Title</th>
               <th className="text-center px-4 py-3 hidden sm:table-cell">Category</th>
               <th className="text-center px-4 py-3">Status</th>
@@ -106,7 +138,7 @@ export default function NoticesPage() {
               <th className="text-right px-5 py-3">Actions</th>
             </tr></thead>
             <tbody>
-              {list.map((n,i)=>(
+              {paged.map((n,i)=>(
                 <tr key={n.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
@@ -121,12 +153,17 @@ export default function NoticesPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(n)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId===n.id} onClick={()=>del(n.id)}>Delete</Button>
+                      <Button size="sm" variant="danger" loading={delId===n.id} onClick={()=>del(n)}>Delete</Button>
                     </div>
                   </td>
                 </tr>))}
             </tbody>
           </table>
+        )}
+        {!loading && filtered.length > PAGE_SIZE && (
+          <div className="px-4 pb-4">
+            <Pagination page={page} totalPages={totalPages} total={filtered.length} limit={PAGE_SIZE} onPageChange={setPage}/>
+          </div>
         )}
       </div>
     </div>

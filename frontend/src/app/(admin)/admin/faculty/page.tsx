@@ -1,12 +1,16 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 import PageHeader  from '@/components/admin/ui/PageHeader';
 import Button      from '@/components/admin/ui/Button';
 import Badge       from '@/components/admin/ui/Badge';
 import EmptyState  from '@/components/admin/ui/EmptyState';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
-import { cn }      from '@/lib/utils/cn';
+import SearchInput from '@/components/admin/ui/SearchInput';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import { Input, Select, Textarea, Checkbox } from '@/components/admin/ui/FormFields';
+import { cn }         from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 
 const DESIG     = ['Professor','Associate Professor','Assistant Professor','Lecturer','Senior Lecturer','Adjunct Faculty','Administrative Officer','Section Officer','Assistant Officer','System Analyst'];
@@ -47,15 +51,20 @@ export default function PeoplePage() {
   const [saving, setSaving]   = useState(false);
   const [delId, setDelId]     = useState<string|null>(null);
   const [err, setErr]         = useState('');
+  const [query, setQuery]     = useState('');
+
+  const toast = useToast();
+  const { confirm, ConfirmDialog } = useConfirm();
 
   const load = useCallback(async () => {
     setLoading(true);
     try { setList(await adminGet<FacultyMember[]>('/faculty')); }
-    catch { setList([]); } finally { setLoading(false); }
-  }, []);
+    catch { toast.error('Failed to load people'); setList([]); } finally { setLoading(false); }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [load]);
 
-  const filtered = list.filter(m => (m.staffType || 'faculty') === activeType);
+  const byType = useMemo(() => list.filter(m => (m.staffType || 'faculty') === activeType), [list, activeType]);
+  const filtered = useMemo(() => query ? byType.filter(m => m.name.toLowerCase().includes(query.toLowerCase()) || m.designation.toLowerCase().includes(query.toLowerCase())) : byType, [byType, query]);
   const F = (k: keyof typeof EMPTY, v: unknown) => setForm(p => ({ ...p, [k]: v }));
 
   function openNew() {
@@ -89,18 +98,19 @@ export default function PeoplePage() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { chairmanFrom, chairmanTo, ...rest } = form;
       const payload = { ...rest, researchInterests: form.researchInterests.split(',').map(s=>s.trim()).filter(Boolean) };
-      if (editing) await adminPatch(`/faculty/${editing.id}`, payload);
-      else await adminPost('/faculty', payload);
+      if (editing) { await adminPatch(`/faculty/${editing.id}`, payload); toast.success('Record updated!'); }
+      else          { await adminPost('/faculty', payload);                toast.success('Record created!'); }
       setOpen(false); load();
-    } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
+    } catch (e) { const msg = e instanceof Error ? e.message : 'Save failed'; setErr(msg); toast.error(msg); }
     finally { setSaving(false); }
   }
 
-  async function del(id: string) {
-    if (!confirm('Delete this record?')) return;
-    setDelId(id);
-    try { await adminDelete(`/faculty/${id}`); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : 'Delete failed'); }
+  async function del(member: FacultyMember) {
+    const ok = await confirm({ title: `Delete "${member.name}"?`, description: 'This record will be permanently removed.', confirmLabel: 'Delete' });
+    if (!ok) return;
+    setDelId(member.id);
+    try { await adminDelete(`/faculty/${member.id}`); toast.success('Record deleted'); load(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : 'Delete failed'); }
     finally { setDelId(null); }
   }
 
@@ -109,6 +119,7 @@ export default function PeoplePage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      {ConfirmDialog}
       <AdminPageTitle title="People" />
       <PageHeader title="People Management" description="Manage faculty, staff, officers and chairman list"/>
 
@@ -135,7 +146,8 @@ export default function PeoplePage() {
       </div>
 
       {/* Add button */}
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+        <SearchInput value={query} onChange={v => setQuery(v)} placeholder={`Search ${current.label.toLowerCase()}…`} className="sm:max-w-xs"/>
         <Button onClick={openNew} icon={
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
@@ -275,12 +287,12 @@ export default function PeoplePage() {
         {loading ? (
           <div className="p-6 space-y-3">{[1,2,3,4].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
         ) : filtered.length === 0 ? (
-          <EmptyState title={`No ${current.label} yet`} description={`Add the first ${current.label.replace(/s$/, '').toLowerCase()}.`}
-            action={<Button onClick={openNew}>Add {current.label.replace(/s$/, '')}</Button>}/>
+          <EmptyState title={query ? `No results for "${query}"` : `No ${current.label} yet`} description={query ? 'Try a different search.' : `Add the first ${current.label.replace(/s$/, '').toLowerCase()}.`}
+            action={!query ? <Button onClick={openNew}>Add {current.label.replace(/s$/, '')}</Button> : undefined}/>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+              <tr className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500 font-semibold uppercase tracking-wider">
                 <th className="text-left px-5 py-3">Person</th>
                 <th className="text-left px-4 py-3 hidden md:table-cell">Designation</th>
                 {activeType === 'chairman' && (
@@ -327,7 +339,7 @@ export default function PeoplePage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(m)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId===m.id} onClick={()=>del(m.id)}>Del</Button>
+                      <Button size="sm" variant="danger" loading={delId===m.id} onClick={()=>del(m)}>Del</Button>
                     </div>
                   </td>
                 </tr>

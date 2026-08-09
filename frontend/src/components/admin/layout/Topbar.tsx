@@ -1,15 +1,33 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useAdminPage } from '@/context/AdminPageContext';
+import { NAV_GROUPS } from './nav-items';
 
 interface TopbarProps { onMenuClick: () => void; }
+
+/** Build breadcrumb from current pathname */
+function useBreadcrumb() {
+  const pathname = usePathname();
+  // Find matching nav item
+  for (const group of NAV_GROUPS) {
+    for (const item of group.items) {
+      const itemPath = item.href.split('?')[0];
+      if (pathname === itemPath || pathname.startsWith(itemPath + '/')) {
+        return { group: group.group, label: item.label };
+      }
+    }
+  }
+  return null;
+}
 
 export default function Topbar({ onMenuClick }: TopbarProps) {
   const { admin, logout } = useAuth();
   const { pageTitle }     = useAdminPage();
   const router            = useRouter();
+  const breadcrumb        = useBreadcrumb();
 
   async function handleLogout() {
     await logout();
@@ -17,50 +35,78 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
     router.refresh();
   }
 
-  return (
-    <header className="h-14 flex items-center gap-4 px-4 lg:px-6 shrink-0 bg-white border-b border-slate-200">
+  const roleLabel = admin?.role?.replace(/_/g, ' ') ?? 'administrator';
+  const initial   = admin?.name?.charAt(0).toUpperCase() ?? 'A';
 
+  return (
+    <header
+      className="h-14 flex items-center gap-3 px-4 lg:px-6 shrink-0 border-b"
+      style={{ background: '#0f1f0f', borderColor: '#1a2e1a' }}
+    >
       {/* Hamburger */}
-      <button onClick={onMenuClick}
-        className="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition"
-        aria-label="Open menu">
+      <button
+        onClick={onMenuClick}
+        className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition"
+        aria-label="Open menu"
+      >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
 
-      {/* Breadcrumb / title */}
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        <span className="text-xs text-slate-400 hidden sm:inline">Admin</span>
-        <span className="text-xs text-slate-300 hidden sm:inline">/</span>
-        <h1 className="text-sm font-semibold text-slate-900 truncate">{pageTitle}</h1>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-1.5 flex-1 min-w-0 text-sm">
+        <span className="text-gray-600 text-xs hidden sm:inline font-medium">Admin</span>
+        {breadcrumb && (
+          <>
+            <svg className="w-3 h-3 text-gray-700 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+            </svg>
+            <span className="text-gray-600 text-xs hidden sm:inline truncate">{breadcrumb.group}</span>
+            <svg className="w-3 h-3 text-gray-700 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+            </svg>
+          </>
+        )}
+        <h1 className="text-sm font-semibold text-white truncate">{pageTitle}</h1>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-2 shrink-0">
-        <a href="/" target="_blank" rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition bg-white">
+
+        {/* View site */}
+        <Link
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-lg transition"
+        >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
           </svg>
           View Site
-        </a>
+        </Link>
 
-        <div className="h-5 w-px bg-slate-200 hidden sm:block"/>
+        <div className="h-4 w-px bg-gray-700 hidden sm:block"/>
 
-        <div className="hidden sm:flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white bg-green-600">
-            {admin?.name?.charAt(0).toUpperCase() ?? 'A'}
+        {/* Admin avatar + name */}
+        <div className="hidden md:flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white bg-green-700 ring-2 ring-green-900">
+            {initial}
           </div>
-          <div className="hidden md:block">
-            <p className="text-xs font-semibold text-slate-900 leading-none">{admin?.name}</p>
-            <p className="text-[10px] text-slate-400 capitalize mt-0.5">{admin?.role?.replace('_', ' ')}</p>
+          <div>
+            <p className="text-xs font-semibold text-white leading-none">{admin?.name}</p>
+            <p className="text-[10px] text-gray-500 capitalize mt-0.5">{roleLabel}</p>
           </div>
         </div>
 
-        <button onClick={handleLogout}
-          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-red-600 border border-slate-200 hover:border-red-200 px-3 py-1.5 rounded-lg transition bg-white">
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-700/40 px-3 py-1.5 rounded-lg transition"
+          title="Logout"
+        >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
