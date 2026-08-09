@@ -1,72 +1,83 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { IsOptional, IsString, IsBoolean, IsArray, MaxLength } from 'class-validator';
-import { News, NewsDocument } from './schemas/news.schema';
+import { PrismaService } from '../../database/prisma.service';
 
 export class CreateNewsDto {
-  @IsString() @MaxLength(300) title: string;
-  @IsString() @MaxLength(300) slug: string;
-  @IsString() @MaxLength(600) excerpt: string;
-  @IsString() content: string;
-  @IsOptional() @IsString() coverImage?: string;
-  @IsOptional() @IsString() category?: string;
+  @IsString() @MaxLength(300)  title: string;
+  @IsString() @MaxLength(300)  slug: string;
+  @IsString() @MaxLength(600)  excerpt: string;
+  @IsString()                  content: string;
+  @IsOptional() @IsString()    coverImage?: string;
+  @IsOptional() @IsString()    category?: string;
   @IsOptional() @IsArray() @IsString({ each: true }) tags?: string[];
-  @IsString() authorName: string;
-  @IsOptional() @IsBoolean() isPublished?: boolean;
-  @IsOptional() @IsBoolean() isFeatured?: boolean;
+  @IsString()                  authorName: string;
+  @IsOptional() @IsBoolean()   isPublished?: boolean;
+  @IsOptional() @IsBoolean()   isFeatured?: boolean;
 }
 
 @Injectable()
 export class NewsService {
-  constructor(
-    @InjectModel(News.name)
-    private readonly newsModel: Model<NewsDocument>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(page = 1, limit = 10, isAdmin = false) {
-    const skip   = (page - 1) * limit;
-    const filter = isAdmin ? {} : { isPublished: true };
-    const [data, total] = await Promise.all([
-      this.newsModel.find(filter).sort({ publishedAt: -1, createdAt: -1 }).skip(skip).limit(limit).lean().exec(),
-      this.newsModel.countDocuments(filter),
+    const skip  = (page - 1) * limit;
+    const where = isAdmin ? {} : { isPublished: true };
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.news.findMany({
+        where,
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+        skip,
+        take: limit,
+      }),
+      this.prisma.news.count({ where }),
     ]);
     return { data, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async findBySlug(slug: string): Promise<NewsDocument> {
-    const item = await this.newsModel.findOne({ slug }).lean().exec();
+  async findBySlug(slug: string) {
+    const item = await this.prisma.news.findUnique({ where: { slug } });
     if (!item) throw new NotFoundException(`News "${slug}" not found`);
-    return item as unknown as NewsDocument;
+    return item;
   }
 
   async findById(id: string) {
-    const item = await this.newsModel.findById(id).lean().exec();
+    const item = await this.prisma.news.findUnique({ where: { id } });
     if (!item) throw new NotFoundException(`News "${id}" not found`);
     return item;
   }
 
   async create(dto: CreateNewsDto, authorId?: string) {
-    const data: Record<string, unknown> = { ...dto };
-    if (authorId) data.author = authorId;
-    if (dto.isPublished) data.publishedAt = new Date();
-    return this.newsModel.create(data);
+    return this.prisma.news.create({
+      data: {
+        ...dto,
+        authorId: authorId ?? null,
+        publishedAt: dto.isPublished ? new Date() : null,
+      },
+    });
   }
 
   async update(id: string, dto: Partial<CreateNewsDto>) {
-    const update: Record<string, unknown> = { ...dto };
-    if (dto.isPublished) update.publishedAt = new Date();
-    const item = await this.newsModel.findByIdAndUpdate(id, update, { new: true }).lean().exec();
+    const item = await this.prisma.news.findUnique({ where: { id } });
     if (!item) throw new NotFoundException(`News "${id}" not found`);
-    return item;
+    return this.prisma.news.update({
+      where: { id },
+      data: {
+        ...dto,
+        ...(dto.isPublished && !item.publishedAt ? { publishedAt: new Date() } : {}),
+      },
+    });
   }
 
   async remove(id: string) {
-    const item = await this.newsModel.findByIdAndDelete(id).exec();
+    const item = await this.prisma.news.findUnique({ where: { id } });
     if (!item) throw new NotFoundException(`News "${id}" not found`);
+    return this.prisma.news.delete({ where: { id } });
   }
 
   async incrementView(id: string) {
-    await this.newsModel.findByIdAndUpdate(id, { $inc: { viewCount: 1 } }).exec();
+    await this.prisma.news.update({
+      where: { id },
+      data: { viewCount: { increment: 1 } },
+    });
   }
 }

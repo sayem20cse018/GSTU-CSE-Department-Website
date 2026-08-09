@@ -6,11 +6,10 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
-import { Admin, AdminDocument } from './schemas/admin.schema';
+import { PrismaService } from '../../database/prisma.service';
+import type { Admin } from '@prisma/client';
 import type { LoginDto } from './dto/login.dto';
 import type { ChangePasswordDto } from './dto/change-password.dto';
 
@@ -35,7 +34,7 @@ export interface AuthTokens {
 }
 
 export interface AdminProfile {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -46,18 +45,16 @@ export interface AdminProfile {
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(Admin.name)
-    private readonly adminModel: Model<AdminDocument>,
+    private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
 
   // ─── Login ──────────────────────────────────────────────────────────────────
   async login(dto: LoginDto, ipAddress?: string): Promise<AuthTokens & { admin: AdminProfile }> {
-    const admin = await this.adminModel
-      .findOne({ email: dto.email.toLowerCase().trim() })
-      .select('+passwordHash +failedLoginAttempts +lockedUntil +activityLog')
-      .exec();
+    const admin = await this.prisma.admin.findUnique({
+      where: { email: dto.email.toLowerCase().trim() },
+    });
 
     if (!admin) throw new UnauthorizedException('Invalid email or password');
 
@@ -67,9 +64,7 @@ export class AuthService {
 
     if (admin.lockedUntil && admin.lockedUntil > new Date()) {
       const remaining = Math.ceil((admin.lockedUntil.getTime() - Date.now()) / 60_000);
-      throw new ForbiddenException(
-        `Account locked. Try again in ${remaining} minute(s).`,
-      );
+      throw new ForbiddenException(`Account locked. Try again in ${remaining} minute(s).`);
     }
 
     const isMatch = await bcrypt.compare(dto.password, admin.passwordHash);
@@ -78,27 +73,21 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    // Reset security counters & record successful login
-    await this.adminModel.findByIdAndUpdate(admin._id, {
-      $set: {
+    // Reset security counters & record login
+    await this.prisma.admin.update({
+      where: { id: admin.id },
+      data: {
         failedLoginAttempts: 0,
         lockedUntil: null,
         lastLoginAt: new Date(),
         lastLoginIp: ipAddress ?? null,
-      },
-      $push: {
         activityLog: {
-          $each: [{ action: 'LOGIN', performedAt: new Date(), ipAddress }],
-          $slice: -100,
+          create: { action: 'LOGIN', ipAddress: ipAddress ?? null },
         },
       },
     });
 
-    const tokens = this.generateTokens(
-      (admin._id as { toString(): string }).toString(),
-      admin.email,
-      admin.role,
-    );
+    const tokens = this.generateTokens(admin.id, admin.email, admin.role);
     return { ...tokens, admin: this.sanitizeAdmin(admin) };
   }
 
@@ -113,11 +102,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    const admin = await this.adminModel.findById(payload.sub).exec();
+    const admin = await this.prisma.admin.findUnique({ where: { id: payload.sub } });
     if (!admin || !admin.isActive) throw new UnauthorizedException('Admin not found or inactive');
 
     const accessToken = this.signToken(
-      { sub: (admin._id as { toString(): string }).toString(), email: admin.email, role: admin.role },
+      { sub: admin.id, email: admin.email, role: admin.role },
       this.configService.get<string>('JWT_SECRET') ?? '',
       this.configService.get<string>('JWT_EXPIRES_IN') ?? '15m',
     );
@@ -127,41 +116,41 @@ export class AuthService {
 
   // ─── Get profile ────────────────────────────────────────────────────────────
   async getProfile(adminId: string): Promise<AdminProfile> {
-    const admin = await this.adminModel.findById(adminId).exec();
+    const admin = await this.prisma.admin.findUnique({ where: { id: adminId } });
     if (!admin) throw new NotFoundException('Admin not found');
     return this.sanitizeAdmin(admin);
   }
 
-  // ─── Update profile (name/email) ───────────────────────────────────────────
+  // ─── Update profile ─────────────────────────────────────────────────────────
   async updateProfile(
     adminId: string,
     dto: { name?: string; email?: string },
   ): Promise<{ message: string; admin: AdminProfile }> {
     const update: Record<string, string> = {};
-    if (dto.name?.trim())  update.name  = dto.name.trim();
+    if (dto.name?.trim()) update.name = dto.name.trim();
     if (dto.email?.trim()) update.email = dto.email.toLowerCase().trim();
 
     if (Object.keys(update).length === 0) {
       throw new BadRequestException('No fields to update');
     }
 
-    // Check email uniqueness if changing
     if (update.email) {
-      const existing = await this.adminModel.findOne({ email: update.email, _id: { $ne: adminId } });
+      const existing = await this.prisma.admin.findFirst({
+        where: { email: update.email, NOT: { id: adminId } },
+      });
       if (existing) throw new BadRequestException('Email already in use');
     }
 
-    const admin = await this.adminModel.findByIdAndUpdate(adminId, { $set: update }, { new: true }).exec();
-    if (!admin) throw new NotFoundException('Admin not found');
+    const admin = await this.prisma.admin.update({
+      where: { id: adminId },
+      data: update,
+    });
     return { message: 'Profile updated successfully', admin: this.sanitizeAdmin(admin) };
   }
 
   // ─── Change password ────────────────────────────────────────────────────────
-  async changePassword(
-    adminId: string,
-    dto: ChangePasswordDto,
-  ): Promise<{ message: string }> {
-    const admin = await this.adminModel.findById(adminId).select('+passwordHash').exec();
+  async changePassword(adminId: string, dto: ChangePasswordDto): Promise<{ message: string }> {
+    const admin = await this.prisma.admin.findUnique({ where: { id: adminId } });
     if (!admin) throw new NotFoundException('Admin not found');
 
     const isMatch = await bcrypt.compare(dto.currentPassword, admin.passwordHash);
@@ -172,13 +161,11 @@ export class AuthService {
     }
 
     const newHash = await bcrypt.hash(dto.newPassword, SALT_ROUNDS);
-    await this.adminModel.findByIdAndUpdate(adminId, {
-      $set: { passwordHash: newHash },
-      $push: {
-        activityLog: {
-          $each: [{ action: 'CHANGE_PASSWORD', performedAt: new Date() }],
-          $slice: -100,
-        },
+    await this.prisma.admin.update({
+      where: { id: adminId },
+      data: {
+        passwordHash: newHash,
+        activityLog: { create: { action: 'CHANGE_PASSWORD' } },
       },
     });
 
@@ -187,52 +174,48 @@ export class AuthService {
 
   // ─── Logout ─────────────────────────────────────────────────────────────────
   async logout(adminId: string): Promise<{ message: string }> {
-    await this.adminModel.findByIdAndUpdate(adminId, {
-      $push: {
-        activityLog: {
-          $each: [{ action: 'LOGOUT', performedAt: new Date() }],
-          $slice: -100,
-        },
-      },
+    await this.prisma.admin.update({
+      where: { id: adminId },
+      data: { activityLog: { create: { action: 'LOGOUT' } } },
     });
     return { message: 'Logged out successfully' };
   }
 
   // ─── Create super admin (seed) ──────────────────────────────────────────────
-  async createSuperAdmin(
-    name: string,
-    email: string,
-    password: string,
-  ): Promise<AdminProfile> {
-    const existing = await this.adminModel.findOne({ email: email.toLowerCase() });
+  async createSuperAdmin(name: string, email: string, password: string): Promise<AdminProfile> {
+    const existing = await this.prisma.admin.findUnique({
+      where: { email: email.toLowerCase() },
+    });
     if (existing) throw new BadRequestException(`Admin with email ${email} already exists`);
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    const admin = await this.adminModel.create({
-      name,
-      email: email.toLowerCase(),
-      passwordHash,
-      role: 'super_admin',
-      permissions: [
-        'manage_faculty', 'manage_news', 'manage_events', 'manage_notice',
-        'manage_gallery', 'manage_alumni', 'manage_research', 'manage_admins',
-      ],
-      isActive: true,
-      isEmailVerified: true,
+    const admin = await this.prisma.admin.create({
+      data: {
+        name,
+        email: email.toLowerCase(),
+        passwordHash,
+        role: 'super_admin',
+        permissions: [
+          'manage_faculty', 'manage_news', 'manage_events', 'manage_notice',
+          'manage_gallery', 'manage_alumni', 'manage_research', 'manage_admins',
+        ],
+        isActive: true,
+        isEmailVerified: true,
+      },
     });
     return this.sanitizeAdmin(admin);
   }
 
   // ─── Validate payload (called by JwtStrategy) ───────────────────────────────
-  async validatePayload(payload: JwtPayload): Promise<AdminDocument> {
-    const admin = await this.adminModel.findById(payload.sub).exec();
+  async validatePayload(payload: JwtPayload): Promise<Admin> {
+    const admin = await this.prisma.admin.findUnique({ where: { id: payload.sub } });
     if (!admin || !admin.isActive) throw new UnauthorizedException('Admin not found or inactive');
     return admin;
   }
 
   // ─── Private helpers ────────────────────────────────────────────────────────
   private generateTokens(id: string, email: string, role: string): AuthTokens {
-    const payload: Omit<JwtPayload, 'iat' | 'exp'> = { sub: id, email, role };
+    const payload = { sub: id, email, role };
     const accessToken = this.signToken(
       payload,
       this.configService.get<string>('JWT_SECRET') ?? '',
@@ -246,7 +229,6 @@ export class AuthService {
     return { accessToken, refreshToken, expiresIn: 15 * 60 };
   }
 
-  /** Wraps jwtService.sign with explicit secret to avoid StringValue type issue */
   private signToken(
     payload: Record<string, unknown>,
     secret: string,
@@ -255,18 +237,22 @@ export class AuthService {
     return this.jwtService.sign(payload, { secret, expiresIn } as Parameters<JwtService['sign']>[1]);
   }
 
-  private async recordFailedAttempt(admin: AdminDocument): Promise<void> {
+  private async recordFailedAttempt(admin: Admin): Promise<void> {
     const attempts = (admin.failedLoginAttempts ?? 0) + 1;
-    const update: Record<string, unknown> = { failedLoginAttempts: attempts };
-    if (attempts >= MAX_FAILED_ATTEMPTS) {
-      update.lockedUntil = new Date(Date.now() + LOCK_DURATION_MS);
-    }
-    await this.adminModel.findByIdAndUpdate(admin._id, { $set: update });
+    await this.prisma.admin.update({
+      where: { id: admin.id },
+      data: {
+        failedLoginAttempts: attempts,
+        ...(attempts >= MAX_FAILED_ATTEMPTS
+          ? { lockedUntil: new Date(Date.now() + LOCK_DURATION_MS) }
+          : {}),
+      },
+    });
   }
 
-  private sanitizeAdmin(admin: AdminDocument): AdminProfile {
+  private sanitizeAdmin(admin: Admin): AdminProfile {
     return {
-      _id: (admin._id as { toString(): string }).toString(),
+      id: admin.id,
       name: admin.name,
       email: admin.email,
       role: admin.role,

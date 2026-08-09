@@ -1,75 +1,85 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
-  IsOptional, IsString, IsBoolean, IsArray, IsDateString, MaxLength,
+  IsOptional, IsString, IsBoolean, IsArray, MaxLength,
 } from 'class-validator';
-import { Notice, NoticeDocument } from './schemas/notice.schema';
+import { PrismaService } from '../../database/prisma.service';
 
 export class CreateNoticeDto {
-  @IsString() @MaxLength(300) title: string;
-  @IsOptional() @IsString() description?: string;
-  @IsOptional() @IsString() category?: string;
+  @IsString() @MaxLength(300)  title: string;
+  @IsOptional() @IsString()    description?: string;
+  @IsOptional() @IsString()    category?: string;
   @IsOptional() @IsArray() @IsString({ each: true }) targetAudience?: string[];
-  @IsOptional() @IsBoolean() isPublished?: boolean;
-  @IsOptional() @IsBoolean() isPinned?: boolean;
-  @IsOptional() @IsBoolean() isUrgent?: boolean;
-  @IsOptional() @IsString() expiresAt?: string;
-  @IsOptional() @IsString() postedByName?: string;
+  @IsOptional() @IsBoolean()   isPublished?: boolean;
+  @IsOptional() @IsBoolean()   isPinned?: boolean;
+  @IsOptional() @IsBoolean()   isUrgent?: boolean;
+  @IsOptional() @IsString()    expiresAt?: string;
+  @IsOptional() @IsString()    postedByName?: string;
 }
 
 @Injectable()
 export class NoticeService {
-  constructor(
-    @InjectModel(Notice.name)
-    private readonly noticeModel: Model<NoticeDocument>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(isAdmin = false) {
-    const filter: Record<string, unknown> = {};
-    if (!isAdmin) {
-      filter.isPublished = true;
-      filter.$or = [{ expiresAt: null }, { expiresAt: { $gt: new Date() } }];
-    }
-    return this.noticeModel
-      .find(filter)
-      .sort({ isPinned: -1, publishedAt: -1 })
-      .lean()
-      .exec();
+    const now = new Date();
+    return this.prisma.notice.findMany({
+      where: isAdmin
+        ? {}
+        : {
+            isPublished: true,
+            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+          },
+      orderBy: [{ isPinned: 'desc' }, { publishedAt: 'desc' }],
+      include: { attachments: true },
+    });
   }
 
   async findById(id: string) {
-    const n = await this.noticeModel.findById(id).lean().exec();
+    const n = await this.prisma.notice.findUnique({
+      where: { id },
+      include: { attachments: true },
+    });
     if (!n) throw new NotFoundException(`Notice ${id} not found`);
     return n;
   }
 
   async create(dto: CreateNoticeDto, adminId?: string) {
-    const data: Record<string, unknown> = { ...dto };
-    if (adminId) data.postedBy = adminId;
-    if (dto.isPublished) data.publishedAt = new Date();
-    return this.noticeModel.create(data);
+    const { expiresAt, ...rest } = dto;
+    return this.prisma.notice.create({
+      data: {
+        ...rest,
+        postedById: adminId ?? null,
+        publishedAt: dto.isPublished ? new Date() : new Date(),
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+      },
+    });
   }
 
   async update(id: string, dto: Partial<CreateNoticeDto>) {
-    const update: Record<string, unknown> = { ...dto };
-    if (dto.isPublished !== undefined && dto.isPublished) {
-      update.publishedAt = new Date();
-    }
-    const n = await this.noticeModel
-      .findByIdAndUpdate(id, update, { new: true })
-      .lean()
-      .exec();
+    const n = await this.prisma.notice.findUnique({ where: { id } });
     if (!n) throw new NotFoundException(`Notice ${id} not found`);
-    return n;
+    const { expiresAt, ...rest } = dto;
+    return this.prisma.notice.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(expiresAt !== undefined ? { expiresAt: expiresAt ? new Date(expiresAt) : null } : {}),
+        ...(dto.isPublished && !n.isPublished ? { publishedAt: new Date() } : {}),
+      },
+      include: { attachments: true },
+    });
   }
 
   async remove(id: string) {
-    const n = await this.noticeModel.findByIdAndDelete(id).exec();
+    const n = await this.prisma.notice.findUnique({ where: { id } });
     if (!n) throw new NotFoundException(`Notice ${id} not found`);
+    return this.prisma.notice.delete({ where: { id } });
   }
 
   async incrementView(id: string) {
-    await this.noticeModel.findByIdAndUpdate(id, { $inc: { viewCount: 1 } }).exec();
+    await this.prisma.notice.update({
+      where: { id },
+      data: { viewCount: { increment: 1 } },
+    });
   }
 }

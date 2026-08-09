@@ -14,27 +14,27 @@ import { AcademicsModule } from './modules/academics/academics.module';
 import { AlumniModule } from './modules/alumni/alumni.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
-import { ClubsModule }        from './modules/clubs/clubs.module';
-import { StatisticsModule }   from './modules/statistics/statistics.module';
-import { SettingsModule }     from './modules/settings/settings.module';
-import { HeroSlidesModule }   from './modules/hero-slides/hero-slides.module';
+import { ClubsModule } from './modules/clubs/clubs.module';
+import { StatisticsModule } from './modules/statistics/statistics.module';
+import { SettingsModule } from './modules/settings/settings.module';
+import { HeroSlidesModule } from './modules/hero-slides/hero-slides.module';
 
 @Module({
   imports: [
-    // ── Environment config (loaded first, available everywhere) ───────────
+    // ── Environment config (loaded first, available everywhere) ──────────
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
 
-    // ── MongoDB Atlas connection ───────────────────────────────────────────
+    // ── PostgreSQL via Prisma ─────────────────────────────────────────────
     DatabaseModule,
 
     // ── Rate limiting ─────────────────────────────────────────────────────
     ThrottlerModule.forRoot([
       {
-        ttl: 60_000,   // 1-minute window
-        limit: 100,    // max 100 requests per IP per window
+        ttl: 60_000,
+        limit: 100,
       },
     ]),
 

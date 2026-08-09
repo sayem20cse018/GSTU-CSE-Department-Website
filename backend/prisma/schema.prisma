@@ -1,0 +1,787 @@
+// ─── Prisma Schema — CSE Department Website ───────────────────────────────────
+// Migrated from MongoDB/Mongoose → PostgreSQL/Prisma
+// Generator + Datasource
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN
+// ─────────────────────────────────────────────────────────────────────────────
+model Admin {
+  id                   String          @id @default(cuid())
+  name                 String
+  email                String          @unique
+  passwordHash         String
+  role                 String          @default("editor")   // super_admin | admin | editor
+  permissions          String[]        @default([])
+  isActive             Boolean         @default(true)
+  isEmailVerified      Boolean         @default(false)
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  failedLoginAttempts  Int             @default(0)
+  lockedUntil          DateTime?
+  lastLoginAt          DateTime?
+  lastLoginIp          String?
+  activityLog          AdminActivityLog[]
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@index([role, isActive])
+  @@map("admins")
+}
+
+model AdminActivityLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  admin       Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action      String
+  performedAt DateTime @default(now())
+  ipAddress   String?
+
+  @@index([adminId])
+  @@map("admin_activity_logs")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FACULTY
+// ─────────────────────────────────────────────────────────────────────────────
+model Faculty {
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique
+  phone              String?
+  photo              String?
+  designation        String
+  title              String?
+  shortBio           String?
+  fullBio            String?
+  slug               String?             @unique
+  officeRoom         String?
+  researchInterests  String[]            @default([])
+  courses            String[]            @default([])
+  websiteUrl         String?
+  googleScholarUrl   String?
+  linkedinUrl        String?
+  researchGateUrl    String?
+  orcidId            String?
+  isActive           Boolean             @default(true)
+  employmentStatus   String              @default("full_time")
+  staffType          String              @default("faculty")
+  sortOrder          Int                 @default(0)
+  joinedAt           DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  education    FacultyEducation[]
+  publications FacultyPublication[]
+  awards       FacultyAward[]
+  officeHours  FacultyOfficeHours[]
+
+  @@index([isActive, sortOrder])
+  @@index([staffType])
+  @@map("faculty")
+}
+
+model FacultyEducation {
+  id          String  @id @default(cuid())
+  facultyId   String
+  faculty     Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  degree      String
+  institution String
+  year        Int
+
+  @@index([facultyId])
+  @@map("faculty_education")
+}
+
+model FacultyPublication {
+  id        String  @id @default(cuid())
+  facultyId String
+  faculty   Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  title     String
+  authors   String
+  venue     String
+  year      Int
+  type      String  @default("journal")
+  doi       String?
+  url       String?
+
+  @@index([facultyId])
+  @@map("faculty_publications")
+}
+
+model FacultyAward {
+  id          String  @id @default(cuid())
+  facultyId   String
+  faculty     Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  title       String
+  awardedBy   String
+  year        Int
+  description String?
+
+  @@index([facultyId])
+  @@map("faculty_awards")
+}
+
+model FacultyOfficeHours {
+  id        String  @id @default(cuid())
+  facultyId String
+  faculty   Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  day       String
+  startTime String
+  endTime   String
+
+  @@index([facultyId])
+  @@map("faculty_office_hours")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NEWS
+// ─────────────────────────────────────────────────────────────────────────────
+model News {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  excerpt      String
+  content      String
+  coverImage   String?
+  category     String   @default("general")
+  tags         String[] @default([])
+  authorId     String?
+  authorName   String
+  isPublished  Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  publishedAt  DateTime?
+  viewCount    Int      @default(0)
+  relatedNewsIds String[] @default([])
+  // SEO
+  seoMetaTitle       String?
+  seoMetaDescription String?
+  seoOgImage         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isPublished, publishedAt])
+  @@index([isFeatured, isPublished])
+  @@index([category, isPublished])
+  @@map("news")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NOTICE
+// ─────────────────────────────────────────────────────────────────────────────
+model Notice {
+  id             String             @id @default(cuid())
+  title          String
+  description    String?
+  category       String             @default("general")
+  tags           String[]           @default([])
+  targetAudience String[]           @default(["all"])
+  publishedAt    DateTime           @default(now())
+  expiresAt      DateTime?
+  isPublished    Boolean            @default(false)
+  isPinned       Boolean            @default(false)
+  isUrgent       Boolean            @default(false)
+  postedById     String?
+  postedByName   String?
+  viewCount      Int                @default(0)
+  attachments    NoticeAttachment[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([isPublished, isPinned, publishedAt])
+  @@index([category, isPublished])
+  @@map("notices")
+}
+
+model NoticeAttachment {
+  id            String   @id @default(cuid())
+  noticeId      String
+  notice        Notice   @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  fileName      String
+  fileUrl       String
+  fileType      String
+  fileSizeBytes Int?
+  uploadedAt    DateTime @default(now())
+
+  @@index([noticeId])
+  @@map("notice_attachments")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EVENT
+// ─────────────────────────────────────────────────────────────────────────────
+model Event {
+  id                  String              @id @default(cuid())
+  title               String
+  slug                String              @unique
+  description         String
+  shortDescription    String?
+  coverImage          String?
+  type                String              @default("seminar")
+  tags                String[]            @default([])
+  startDate           DateTime
+  endDate             DateTime?
+  venue               String
+  venueMapUrl         String?
+  mode                String              @default("in_person")
+  onlineLink          String?
+  organizerId         String?
+  organizerName       String?
+  organizerContact    String?
+  isPublished         Boolean             @default(false)
+  isFeatured          Boolean             @default(false)
+  status              String              @default("upcoming")
+  viewCount           Int                 @default(0)
+  galleryImages       String[]            @default([])
+  // Registration config (flattened)
+  regIsRequired       Boolean             @default(false)
+  regFormUrl          String?
+  regDeadline         DateTime?
+  regMaxSeats         Int                 @default(0)
+  regRegisteredCount  Int                 @default(0)
+  speakers            EventSpeaker[]
+  schedule            EventScheduleItem[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@index([isPublished, startDate])
+  @@index([isFeatured, isPublished])
+  @@index([status, isPublished])
+  @@map("events")
+}
+
+model EventSpeaker {
+  id           String @id @default(cuid())
+  eventId      String
+  event        Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name         String
+  title        String?
+  organization String?
+  photo        String?
+  bio          String?
+
+  @@index([eventId])
+  @@map("event_speakers")
+}
+
+model EventScheduleItem {
+  id       String @id @default(cuid())
+  eventId  String
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  time     String
+  activity String
+  speaker  String?
+
+  @@index([eventId])
+  @@map("event_schedule_items")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GALLERY
+// ─────────────────────────────────────────────────────────────────────────────
+model Gallery {
+  id               String           @id @default(cuid())
+  title            String
+  slug             String           @unique
+  description      String?
+  category         String           @default("event")
+  tags             String[]         @default([])
+  coverImage       String?
+  albumDate        DateTime
+  uploadedById     String?
+  uploadedByName   String?
+  isPublished      Boolean          @default(false)
+  isFeatured       Boolean          @default(false)
+  viewCount        Int              @default(0)
+  mediaCount       Int              @default(0)
+  media            GalleryMediaItem[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([isPublished, albumDate])
+  @@index([isFeatured, isPublished])
+  @@index([category, isPublished])
+  @@map("galleries")
+}
+
+model GalleryMediaItem {
+  id            String   @id @default(cuid())
+  galleryId     String
+  gallery       Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  url           String
+  thumbnailUrl  String
+  mediaType     String   @default("image")
+  caption       String?
+  altText       String?
+  format        String?
+  fileSizeBytes Int?
+  width         Int?
+  height        Int?
+  sortOrder     Int      @default(0)
+  uploadedAt    DateTime @default(now())
+
+  @@index([galleryId])
+  @@map("gallery_media_items")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RESEARCH GROUP
+// ─────────────────────────────────────────────────────────────────────────────
+model ResearchGroup {
+  id          String                @id @default(cuid())
+  name        String
+  slug        String                @unique
+  description String
+  lead        String
+  members     String[]              @default([])
+  projects    ResearchGroupProject[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@map("research_groups")
+}
+
+model ResearchGroupProject {
+  id           String        @id @default(cuid())
+  groupId      String
+  group        ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  fundingBody  String?
+  status       String        @default("ongoing")
+  startYear    Int?
+  endYear      Int?
+
+  @@index([groupId])
+  @@map("research_group_projects")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ALUMNI
+// ─────────────────────────────────────────────────────────────────────────────
+model Alumni {
+  id                   String                 @id @default(cuid())
+  name                 String
+  email                String                 @unique
+  photo                String?
+  phone                String?
+  currentCity          String?
+  currentCountry       String?
+  batchYear            Int?
+  graduationYear       Int?
+  degree               String?
+  studentId            String?
+  cgpa                 String?
+  currentDesignation   String?
+  currentOrganization  String?
+  industry             String                 @default("other")
+  testimonial          String?
+  linkedinUrl          String?
+  githubUrl            String?
+  websiteUrl           String?
+  isProfilePublic      Boolean                @default(false)
+  isFeatured           Boolean                @default(false)
+  isVerified           Boolean                @default(false)
+  approvalStatus       String                 @default("pending")
+  willingToMentor      Boolean                @default(false)
+  willingToSpeak       Boolean                @default(false)
+  mentorshipTopics     String?
+  workExperience       AlumniWorkExperience[]
+  higherEducation      AlumniHigherEducation[]
+  achievements         AlumniAchievement[]
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  @@index([batchYear])
+  @@index([approvalStatus, isProfilePublic])
+  @@index([isFeatured, isVerified])
+  @@map("alumni")
+}
+
+model AlumniWorkExperience {
+  id        String  @id @default(cuid())
+  alumniId  String
+  alumni    Alumni  @relation(fields: [alumniId], references: [id], onDelete: Cascade)
+  company   String
+  position  String
+  startYear Int
+  endYear   Int?
+  isCurrent Boolean @default(false)
+  location  String?
+
+  @@index([alumniId])
+  @@map("alumni_work_experience")
+}
+
+model AlumniHigherEducation {
+  id          String  @id @default(cuid())
+  alumniId    String
+  alumni      Alumni  @relation(fields: [alumniId], references: [id], onDelete: Cascade)
+  degree      String
+  institution String
+  country     String?
+  year        Int?
+  isCurrent   Boolean @default(false)
+
+  @@index([alumniId])
+  @@map("alumni_higher_education")
+}
+
+model AlumniAchievement {
+  id          String  @id @default(cuid())
+  alumniId    String
+  alumni      Alumni  @relation(fields: [alumniId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  year        Int?
+
+  @@index([alumniId])
+  @@map("alumni_achievements")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACADEMICS — Program
+// ─────────────────────────────────────────────────────────────────────────────
+model Program {
+  id                   String                      @id @default(cuid())
+  name                 String
+  degree               String
+  duration             String
+  totalCredits         Int
+  description          String
+  objectives           String
+  eligibility          String
+  highlights           String[]                    @default([])
+  learningOutcomes     String[]                    @default([])
+  totalSeats           Int                         @default(0)
+  tuitionFee           String?
+  brochureUrl          String?
+  isActive             Boolean                     @default(true)
+  sortOrder            Int                         @default(0)
+  admissionRequirements ProgramAdmissionRequirement[]
+  careerOpportunities  ProgramCareerOpportunity[]
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
+
+  @@index([degree])
+  @@map("programs")
+}
+
+model ProgramAdmissionRequirement {
+  id        String  @id @default(cuid())
+  programId String
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  label     String
+  value     String
+
+  @@index([programId])
+  @@map("program_admission_requirements")
+}
+
+model ProgramCareerOpportunity {
+  id          String  @id @default(cuid())
+  programId   String
+  program     Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+
+  @@index([programId])
+  @@map("program_career_opportunities")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACADEMICS — Course
+// ─────────────────────────────────────────────────────────────────────────────
+model Course {
+  id               String               @id @default(cuid())
+  code             String               @unique
+  title            String
+  credits          Int
+  semester         Int
+  degree           String
+  type             String
+  description      String?
+  objectives       String?
+  prerequisites    String[]             @default([])
+  learningOutcomes String[]             @default([])
+  topics           String[]             @default([])
+  syllabusUrl      String?
+  teacherName      String?
+  theoryHours      Int                  @default(0)
+  labHours         Int                  @default(0)
+  isActive         Boolean              @default(true)
+  sortOrder        Int                  @default(0)
+  schedule         CourseWeeklySchedule[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  @@index([degree, semester])
+  @@index([type])
+  @@map("courses")
+}
+
+model CourseWeeklySchedule {
+  id        String @id @default(cuid())
+  courseId  String
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  day       String
+  startTime String
+  endTime   String
+  room      String?
+
+  @@index([courseId])
+  @@map("course_weekly_schedules")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACADEMICS — Academic Resource
+// ─────────────────────────────────────────────────────────────────────────────
+model AcademicResource {
+  id           String                 @id @default(cuid())
+  title        String
+  type         String
+  description  String?
+  targetDegree String                 @default("all")
+  academicYear String
+  term         String                 @default("Spring")
+  isPublished  Boolean                @default(false)
+  isPinned     Boolean                @default(false)
+  viewCount    Int                    @default(0)
+  sortOrder    Int                    @default(0)
+  files        AcademicResourceFile[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  @@index([type, isPublished])
+  @@index([targetDegree, academicYear])
+  @@map("academic_resources")
+}
+
+model AcademicResourceFile {
+  id            String           @id @default(cuid())
+  resourceId    String
+  resource      AcademicResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  fileName      String
+  fileUrl       String
+  fileType      String           @default("pdf")
+  fileSizeBytes Int?
+  uploadedAt    DateTime         @default(now())
+
+  @@index([resourceId])
+  @@map("academic_resource_files")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACADEMICS — Laboratory
+// ─────────────────────────────────────────────────────────────────────────────
+model Laboratory {
+  id                String              @id @default(cuid())
+  name              String
+  slug              String              @unique
+  description       String
+  shortDescription  String?
+  location          String
+  capacity          Int?
+  workstations      Int?
+  inCharge          String?
+  inChargeEmail     String?
+  labType           String              @default("both")
+  softwareInstalled String[]            @default([])
+  facilities        String[]            @default([])
+  isActive          Boolean             @default(true)
+  isFeatured        Boolean             @default(false)
+  sortOrder         Int                 @default(0)
+  equipment         LaboratoryEquipment[]
+  images            LaboratoryImage[]
+  schedule          LaboratorySchedule[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@map("laboratories")
+}
+
+model LaboratoryEquipment {
+  id            String     @id @default(cuid())
+  labId         String
+  lab           Laboratory @relation(fields: [labId], references: [id], onDelete: Cascade)
+  name          String
+  quantity      Int?
+  specification String?
+
+  @@index([labId])
+  @@map("laboratory_equipment")
+}
+
+model LaboratoryImage {
+  id        String     @id @default(cuid())
+  labId     String
+  lab       Laboratory @relation(fields: [labId], references: [id], onDelete: Cascade)
+  url       String
+  caption   String?
+  isCover   Boolean    @default(false)
+
+  @@index([labId])
+  @@map("laboratory_images")
+}
+
+model LaboratorySchedule {
+  id         String     @id @default(cuid())
+  labId      String
+  lab        Laboratory @relation(fields: [labId], references: [id], onDelete: Cascade)
+  day        String
+  startTime  String
+  endTime    String
+  courseCode String?
+  group      String?
+
+  @@index([labId])
+  @@map("laboratory_schedules")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACHIEVEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+model Achievement {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  image        String?
+  type         String   @default("student")
+  achievedAt   DateTime
+  achieverName String?
+  awardedBy    String?
+  isPublished  Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isPublished, achievedAt])
+  @@index([isFeatured, isPublished])
+  @@map("achievements")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CLUB
+// ─────────────────────────────────────────────────────────────────────────────
+model Club {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  description      String
+  shortDescription String?
+  logo             String?
+  coverImage       String?
+  founderName      String?
+  presidentName    String?
+  advisorName      String?
+  foundedYear      Int?
+  activities       String[] @default([])
+  email            String?
+  websiteUrl       String?
+  facebookUrl      String?
+  memberCount      Int      @default(0)
+  isActive         Boolean  @default(true)
+  isFeatured       Boolean  @default(false)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@map("clubs")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HERO SLIDE
+// ─────────────────────────────────────────────────────────────────────────────
+model HeroSlide {
+  id                 String   @id @default(cuid())
+  title              String
+  subtitle           String
+  tag                String   @default("")
+  imageUrl           String   @default("")
+  overlayOpacity     Int      @default(60)
+  primaryBtnLabel    String   @default("")
+  primaryBtnHref     String   @default("")
+  secondaryBtnLabel  String   @default("")
+  secondaryBtnHref   String   @default("")
+  align              String   @default("left")
+  isActive           Boolean  @default(true)
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@map("hero_slides")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATISTIC
+// ─────────────────────────────────────────────────────────────────────────────
+model Statistic {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  value     String
+  icon      String?
+  sortOrder Int      @default(0)
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isVisible, sortOrder])
+  @@map("statistics")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SETTINGS (singleton)
+// ─────────────────────────────────────────────────────────────────────────────
+model Settings {
+  id                   String   @id @default(cuid())
+  key                  String   @unique @default("site_settings")
+  deptName             String   @default("Department of Computer Science & Engineering")
+  deptShortName        String   @default("Dept. of CSE")
+  universityName       String   @default("Gopalganj Science & Technology University")
+  universityShortName  String   @default("GSTU")
+  tagline              String   @default("Advancing Computing, Shaping the Future")
+  deptLogo             String?
+  universityLogo       String?
+  email                String   @default("cse@gstu.edu.bd")
+  phone                String   @default("+880-468-XXXXXX")
+  address              String   @default("CSE Building, GSTU Campus, Gopalganj-8100, Bangladesh")
+  moodleUrl            String   @default("https://moodle.gstu.edu.bd")
+  facebookUrl          String   @default("https://facebook.com/gstu.cse")
+  twitterUrl           String   @default("")
+  linkedinUrl          String   @default("")
+  youtubeUrl           String   @default("")
+  foundedYear          Int      @default(2011)
+  footerText           String   @default("")
+  aboutIntro           String   @default("")
+  aboutVision          String   @default("")
+  aboutMission         String   @default("")
+  aboutHistory         String   @default("")
+  chairmanName         String   @default("Dr. Mrinal Kanti Baowaly")
+  chairmanTitle        String   @default("Professor & Chairman")
+  chairmanPhoto        String   @default("")
+  chairmanEmail        String   @default("baowaly@gmail.com")
+  chairmanEmail2       String   @default("baowaly@gstu.edu.bd")
+  chairmanMessage      String   @default("")
+  aboutImage1          String   @default("")
+  aboutImage2          String   @default("")
+  aboutImage3          String   @default("")
+  aboutImage4          String   @default("")
+  hiddenNavItems       String[] @default([])
+  customNavItems       String   @default("[]")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("settings")
+}

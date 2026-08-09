@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthService, JwtPayload } from '../auth.service';
-import { AdminDocument } from '../schemas/admin.schema';
+import type { Admin } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -12,17 +12,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly authService: AuthService,
   ) {
     super({
-      // Extract token from Authorization: Bearer <token>
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
     });
   }
 
-  /** Called automatically by Passport after signature is verified */
-  async validate(payload: JwtPayload): Promise<AdminDocument> {
+  async validate(payload: JwtPayload): Promise<Admin> {
     const admin = await this.authService.validatePayload(payload);
     if (!admin) throw new UnauthorizedException('Token is no longer valid');
-    return admin; // attached as req.user
+    return admin;
   }
 }

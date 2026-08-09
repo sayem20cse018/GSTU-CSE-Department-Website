@@ -1,106 +1,137 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { PrismaService } from '../../database/prisma.service';
 
-import { Program, ProgramDocument }                     from './schemas/program.schema';
-import { Course, CourseDocument }                        from './schemas/course.schema';
-import { AcademicResource, AcademicResourceDocument }    from './schemas/academic-resource.schema';
-import { Laboratory, LaboratoryDocument }                from './schemas/laboratory.schema';
-
-import type { CreateProgramDto, UpdateProgramDto }               from './dto/program.dto';
-import type { CreateCourseDto, UpdateCourseDto }                 from './dto/course.dto';
+import type { CreateProgramDto, UpdateProgramDto }                   from './dto/program.dto';
+import type { CreateCourseDto, UpdateCourseDto }                     from './dto/course.dto';
 import type { CreateAcademicResourceDto, UpdateAcademicResourceDto } from './dto/academic-resource.dto';
-import type { CreateLaboratoryDto, UpdateLaboratoryDto }         from './dto/laboratory.dto';
+import type { CreateLaboratoryDto, UpdateLaboratoryDto }             from './dto/laboratory.dto';
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  PROGRAM
-// ─────────────────────────────────────────────────────────────────────────────
 @Injectable()
 export class AcademicsService {
-  constructor(
-    @InjectModel(Program.name)          private programModel: Model<ProgramDocument>,
-    @InjectModel(Course.name)           private courseModel: Model<CourseDocument>,
-    @InjectModel(AcademicResource.name) private resourceModel: Model<AcademicResourceDocument>,
-    @InjectModel(Laboratory.name)       private labModel: Model<LaboratoryDocument>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   // ── Programs ────────────────────────────────────────────────────────────────
-  async findAllPrograms(isAdmin = false) {
-    const filter = isAdmin ? {} : { isActive: true };
-    return this.programModel.find(filter).sort({ sortOrder: 1, degree: 1 }).lean();
+  findAllPrograms(isAdmin = false) {
+    return this.prisma.program.findMany({
+      where: isAdmin ? {} : { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { degree: 'asc' }],
+      include: { admissionRequirements: true, careerOpportunities: true },
+    });
   }
 
   async findProgramByDegree(degree: string) {
-    const p = await this.programModel.findOne({ degree, isActive: true }).lean();
+    const p = await this.prisma.program.findFirst({
+      where: { degree, isActive: true },
+      include: { admissionRequirements: true, careerOpportunities: true },
+    });
     if (!p) throw new NotFoundException(`Program "${degree}" not found`);
     return p;
   }
 
   async findProgramById(id: string) {
-    const p = await this.programModel.findById(id).lean();
+    const p = await this.prisma.program.findUnique({
+      where: { id },
+      include: { admissionRequirements: true, careerOpportunities: true },
+    });
     if (!p) throw new NotFoundException(`Program ${id} not found`);
     return p;
   }
 
   async createProgram(dto: CreateProgramDto) {
-    return this.programModel.create(dto);
+    const { admissionRequirements, careerOpportunities, ...rest } = dto as any;
+    return this.prisma.program.create({
+      data: {
+        ...rest,
+        ...(admissionRequirements ? { admissionRequirements: { create: admissionRequirements } } : {}),
+        ...(careerOpportunities   ? { careerOpportunities:   { create: careerOpportunities } }   : {}),
+      },
+      include: { admissionRequirements: true, careerOpportunities: true },
+    });
   }
 
   async updateProgram(id: string, dto: UpdateProgramDto) {
-    const p = await this.programModel.findByIdAndUpdate(id, dto, { new: true }).lean();
+    const p = await this.prisma.program.findUnique({ where: { id } });
     if (!p) throw new NotFoundException(`Program ${id} not found`);
-    return p;
+    const { admissionRequirements, careerOpportunities, ...rest } = dto as any;
+    return this.prisma.program.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(admissionRequirements ? { admissionRequirements: { deleteMany: {}, create: admissionRequirements } } : {}),
+        ...(careerOpportunities   ? { careerOpportunities:   { deleteMany: {}, create: careerOpportunities } }   : {}),
+      },
+      include: { admissionRequirements: true, careerOpportunities: true },
+    });
   }
 
   async deleteProgram(id: string) {
-    const p = await this.programModel.findByIdAndDelete(id);
+    const p = await this.prisma.program.findUnique({ where: { id } });
     if (!p) throw new NotFoundException(`Program ${id} not found`);
+    return this.prisma.program.delete({ where: { id } });
   }
 
   // ── Courses ─────────────────────────────────────────────────────────────────
-  async findAllCourses(degree?: string, semester?: number, isAdmin = false) {
-    const filter: Record<string, unknown> = {};
-    if (!isAdmin) filter.isActive = true;
-    if (degree)   filter.degree   = degree;
-    if (semester) filter.semester = semester;
-    return this.courseModel.find(filter).sort({ semester: 1, sortOrder: 1, code: 1 }).lean();
+  findAllCourses(degree?: string, semester?: number, isAdmin = false) {
+    return this.prisma.course.findMany({
+      where: {
+        ...(isAdmin ? {} : { isActive: true }),
+        ...(degree   ? { degree }   : {}),
+        ...(semester ? { semester } : {}),
+      },
+      orderBy: [{ semester: 'asc' }, { sortOrder: 'asc' }, { code: 'asc' }],
+      include: { schedule: true },
+    });
   }
 
   async findCourseById(id: string) {
-    const c = await this.courseModel.findById(id).lean();
+    const c = await this.prisma.course.findUnique({ where: { id }, include: { schedule: true } });
     if (!c) throw new NotFoundException(`Course ${id} not found`);
     return c;
   }
 
   async findCourseByCode(code: string) {
-    const c = await this.courseModel.findOne({ code: code.toUpperCase() }).lean();
+    const c = await this.prisma.course.findUnique({ where: { code: code.toUpperCase() }, include: { schedule: true } });
     if (!c) throw new NotFoundException(`Course "${code}" not found`);
     return c;
   }
 
   async createCourse(dto: CreateCourseDto) {
-    return this.courseModel.create(dto);
+    const { schedule, ...rest } = dto as any;
+    return this.prisma.course.create({
+      data: {
+        ...rest,
+        ...(schedule ? { schedule: { create: schedule } } : {}),
+      },
+      include: { schedule: true },
+    });
   }
 
   async updateCourse(id: string, dto: UpdateCourseDto) {
-    const c = await this.courseModel.findByIdAndUpdate(id, dto, { new: true }).lean();
+    const c = await this.prisma.course.findUnique({ where: { id } });
     if (!c) throw new NotFoundException(`Course ${id} not found`);
-    return c;
+    const { schedule, ...rest } = dto as any;
+    return this.prisma.course.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(schedule ? { schedule: { deleteMany: {}, create: schedule } } : {}),
+      },
+      include: { schedule: true },
+    });
   }
 
   async deleteCourse(id: string) {
-    const c = await this.courseModel.findByIdAndDelete(id);
+    const c = await this.prisma.course.findUnique({ where: { id } });
     if (!c) throw new NotFoundException(`Course ${id} not found`);
+    return this.prisma.course.delete({ where: { id } });
   }
 
-  // Curriculum: courses grouped by degree → semester
   async getCurriculum(degree: string) {
-    const courses = await this.courseModel
-      .find({ degree, isActive: true })
-      .sort({ semester: 1, sortOrder: 1, code: 1 })
-      .lean();
-
-    // Group by semester
+    const courses = await this.prisma.course.findMany({
+      where: { degree, isActive: true },
+      orderBy: [{ semester: 'asc' }, { sortOrder: 'asc' }, { code: 'asc' }],
+      include: { schedule: true },
+    });
     const grouped: Record<number, typeof courses> = {};
     for (const c of courses) {
       if (!grouped[c.semester]) grouped[c.semester] = [];
@@ -110,75 +141,124 @@ export class AcademicsService {
   }
 
   // ── Academic Resources ──────────────────────────────────────────────────────
-  async findAllResources(type?: string, degree?: string, isAdmin = false) {
-    const filter: Record<string, unknown> = {};
-    if (!isAdmin) filter.isPublished = true;
-    if (type)   filter.type          = type;
-    if (degree) filter.targetDegree  = { $in: [degree, 'all'] };
-    return this.resourceModel.find(filter).sort({ isPinned: -1, sortOrder: 1, createdAt: -1 }).lean();
+  findAllResources(type?: string, degree?: string, isAdmin = false) {
+    return this.prisma.academicResource.findMany({
+      where: {
+        ...(isAdmin ? {} : { isPublished: true }),
+        ...(type   ? { type }                                              : {}),
+        ...(degree ? { targetDegree: { in: [degree, 'all'] } }            : {}),
+      },
+      orderBy: [{ isPinned: 'desc' }, { sortOrder: 'asc' }, { createdAt: 'desc' }],
+      include: { files: true },
+    });
   }
 
   async findResourceById(id: string) {
-    const r = await this.resourceModel.findById(id).lean();
+    const r = await this.prisma.academicResource.findUnique({ where: { id }, include: { files: true } });
     if (!r) throw new NotFoundException(`Resource ${id} not found`);
     return r;
   }
 
   async createResource(dto: CreateAcademicResourceDto) {
-    return this.resourceModel.create(dto);
+    const { files, ...rest } = dto as any;
+    return this.prisma.academicResource.create({
+      data: {
+        ...rest,
+        ...(files ? { files: { create: files } } : {}),
+      },
+      include: { files: true },
+    });
   }
 
   async updateResource(id: string, dto: UpdateAcademicResourceDto) {
-    const r = await this.resourceModel.findByIdAndUpdate(id, dto, { new: true }).lean();
+    const r = await this.prisma.academicResource.findUnique({ where: { id } });
     if (!r) throw new NotFoundException(`Resource ${id} not found`);
-    return r;
+    const { files, ...rest } = dto as any;
+    return this.prisma.academicResource.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(files ? { files: { deleteMany: {}, create: files } } : {}),
+      },
+      include: { files: true },
+    });
   }
 
   async deleteResource(id: string) {
-    const r = await this.resourceModel.findByIdAndDelete(id);
+    const r = await this.prisma.academicResource.findUnique({ where: { id } });
     if (!r) throw new NotFoundException(`Resource ${id} not found`);
+    return this.prisma.academicResource.delete({ where: { id } });
   }
 
   // ── Laboratories ────────────────────────────────────────────────────────────
-  async findAllLabs(isAdmin = false) {
-    const filter = isAdmin ? {} : { isActive: true };
-    return this.labModel.find(filter).sort({ sortOrder: 1, name: 1 }).lean();
+  findAllLabs(isAdmin = false) {
+    return this.prisma.laboratory.findMany({
+      where: isAdmin ? {} : { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      include: { equipment: true, images: true, schedule: true },
+    });
   }
 
   async findLabBySlug(slug: string) {
-    const lab = await this.labModel.findOne({ slug }).lean();
+    const lab = await this.prisma.laboratory.findUnique({
+      where: { slug },
+      include: { equipment: true, images: true, schedule: true },
+    });
     if (!lab) throw new NotFoundException(`Lab "${slug}" not found`);
     return lab;
   }
 
   async findLabById(id: string) {
-    const lab = await this.labModel.findById(id).lean();
+    const lab = await this.prisma.laboratory.findUnique({
+      where: { id },
+      include: { equipment: true, images: true, schedule: true },
+    });
     if (!lab) throw new NotFoundException(`Lab ${id} not found`);
     return lab;
   }
 
   async createLab(dto: CreateLaboratoryDto) {
-    return this.labModel.create(dto);
+    const { equipment, images, schedule, ...rest } = dto as any;
+    return this.prisma.laboratory.create({
+      data: {
+        ...rest,
+        ...(equipment ? { equipment: { create: equipment } } : {}),
+        ...(images    ? { images:    { create: images } }    : {}),
+        ...(schedule  ? { schedule:  { create: schedule } }  : {}),
+      },
+      include: { equipment: true, images: true, schedule: true },
+    });
   }
 
   async updateLab(id: string, dto: UpdateLaboratoryDto) {
-    const lab = await this.labModel.findByIdAndUpdate(id, dto, { new: true }).lean();
+    const lab = await this.prisma.laboratory.findUnique({ where: { id } });
     if (!lab) throw new NotFoundException(`Lab ${id} not found`);
-    return lab;
+    const { equipment, images, schedule, ...rest } = dto as any;
+    return this.prisma.laboratory.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(equipment ? { equipment: { deleteMany: {}, create: equipment } } : {}),
+        ...(images    ? { images:    { deleteMany: {}, create: images } }    : {}),
+        ...(schedule  ? { schedule:  { deleteMany: {}, create: schedule } }  : {}),
+      },
+      include: { equipment: true, images: true, schedule: true },
+    });
   }
 
   async deleteLab(id: string) {
-    const lab = await this.labModel.findByIdAndDelete(id);
+    const lab = await this.prisma.laboratory.findUnique({ where: { id } });
     if (!lab) throw new NotFoundException(`Lab ${id} not found`);
+    return this.prisma.laboratory.delete({ where: { id } });
   }
 
-  // ── Stats (for admin dashboard) ─────────────────────────────────────────────
+  // ── Stats ───────────────────────────────────────────────────────────────────
   async getStats() {
-    const [programs, courses, resources, labs] = await Promise.all([
-      this.programModel.countDocuments({ isActive: true }),
-      this.courseModel.countDocuments({ isActive: true }),
-      this.resourceModel.countDocuments({ isPublished: true }),
-      this.labModel.countDocuments({ isActive: true }),
+    const [programs, courses, resources, labs] = await this.prisma.$transaction([
+      this.prisma.program.count({ where: { isActive: true } }),
+      this.prisma.course.count({ where: { isActive: true } }),
+      this.prisma.academicResource.count({ where: { isPublished: true } }),
+      this.prisma.laboratory.count({ where: { isActive: true } }),
     ]);
     return { programs, courses, resources, labs };
   }

@@ -1,62 +1,65 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
   IsOptional, IsString, IsBoolean, IsNumber, IsArray, MaxLength,
 } from 'class-validator';
-import { Club, ClubDocument } from './schemas/club.schema';
+import { PrismaService } from '../../database/prisma.service';
 
 export class CreateClubDto {
-  @IsString() @MaxLength(200) name: string;
-  @IsString() @MaxLength(200) slug: string;
-  @IsString() description: string;
-  @IsOptional() @IsString() shortDescription?: string;
-  @IsOptional() @IsString() logo?: string;
-  @IsOptional() @IsString() coverImage?: string;
-  @IsOptional() @IsString() founderName?: string;
-  @IsOptional() @IsString() presidentName?: string;
-  @IsOptional() @IsString() advisorName?: string;
-  @IsOptional() @IsNumber() foundedYear?: number;
+  @IsString() @MaxLength(200)  name: string;
+  @IsString() @MaxLength(200)  slug: string;
+  @IsString()                  description: string;
+  @IsOptional() @IsString()    shortDescription?: string;
+  @IsOptional() @IsString()    logo?: string;
+  @IsOptional() @IsString()    coverImage?: string;
+  @IsOptional() @IsString()    founderName?: string;
+  @IsOptional() @IsString()    presidentName?: string;
+  @IsOptional() @IsString()    advisorName?: string;
+  @IsOptional() @IsNumber()    foundedYear?: number;
   @IsOptional() @IsArray() @IsString({ each: true }) activities?: string[];
-  @IsOptional() @IsString() email?: string;
-  @IsOptional() @IsString() facebookUrl?: string;
-  @IsOptional() @IsNumber() memberCount?: number;
-  @IsOptional() @IsBoolean() isActive?: boolean;
-  @IsOptional() @IsBoolean() isFeatured?: boolean;
-  @IsOptional() @IsNumber() sortOrder?: number;
+  @IsOptional() @IsString()    email?: string;
+  @IsOptional() @IsString()    facebookUrl?: string;
+  @IsOptional() @IsNumber()    memberCount?: number;
+  @IsOptional() @IsBoolean()   isActive?: boolean;
+  @IsOptional() @IsBoolean()   isFeatured?: boolean;
+  @IsOptional() @IsNumber()    sortOrder?: number;
 }
 
 @Injectable()
 export class ClubsService {
-  constructor(@InjectModel(Club.name) private readonly model: Model<ClubDocument>) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(isAdmin = false) {
-    const filter = isAdmin ? {} : { isActive: true };
-    return this.model.find(filter).sort({ isFeatured: -1, sortOrder: 1, name: 1 }).lean();
+  findAll(isAdmin = false) {
+    return this.prisma.club.findMany({
+      where: isAdmin ? {} : { isActive: true },
+      orderBy: [{ isFeatured: 'desc' }, { sortOrder: 'asc' }, { name: 'asc' }],
+    });
   }
 
   async findBySlug(slug: string) {
-    const doc = await this.model.findOne({ slug }).lean();
+    const doc = await this.prisma.club.findUnique({ where: { slug } });
     if (!doc) throw new NotFoundException(`Club "${slug}" not found`);
     return doc;
   }
 
   async findById(id: string) {
-    const doc = await this.model.findById(id).lean();
+    const doc = await this.prisma.club.findUnique({ where: { id } });
     if (!doc) throw new NotFoundException(`Club ${id} not found`);
     return doc;
   }
 
-  async create(dto: CreateClubDto) { return this.model.create(dto); }
+  create(dto: CreateClubDto) {
+    return this.prisma.club.create({ data: dto });
+  }
 
   async update(id: string, dto: Partial<CreateClubDto>) {
-    const doc = await this.model.findByIdAndUpdate(id, dto, { new: true }).lean();
+    const doc = await this.prisma.club.findUnique({ where: { id } });
     if (!doc) throw new NotFoundException(`Club ${id} not found`);
-    return doc;
+    return this.prisma.club.update({ where: { id }, data: dto });
   }
 
   async remove(id: string) {
-    const doc = await this.model.findByIdAndDelete(id);
+    const doc = await this.prisma.club.findUnique({ where: { id } });
     if (!doc) throw new NotFoundException(`Club ${id} not found`);
+    return this.prisma.club.delete({ where: { id } });
   }
 }
