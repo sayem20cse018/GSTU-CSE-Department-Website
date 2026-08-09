@@ -5,6 +5,7 @@ import { adminGet, adminPatch, adminPost } from '@/lib/api/admin-fetch';
 import { useAuth } from '@/context/AuthContext';
 import type { SiteSettings } from '@/lib/api/settings';
 import { SETTINGS_FALLBACK } from '@/lib/api/settings';
+import ImageUpload from '@/components/admin/ui/ImageUpload';
 
 type Tab = 'identity' | 'contact' | 'social' | 'account';
 
@@ -138,6 +139,23 @@ export default function SettingsPage() {
           {tab === 'identity' && (
             <>
               <p className={sectionLabel}>Department Identity</p>
+
+              {/* Logos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pb-2 border-b border-slate-100">
+                <ImageUpload
+                  label="Department Logo"
+                  value={form.deptLogo ?? ''}
+                  onChange={v => F('deptLogo', v === '' ? '__CLEAR__' : v)}
+                  hint="Shown in navbar, sidebar, login page and footer"
+                />
+                <ImageUpload
+                  label="University Logo"
+                  value={form.universityLogo ?? ''}
+                  onChange={v => F('universityLogo', v === '' ? '__CLEAR__' : v)}
+                  hint="Shown alongside dept logo where needed"
+                />
+              </div>
+
               <div>
                 <label className={lCls}>Department Full Name</label>
                 <input value={form.deptName} onChange={e => F('deptName', e.target.value)}

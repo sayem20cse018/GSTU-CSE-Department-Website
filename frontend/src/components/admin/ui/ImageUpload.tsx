@@ -14,6 +14,7 @@ interface Props {
   maxMB?: number;
   previewRounded?: boolean;
   dark?: boolean;
+  hint?: string;
 }
 
 const CLOUD  = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -67,7 +68,7 @@ async function processFile(file: File): Promise<string> {
 
 export default function ImageUpload({
   value, onChange, label = 'Image', accept = 'image/*',
-  maxMB = 10, previewRounded = false, dark = false,
+  maxMB = 10, previewRounded = false, dark = false, hint,
 }: Props) {
   const ref              = useRef<HTMLInputElement>(null);
   const [busy, setBusy]  = useState(false);
@@ -93,13 +94,15 @@ export default function ImageUpload({
   const hintCls = dark ? 'text-[10px] text-slate-500 mt-1' : 'text-[10px] text-slate-400 mt-1';
 
   const isData = value?.startsWith('data:');
+  const isClear = value === '__CLEAR__';
+  const displayUrl = isData || isClear ? '' : (value ?? '');
 
   return (
     <div>
       <label className={lCls}>{label}</label>
       <div className="flex items-start gap-3">
         {/* Preview */}
-        {value && (
+        {value && !isClear && (
           <div className={`w-16 h-16 shrink-0 overflow-hidden border ${dark ? 'border-white/15 bg-white/5' : 'border-slate-200 bg-slate-50'} flex items-center justify-center ${previewRounded ? 'rounded-full' : 'rounded-lg'}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={value} alt="" className="w-full h-full object-cover" onError={() => onChange('')}/>
@@ -107,7 +110,7 @@ export default function ImageUpload({
         )}
         <div className="flex-1 min-w-0">
           {/* URL input */}
-          <input type="url" value={isData ? '' : (value ?? '')}
+          <input type="url" value={displayUrl}
             onChange={e => { setErr(''); onChange(e.target.value); }}
             placeholder="https://… or upload below"
             className={urlCls}/>
@@ -132,9 +135,10 @@ export default function ImageUpload({
             )}
           </button>
           <p className={hintCls}>JPG, PNG, WebP · auto-compressed · max {maxMB} MB</p>
+          {hint && <p className={hintCls + ' mt-0.5 font-medium'}>{hint}</p>}
         </div>
-        {value && (
-          <button type="button" onClick={() => { onChange(''); setErr(''); }}
+        {value && !isClear && (
+          <button type="button" onClick={() => { onChange('__CLEAR__'); setErr(''); }}
             className="shrink-0 text-xs text-red-400 hover:text-red-600 transition mt-1" title="Remove">✕</button>
         )}
       </div>
