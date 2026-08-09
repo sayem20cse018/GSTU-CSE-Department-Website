@@ -18,3 +18,9 @@ npm-debug.log*
 Thumbs.db
 
 /generated/prisma
+
+# Kiro/Windsurf/Claude IDE agent skill files (local only)
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
