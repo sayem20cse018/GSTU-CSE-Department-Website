@@ -6,15 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { AdminDocument } from '../../modules/auth/schemas/admin.schema';
-
-/**
- * Role-based access guard.
- * Usage: @Roles('super_admin') or @Roles('super_admin', 'admin')
- *
- * Role hierarchy:
- *   super_admin > admin > editor
- */
+import type { Admin } from '@prisma/client';
 
 const ROLE_RANK: Record<string, number> = {
   super_admin: 3,
@@ -32,10 +24,9 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    // No role restriction on this route
     if (!requiredRoles || requiredRoles.length === 0) return true;
 
-    const request = context.switchToHttp().getRequest<{ user: AdminDocument }>();
+    const request = context.switchToHttp().getRequest<{ user: Admin }>();
     const admin = request.user;
 
     if (!admin) throw new ForbiddenException('No authenticated user found');

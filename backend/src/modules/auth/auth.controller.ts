@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import type { Admin } from '@prisma/client';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -28,7 +29,6 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import type { AdminDocument } from './schemas/admin.schema';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -66,8 +66,8 @@ export class AuthController {
   @Get('me')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get currently authenticated admin profile' })
-  async getMe(@CurrentUser() admin: AdminDocument) {
-    return this.authService.getProfile((admin._id as { toString(): string }).toString());
+  async getMe(@CurrentUser() admin: Admin) {
+    return this.authService.getProfile(admin.id);
   }
 
   // ─── PATCH /api/auth/update-profile ────────────────────────────────────
@@ -77,13 +77,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update admin name and/or email' })
   async updateProfile(
-    @CurrentUser() admin: AdminDocument,
+    @CurrentUser() admin: Admin,
     @Body() dto: UpdateProfileDto,
   ) {
-    return this.authService.updateProfile(
-      (admin._id as { toString(): string }).toString(),
-      dto,
-    );
+    return this.authService.updateProfile(admin.id, dto);
   }
 
   // ─── PATCH /api/auth/change-password ────────────────────────────────────
@@ -93,13 +90,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Change current admin password' })
   async changePassword(
-    @CurrentUser() admin: AdminDocument,
+    @CurrentUser() admin: Admin,
     @Body() dto: ChangePasswordDto,
   ) {
-    return this.authService.changePassword(
-      (admin._id as { toString(): string }).toString(),
-      dto,
-    );
+    return this.authService.changePassword(admin.id, dto);
   }
 
   // ─── POST /api/auth/logout ───────────────────────────────────────────────
@@ -108,9 +102,7 @@ export class AuthController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout — records activity. Client must discard tokens.' })
-  async logout(@CurrentUser() admin: AdminDocument) {
-    return this.authService.logout(
-      (admin._id as { toString(): string }).toString(),
-    );
+  async logout(@CurrentUser() admin: Admin) {
+    return this.authService.logout(admin.id);
   }
 }
