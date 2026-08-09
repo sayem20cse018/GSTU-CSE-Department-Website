@@ -85,8 +85,8 @@ export default function AboutAdminPage() {
   async function save() {
     setSave(true); setErr(''); setSaved(false);
     try {
-      const { _id, key, __v, createdAt, updatedAt, ...payload } =
-        form as SiteSettings & { _id?: unknown; key?: unknown; __v?: unknown; createdAt?: unknown; updatedAt?: unknown };
+      const { id, key, __v, createdAt, updatedAt, ...payload } =
+        form as SiteSettings & { id?: unknown; key?: unknown; __v?: unknown; createdAt?: unknown; updatedAt?: unknown };
       await adminPatch('/settings', payload);
       setSaved(true); setTimeout(() => setSaved(false), 3000);
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }

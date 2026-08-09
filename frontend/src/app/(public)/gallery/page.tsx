@@ -5,7 +5,7 @@ import SectionHero from '@/components/academics/SectionHero';
 export const metadata: Metadata = { title: 'Photo Gallery — GSTU CSE' };
 
 interface Album {
-  _id: string; title: string; slug: string; category: string;
+  id: string; title: string; slug: string; category: string;
   mediaCount: number; albumDate: string; coverImage?: string;
   isPublished: boolean; isFeatured: boolean; description?: string;
 }
@@ -22,15 +22,15 @@ const CATS = [
 ];
 
 const MOCK: Album[] = [
-  { _id:'1', title:'Annual Convocation 2023', slug:'convocation-2023', category:'convocation', mediaCount:48, albumDate:'2023-11-15', coverImage:'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80', isPublished:true, isFeatured:true, description:'Annual convocation ceremony for graduating students.' },
-  { _id:'2', title:'Programming Contest 2024', slug:'programming-contest-2024', category:'competition', mediaCount:32, albumDate:'2024-03-10', coverImage:'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80', isPublished:true, isFeatured:true, description:'National programming contest hosted at GSTU.' },
-  { _id:'3', title:'AI Research Lab Opening', slug:'ai-lab-opening', category:'lab', mediaCount:24, albumDate:'2024-01-20', coverImage:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80', isPublished:true, isFeatured:false, description:'Inauguration of the new AI & Machine Learning lab.' },
-  { _id:'4', title:'Cultural Program 2024', slug:'cultural-2024', category:'student_life', mediaCount:60, albumDate:'2024-02-14', coverImage:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80', isPublished:true, isFeatured:false, description:'Annual cultural evening organized by students.' },
-  { _id:'5', title:'Tech Talk: Industry Leaders', slug:'tech-talk-2024', category:'event', mediaCount:18, albumDate:'2024-03-25', coverImage:'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80', isPublished:true, isFeatured:false, description:'Guest lectures from industry professionals.' },
-  { _id:'6', title:'Sports Day 2023', slug:'sports-day-2023', category:'sports', mediaCount:42, albumDate:'2023-12-05', coverImage:'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80', isPublished:true, isFeatured:false, description:'Inter-batch sports competition.' },
-  { _id:'7', title:'Faculty Workshop 2024', slug:'faculty-workshop-2024', category:'faculty', mediaCount:16, albumDate:'2024-04-10', coverImage:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80', isPublished:true, isFeatured:false, description:'Faculty development workshop on modern pedagogy.' },
-  { _id:'8', title:'Hackathon GSTU 2024', slug:'hackathon-2024', category:'competition', mediaCount:55, albumDate:'2024-04-20', coverImage:'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&q=80', isPublished:true, isFeatured:true, description:'48-hour hackathon with 30+ teams competing.' },
-  { _id:'9', title:'Orientation Day 2024', slug:'orientation-2024', category:'student_life', mediaCount:28, albumDate:'2024-01-05', coverImage:'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80', isPublished:true, isFeatured:false, description:'Welcome ceremony for new students.' },
+  { id:'1', title:'Annual Convocation 2023', slug:'convocation-2023', category:'convocation', mediaCount:48, albumDate:'2023-11-15', coverImage:'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80', isPublished:true, isFeatured:true, description:'Annual convocation ceremony for graduating students.' },
+  { id:'2', title:'Programming Contest 2024', slug:'programming-contest-2024', category:'competition', mediaCount:32, albumDate:'2024-03-10', coverImage:'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80', isPublished:true, isFeatured:true, description:'National programming contest hosted at GSTU.' },
+  { id:'3', title:'AI Research Lab Opening', slug:'ai-lab-opening', category:'lab', mediaCount:24, albumDate:'2024-01-20', coverImage:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80', isPublished:true, isFeatured:false, description:'Inauguration of the new AI & Machine Learning lab.' },
+  { id:'4', title:'Cultural Program 2024', slug:'cultural-2024', category:'student_life', mediaCount:60, albumDate:'2024-02-14', coverImage:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80', isPublished:true, isFeatured:false, description:'Annual cultural evening organized by students.' },
+  { id:'5', title:'Tech Talk: Industry Leaders', slug:'tech-talk-2024', category:'event', mediaCount:18, albumDate:'2024-03-25', coverImage:'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80', isPublished:true, isFeatured:false, description:'Guest lectures from industry professionals.' },
+  { id:'6', title:'Sports Day 2023', slug:'sports-day-2023', category:'sports', mediaCount:42, albumDate:'2023-12-05', coverImage:'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80', isPublished:true, isFeatured:false, description:'Inter-batch sports competition.' },
+  { id:'7', title:'Faculty Workshop 2024', slug:'faculty-workshop-2024', category:'faculty', mediaCount:16, albumDate:'2024-04-10', coverImage:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80', isPublished:true, isFeatured:false, description:'Faculty development workshop on modern pedagogy.' },
+  { id:'8', title:'Hackathon GSTU 2024', slug:'hackathon-2024', category:'competition', mediaCount:55, albumDate:'2024-04-20', coverImage:'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&q=80', isPublished:true, isFeatured:true, description:'48-hour hackathon with 30+ teams competing.' },
+  { id:'9', title:'Orientation Day 2024', slug:'orientation-2024', category:'student_life', mediaCount:28, albumDate:'2024-01-05', coverImage:'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80', isPublished:true, isFeatured:false, description:'Welcome ceremony for new students.' },
 ];
 
 async function fetchAlbums(): Promise<Album[]> {
@@ -81,7 +81,7 @@ export default async function GalleryPage({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {featured.map(a => (
-                  <Link key={a._id} href={`/gallery/${a.slug}`}
+                  <Link key={a.id} href={`/gallery/${a.slug}`}
                     className="group relative overflow-hidden rounded-2xl border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div className="h-48 overflow-hidden bg-slate-100">
                       {a.coverImage ? (
@@ -132,7 +132,7 @@ export default async function GalleryPage({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filtered.map(a => (
-                <Link key={a._id} href={`/gallery/${a.slug}`}
+                <Link key={a.id} href={`/gallery/${a.slug}`}
                   className="group flex flex-col rounded-xl overflow-hidden border border-slate-200 hover:border-green-300 hover:shadow-lg transition-all duration-300">
                   {/* Thumbnail */}
                   <div className="relative h-44 overflow-hidden bg-slate-100">

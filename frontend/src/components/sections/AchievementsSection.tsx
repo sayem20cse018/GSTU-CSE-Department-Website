@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils/format';
 
 interface Achievement {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   image?: string;
@@ -14,10 +14,10 @@ interface Achievement {
 }
 
 const MOCK: Achievement[] = [
-  { _id:'1', title:'1st Place — ACM ICPC Regional 2024', description:'A team of three CSE students secured first place at the ACM ICPC Regional Programming Contest held in Dhaka.', type:'competition', achievedAt:new Date().toISOString(), achieverName:'Team Epsilon — Rafi, Sadia, Tanvir', awardedBy:'ACM Bangladesh', isFeatured:true },
-  { _id:'2', title:'Best Research Paper Award — IEEE 2024', description:'Dr. Mohammad Rahman received the Best Research Paper Award at the IEEE International Conference on Computer Science and Engineering.', type:'research', achievedAt:new Date(Date.now()-30*86400000).toISOString(), achieverName:'Dr. Mohammad Rahman', awardedBy:'IEEE Bangladesh Section', isFeatured:true },
-  { _id:'3', title:'National Innovation Award 2024', description:'The CSE Department received the National Innovation Award for outstanding contributions to technology research and development.', type:'department', achievedAt:new Date(Date.now()-60*86400000).toISOString(), awardedBy:'Ministry of Science and Technology, Bangladesh', isFeatured:false },
-  { _id:'4', title:'Google CodeJam Top 100', description:'CSE student Nasrin Akter ranked in the global top 100 of Google CodeJam programming competition.', type:'student', achievedAt:new Date(Date.now()-90*86400000).toISOString(), achieverName:'Nasrin Akter', awardedBy:'Google', isFeatured:false },
+  { id:'1', title:'1st Place — ACM ICPC Regional 2024', description:'A team of three CSE students secured first place at the ACM ICPC Regional Programming Contest held in Dhaka.', type:'competition', achievedAt:new Date().toISOString(), achieverName:'Team Epsilon — Rafi, Sadia, Tanvir', awardedBy:'ACM Bangladesh', isFeatured:true },
+  { id:'2', title:'Best Research Paper Award — IEEE 2024', description:'Dr. Mohammad Rahman received the Best Research Paper Award at the IEEE International Conference on Computer Science and Engineering.', type:'research', achievedAt:new Date(Date.now()-30*86400000).toISOString(), achieverName:'Dr. Mohammad Rahman', awardedBy:'IEEE Bangladesh Section', isFeatured:true },
+  { id:'3', title:'National Innovation Award 2024', description:'The CSE Department received the National Innovation Award for outstanding contributions to technology research and development.', type:'department', achievedAt:new Date(Date.now()-60*86400000).toISOString(), awardedBy:'Ministry of Science and Technology, Bangladesh', isFeatured:false },
+  { id:'4', title:'Google CodeJam Top 100', description:'CSE student Nasrin Akter ranked in the global top 100 of Google CodeJam programming competition.', type:'student', achievedAt:new Date(Date.now()-90*86400000).toISOString(), achieverName:'Nasrin Akter', awardedBy:'Google', isFeatured:false },
 ];
 
 const TYPE_COLORS: Record<string,{bg:string;text:string;dot:string}> = {
@@ -62,7 +62,7 @@ export default async function AchievementsSection() {
           {items.map((item, i) => {
             const style = TYPE_COLORS[item.type] ?? TYPE_COLORS.other;
             return (
-              <article key={item._id}
+              <article key={item.id}
                 className="group bg-white border border-slate-200 rounded-2xl overflow-hidden
                            hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
@@ -113,7 +113,7 @@ export default async function AchievementsSection() {
                     )}
                   </div>
 
-                  <Link href={`/achievements/${item._id}`}
+                  <Link href={`/achievements/${item.id}`}
                     className="mt-4 flex items-center gap-1 text-xs font-semibold transition"
                     style={{ color:'#166534' }}>
                     View Details

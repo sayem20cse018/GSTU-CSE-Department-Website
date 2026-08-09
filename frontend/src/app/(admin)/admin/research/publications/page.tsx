@@ -11,7 +11,7 @@ import { formatDate } from '@/lib/utils/format';
 type PubType = 'journal' | 'conference';
 
 interface Publication {
-  _id: string;
+  id: string;
   title: string;
   authors: string;
   venue: string;
@@ -23,7 +23,7 @@ interface Publication {
   createdAt: string;
 }
 
-const EMPTY: Omit<Publication, '_id' | 'createdAt'> = {
+const EMPTY: Omit<Publication, 'id' | 'createdAt'> = {
   title: '', authors: '', venue: '', year: new Date().getFullYear(),
   type: 'journal', doi: '', url: '', isPublished: true,
 };
@@ -66,7 +66,7 @@ export default function PublicationsPage() {
     }
     setSaving(true); setErr('');
     try {
-      if (editing) await adminPatch(`/research/publications/${editing._id}`, form);
+      if (editing) await adminPatch(`/research/publications/${editing.id}`, form);
       else await adminPost('/research/publications', form);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
@@ -200,7 +200,7 @@ export default function PublicationsPage() {
             </thead>
             <tbody>
               {filtered.map((p, i) => (
-                <tr key={p._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i % 2 ? 'bg-white' : '')}>
+                <tr key={p.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i % 2 ? 'bg-white' : '')}>
                   <td className="px-5 py-4">
                     <p className="font-semibold text-slate-900 line-clamp-1">{p.title}</p>
                     <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{p.authors}</p>
@@ -217,7 +217,7 @@ export default function PublicationsPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={() => openEdit(p)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId === p._id} onClick={() => del(p._id)}>Del</Button>
+                      <Button size="sm" variant="danger" loading={delId === p.id} onClick={() => del(p.id)}>Del</Button>
                     </div>
                   </td>
                 </tr>

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils/cn';
 export const metadata: Metadata = { title: 'Faculty Members — GSTU CSE' };
 
 interface Faculty {
-  _id: string; name: string; title?: string; designation: string;
+  id: string; name: string; title?: string; designation: string;
   email: string; phone?: string; photo?: string; shortBio?: string;
   researchInterests: string[]; officeRoom?: string; slug?: string;
   googleScholarUrl?: string; linkedinUrl?: string; isActive: boolean;
@@ -27,12 +27,12 @@ const BADGE: Record<string, string> = {
 };
 const AVATAR_COLORS = ['bg-blue-600','bg-violet-600','bg-emerald-600','bg-rose-600','bg-amber-600','bg-teal-600'];
 const MOCK: Faculty[] = [
-  {_id:'1',name:'Mohammad Rahman',title:'Dr.',designation:'Professor',email:'mrahman@gstu.edu.bd',researchInterests:['Machine Learning','Computer Vision'],isActive:true,slug:'dr-mohammad-rahman'},
-  {_id:'2',name:'Fatima Khatun',title:'Dr.',designation:'Associate Professor',email:'fkhatun@gstu.edu.bd',researchInterests:['Cybersecurity','Networking'],isActive:true,slug:'dr-fatima-khatun'},
-  {_id:'3',name:'Karim Hossain',title:'Dr.',designation:'Associate Professor',email:'khossain@gstu.edu.bd',researchInterests:['NLP','Deep Learning'],isActive:true,slug:'dr-karim-hossain'},
-  {_id:'4',name:'Arif Ahmed',title:'Mr.',designation:'Assistant Professor',email:'aahmed@gstu.edu.bd',researchInterests:['IoT','Embedded Systems'],isActive:true,slug:'mr-arif-ahmed'},
-  {_id:'5',name:'Nadia Islam',title:'Ms.',designation:'Assistant Professor',email:'nislam@gstu.edu.bd',researchInterests:['Software Engineering'],isActive:true,slug:'ms-nadia-islam'},
-  {_id:'6',name:'Tanvir Hasan',title:'Mr.',designation:'Lecturer',email:'thasan@gstu.edu.bd',researchInterests:['Algorithms'],isActive:true,slug:'mr-tanvir-hasan'},
+  {id:'1',name:'Mohammad Rahman',title:'Dr.',designation:'Professor',email:'mrahman@gstu.edu.bd',researchInterests:['Machine Learning','Computer Vision'],isActive:true,slug:'dr-mohammad-rahman'},
+  {id:'2',name:'Fatima Khatun',title:'Dr.',designation:'Associate Professor',email:'fkhatun@gstu.edu.bd',researchInterests:['Cybersecurity','Networking'],isActive:true,slug:'dr-fatima-khatun'},
+  {id:'3',name:'Karim Hossain',title:'Dr.',designation:'Associate Professor',email:'khossain@gstu.edu.bd',researchInterests:['NLP','Deep Learning'],isActive:true,slug:'dr-karim-hossain'},
+  {id:'4',name:'Arif Ahmed',title:'Mr.',designation:'Assistant Professor',email:'aahmed@gstu.edu.bd',researchInterests:['IoT','Embedded Systems'],isActive:true,slug:'mr-arif-ahmed'},
+  {id:'5',name:'Nadia Islam',title:'Ms.',designation:'Assistant Professor',email:'nislam@gstu.edu.bd',researchInterests:['Software Engineering'],isActive:true,slug:'ms-nadia-islam'},
+  {id:'6',name:'Tanvir Hasan',title:'Mr.',designation:'Lecturer',email:'thasan@gstu.edu.bd',researchInterests:['Algorithms'],isActive:true,slug:'mr-tanvir-hasan'},
 ];
 
 async function fetchFaculty(): Promise<Faculty[]> {
@@ -73,7 +73,7 @@ export default async function FacultyPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {members.map((f, idx) => (
-                  <article key={f._id} className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-300 hover:shadow-md transition-all">
+                  <article key={f.id} className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-blue-300 hover:shadow-md transition-all">
                     {/* Photo */}
                     <div className="h-36 relative bg-slate-100 overflow-hidden">
                       {f.photo
@@ -88,7 +88,7 @@ export default async function FacultyPage() {
                         {f.designation}
                       </span>
                       <h3 className="mt-2 font-bold text-slate-900 group-hover:text-blue-700 transition leading-tight">
-                        <Link href={`/faculty/${f.slug ?? f._id}`}>{f.title} {f.name}</Link>
+                        <Link href={`/faculty/${f.slug ?? f.id}`}>{f.title} {f.name}</Link>
                       </h3>
                       {f.shortBio && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{f.shortBio}</p>}
                       {f.researchInterests?.length > 0 && (

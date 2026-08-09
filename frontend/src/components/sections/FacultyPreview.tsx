@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 interface FacultyMember {
-  _id: string; name: string; designation: string; title?: string;
+  id: string; name: string; designation: string; title?: string;
   photo?: string; email: string; slug?: string; researchInterests?: string[];
 }
 
@@ -16,12 +16,12 @@ async function fetchFaculty(): Promise<FacultyMember[]> {
 }
 
 const MOCK: FacultyMember[] = [
-  { _id:'1', name:'Mrinal Kanti Baowaly', title:'Dr.', designation:'Professor', email:'baowaly@gstu.edu.bd', slug:'dr-mrinal-kanti-baowaly', researchInterests:['Machine Learning','Computer Vision'] },
-  { _id:'2', name:'Mohammad Rahman',       title:'Dr.', designation:'Professor', email:'mrahman@gstu.edu.bd', slug:'dr-mohammad-rahman', researchInterests:['Deep Learning','NLP'] },
-  { _id:'3', name:'Fatima Khatun',         title:'Dr.', designation:'Associate Professor', email:'fkhatun@gstu.edu.bd', researchInterests:['Cybersecurity','Networks'] },
-  { _id:'4', name:'Karim Hossain',         title:'Dr.', designation:'Associate Professor', email:'khossain@gstu.edu.bd', researchInterests:['IoT','Embedded Systems'] },
-  { _id:'5', name:'Nadia Islam',           title:'Ms.', designation:'Assistant Professor', email:'nislam@gstu.edu.bd', researchInterests:['Software Engineering'] },
-  { _id:'6', name:'Arif Ahmed',            title:'Mr.', designation:'Assistant Professor', email:'aahmed@gstu.edu.bd', researchInterests:['Algorithms','Theory'] },
+  { id:'1', name:'Mrinal Kanti Baowaly', title:'Dr.', designation:'Professor', email:'baowaly@gstu.edu.bd', slug:'dr-mrinal-kanti-baowaly', researchInterests:['Machine Learning','Computer Vision'] },
+  { id:'2', name:'Mohammad Rahman',       title:'Dr.', designation:'Professor', email:'mrahman@gstu.edu.bd', slug:'dr-mohammad-rahman', researchInterests:['Deep Learning','NLP'] },
+  { id:'3', name:'Fatima Khatun',         title:'Dr.', designation:'Associate Professor', email:'fkhatun@gstu.edu.bd', researchInterests:['Cybersecurity','Networks'] },
+  { id:'4', name:'Karim Hossain',         title:'Dr.', designation:'Associate Professor', email:'khossain@gstu.edu.bd', researchInterests:['IoT','Embedded Systems'] },
+  { id:'5', name:'Nadia Islam',           title:'Ms.', designation:'Assistant Professor', email:'nislam@gstu.edu.bd', researchInterests:['Software Engineering'] },
+  { id:'6', name:'Arif Ahmed',            title:'Mr.', designation:'Assistant Professor', email:'aahmed@gstu.edu.bd', researchInterests:['Algorithms','Theory'] },
 ];
 
 const DESIG_STYLE: Record<string,{bg:string;text:string}> = {
@@ -75,7 +75,7 @@ export default async function FacultyPreview() {
           {faculty.map((member, i) => {
             const desig = DESIG_STYLE[member.designation] ?? DESIG_STYLE.Lecturer;
             return (
-              <article key={member._id}
+              <article key={member.id}
                 className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-green-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
 
                 {/* Top strip */}
@@ -96,7 +96,7 @@ export default async function FacultyPreview() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-slate-900 group-hover:text-green-700 transition leading-tight">
-                        <Link href={`/faculty/${member.slug ?? member._id}`}>
+                        <Link href={`/faculty/${member.slug ?? member.id}`}>
                           {member.title} {member.name}
                         </Link>
                       </h3>
@@ -128,7 +128,7 @@ export default async function FacultyPreview() {
                   </a>
 
                   {/* Profile link */}
-                  <Link href={`/faculty/${member.slug ?? member._id}`}
+                  <Link href={`/faculty/${member.slug ?? member.id}`}
                     className="mt-4 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90"
                     style={{ background:'linear-gradient(135deg,#166534,#15803d)' }}>
                     View Profile

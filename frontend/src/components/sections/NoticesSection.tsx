@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
 
 interface Notice {
-  _id: string; title: string; category: string; publishedAt: string;
+  id: string; title: string; category: string; publishedAt: string;
   isUrgent?: boolean; isPinned?: boolean;
   attachments?: { fileUrl: string; fileName: string }[];
 }
@@ -20,12 +20,12 @@ async function fetchNotices(): Promise<Notice[]> {
 }
 
 const MOCK: Notice[] = [
-  { _id:'1', title:'BSc Final Semester Examination Routine — Spring 2024', category:'academic', publishedAt:new Date().toISOString(), isUrgent:true, isPinned:true },
-  { _id:'2', title:'Admission Test Result Published for MSc Program 2024-25', category:'admission', publishedAt:new Date(Date.now()-86400000).toISOString(), isPinned:true },
-  { _id:'3', title:'Workshop on Deep Learning with TensorFlow — Registration Open', category:'workshop_seminar', publishedAt:new Date(Date.now()-2*86400000).toISOString() },
-  { _id:'4', title:'Merit Scholarship Applications Open for 2024-25 Session', category:'scholarship', publishedAt:new Date(Date.now()-3*86400000).toISOString() },
-  { _id:'5', title:'Class Schedule Revised for 6th Semester CSE Students', category:'academic', publishedAt:new Date(Date.now()-4*86400000).toISOString() },
-  { _id:'6', title:'Faculty Recruitment Notice — Assistant Professor Position', category:'recruitment', publishedAt:new Date(Date.now()-5*86400000).toISOString() },
+  { id:'1', title:'BSc Final Semester Examination Routine — Spring 2024', category:'academic', publishedAt:new Date().toISOString(), isUrgent:true, isPinned:true },
+  { id:'2', title:'Admission Test Result Published for MSc Program 2024-25', category:'admission', publishedAt:new Date(Date.now()-86400000).toISOString(), isPinned:true },
+  { id:'3', title:'Workshop on Deep Learning with TensorFlow — Registration Open', category:'workshop_seminar', publishedAt:new Date(Date.now()-2*86400000).toISOString() },
+  { id:'4', title:'Merit Scholarship Applications Open for 2024-25 Session', category:'scholarship', publishedAt:new Date(Date.now()-3*86400000).toISOString() },
+  { id:'5', title:'Class Schedule Revised for 6th Semester CSE Students', category:'academic', publishedAt:new Date(Date.now()-4*86400000).toISOString() },
+  { id:'6', title:'Faculty Recruitment Notice — Assistant Professor Position', category:'recruitment', publishedAt:new Date(Date.now()-5*86400000).toISOString() },
 ];
 
 const CAT: Record<string, { label: string; cls: string }> = {
@@ -111,7 +111,7 @@ export default async function NoticesSection() {
                   className="text-white font-bold leading-snug uppercase mb-auto"
                   style={{ fontFamily: 'var(--font-oswald)', fontSize: '1.15rem', letterSpacing: '0.03em' }}
                 >
-                  <Link href={`/notices/${featured._id}`} className="hover:text-green-300 transition-colors">
+                  <Link href={`/notices/${featured.id}`} className="hover:text-green-300 transition-colors">
                     {featured.title}
                   </Link>
                 </h3>
@@ -119,7 +119,7 @@ export default async function NoticesSection() {
                 <div className="flex items-center justify-between mt-6 pt-4 border-t"
                   style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
                   <span className="text-xs" style={{ color: 'rgba(134,239,172,0.6)' }}>{formatDate(featured.publishedAt)}</span>
-                  <Link href={`/notices/${featured._id}`}
+                  <Link href={`/notices/${featured.id}`}
                     className="flex items-center gap-1.5 text-sm font-bold transition-colors hover:text-green-300"
                     style={{ color: '#4ade80', fontFamily: 'var(--font-inter)' }}>
                     Read More
@@ -137,7 +137,7 @@ export default async function NoticesSection() {
             {rest.slice(0, 5).map((notice) => {
               const cat = CAT[notice.category] ?? CAT.general;
               return (
-                <div key={notice._id}
+                <div key={notice.id}
                   className="flex items-stretch hover:bg-[#e8f5e9] transition-colors group">
                   {/* Date box */}
                   <SplitDate dateStr={notice.publishedAt} />
@@ -161,10 +161,10 @@ export default async function NoticesSection() {
                       className="font-bold uppercase text-slate-900 group-hover:text-[#1a7a3c] transition-colors line-clamp-2 leading-snug"
                       style={{ fontFamily: 'var(--font-oswald)', fontSize: '0.88rem', letterSpacing: '0.02em' }}
                     >
-                      <Link href={`/notices/${notice._id}`}>{notice.title}</Link>
+                      <Link href={`/notices/${notice.id}`}>{notice.title}</Link>
                     </h3>
                     <Link
-                      href={`/notices/${notice._id}`}
+                      href={`/notices/${notice.id}`}
                       className="mt-1 text-sm font-semibold transition-colors"
                       style={{ color: '#1a7a3c', fontFamily: 'var(--font-inter)' }}
                     >

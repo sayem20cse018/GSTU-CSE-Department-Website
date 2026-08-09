@@ -4,7 +4,7 @@ const BASE = '/academics';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface Program {
-  _id: string;
+  id: string;
   name: string;
   degree: 'BSc' | 'MSc' | 'PhD';
   duration: string;
@@ -23,7 +23,7 @@ export interface Program {
 }
 
 export interface Course {
-  _id: string;
+  id: string;
   code: string;
   title: string;
   credits: number;
@@ -43,7 +43,7 @@ export interface Course {
 }
 
 export interface AcademicResource {
-  _id: string;
+  id: string;
   title: string;
   type: 'routine' | 'calendar' | 'exam_schedule' | 'result' | 'guideline' | 'other';
   description?: string;
@@ -56,7 +56,7 @@ export interface AcademicResource {
 }
 
 export interface Laboratory {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
   description: string;

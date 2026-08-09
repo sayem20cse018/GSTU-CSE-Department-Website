@@ -47,7 +47,7 @@ export default function AdminCoursesPage() {
     setSaving(true);
     try {
       const token = document.cookie.match(/cse_access=([^;]+)/)?.[1];
-      const url   = editing ? `${API}/${editing._id}` : API;
+      const url   = editing ? `${API}/${editing.id}` : API;
       const r = await fetch(url, { method:editing?'PATCH':'POST', headers:{ 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}) }, body:JSON.stringify(form), credentials:'include' });
       if (r.ok) { setShowForm(false); load(); }
       else { const e = await r.json() as {message?:string}; alert(e.message??'Save failed'); }
@@ -151,7 +151,7 @@ export default function AdminCoursesPage() {
             <table className="w-full text-sm">
               <tbody>
                 {grouped[sem].map((c,i)=>(
-                  <tr key={c._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white':''}`}>
+                  <tr key={c.id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white':''}`}>
                     <td className="px-5 py-3 font-mono text-xs text-blue-400 font-bold w-24">{c.code}</td>
                     <td className="px-4 py-3 text-white">{c.title}</td>
                     <td className="px-4 py-3 text-center text-slate-400 w-16">{c.credits}cr</td>
@@ -160,7 +160,7 @@ export default function AdminCoursesPage() {
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <Button size="sm" variant="secondary" onClick={()=>openEdit(c)}>Edit</Button>
-                        <Button size="sm" variant="danger" loading={deleting===c._id} onClick={()=>remove(c._id)}>Del</Button>
+                        <Button size="sm" variant="danger" loading={deleting===c.id} onClick={()=>remove(c.id)}>Del</Button>
                       </div>
                     </td>
                   </tr>))}

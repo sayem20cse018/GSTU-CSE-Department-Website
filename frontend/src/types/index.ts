@@ -1,7 +1,7 @@
 // ─── Shared domain types ────────────────────────────────────────────────────
 
 export interface Faculty {
-  _id: string;
+  id: string;
   name: string;
   title: string;
   designation: string; // Professor, Associate Professor, etc.
@@ -30,7 +30,7 @@ export interface Publication {
 }
 
 export interface NewsItem {
-  _id: string;
+  id: string;
   title: string;
   slug: string;
   excerpt: string;
@@ -51,7 +51,7 @@ export type NewsCategory =
   | "general";
 
 export interface Event {
-  _id: string;
+  id: string;
   title: string;
   slug: string;
   description: string;
@@ -63,7 +63,7 @@ export interface Event {
 }
 
 export interface ResearchGroup {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
   description: string;
@@ -82,7 +82,7 @@ export interface ResearchProject {
 }
 
 export interface Program {
-  _id: string;
+  id: string;
   name: string;
   degree: "BSc" | "MSc" | "PhD";
   duration: string;

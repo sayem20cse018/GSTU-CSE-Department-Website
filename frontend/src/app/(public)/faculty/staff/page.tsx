@@ -3,12 +3,12 @@ import SectionHero from '@/components/academics/SectionHero';
 
 export const metadata: Metadata = { title: 'Officers & Staff — GSTU CSE' };
 
-interface Person { _id:string; name:string; title?:string; designation:string; email:string; photo?:string; shortBio?:string; officeRoom?:string; staffType:string; phone?:string; isActive:boolean; }
+interface Person { id:string; name:string; title?:string; designation:string; email:string; photo?:string; shortBio?:string; officeRoom?:string; staffType:string; phone?:string; isActive:boolean; }
 
 const MOCK: Person[] = [
-  { _id:'1', name:'Md. Rafiqul Islam', title:'Mr.', designation:'Section Officer', email:'rafiq@gstu.edu.bd', staffType:'staff', isActive:true, officeRoom:'Room 101, Admin Block' },
-  { _id:'2', name:'Nasrin Akter', title:'Ms.', designation:'Administrative Officer', email:'nasrin@gstu.edu.bd', staffType:'officer', isActive:true, officeRoom:'Room 102, Admin Block' },
-  { _id:'3', name:'Md. Jahangir Alam', title:'Mr.', designation:'System Analyst', email:'jahangir@gstu.edu.bd', staffType:'officer', isActive:true, officeRoom:'Computer Lab, 2nd Floor' },
+  { id:'1', name:'Md. Rafiqul Islam', title:'Mr.', designation:'Section Officer', email:'rafiq@gstu.edu.bd', staffType:'staff', isActive:true, officeRoom:'Room 101, Admin Block' },
+  { id:'2', name:'Nasrin Akter', title:'Ms.', designation:'Administrative Officer', email:'nasrin@gstu.edu.bd', staffType:'officer', isActive:true, officeRoom:'Room 102, Admin Block' },
+  { id:'3', name:'Md. Jahangir Alam', title:'Mr.', designation:'System Analyst', email:'jahangir@gstu.edu.bd', staffType:'officer', isActive:true, officeRoom:'Computer Lab, 2nd Floor' },
 ];
 
 async function fetchStaff(): Promise<Person[]> {
@@ -44,7 +44,7 @@ export default async function StaffPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {list.map(m => (
-                <div key={m._id} className="flex flex-col items-center text-center p-6 border border-slate-200 rounded-2xl hover:border-green-300 hover:shadow-md transition">
+                <div key={m.id} className="flex flex-col items-center text-center p-6 border border-slate-200 rounded-2xl hover:border-green-300 hover:shadow-md transition">
                   {m.photo ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={m.photo} alt={m.name} className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-md mb-3"/>

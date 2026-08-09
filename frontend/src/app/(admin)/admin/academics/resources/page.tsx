@@ -72,7 +72,7 @@ export default function AdminResourcesPage() {
     try {
       const token = document.cookie.match(/cse_access=([^;]+)/)?.[1];
       const payload = { ...form, files: form.fileUrl ? [{ fileName:form.fileName||form.fileUrl.split('/').pop()||'file', fileUrl:form.fileUrl }] : [] };
-      const url = editing ? `${API}/${editing._id}` : API;
+      const url = editing ? `${API}/${editing.id}` : API;
       const r   = await fetch(url, { method:editing?'PATCH':'POST', headers:{ 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}) }, body:JSON.stringify(payload), credentials:'include' });
       if (r.ok) { setShowForm(false); load(); }
       else { const e = await r.json() as {message?:string}; alert(e.message??'Save failed'); }
@@ -187,7 +187,7 @@ export default function AdminResourcesPage() {
             </tr></thead>
             <tbody>
               {resources.map((r,i)=>(
-                <tr key={r._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-slate-50/30':''}`}>
+                <tr key={r.id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-slate-50/30':''}`}>
                   <td className="px-5 py-4">
                     <p className="font-semibold text-slate-900">{r.title}</p>
                     <p className="text-xs text-slate-500">{r.targetDegree} · {r.files.length} file{r.files.length!==1?'s':''}</p>
@@ -203,7 +203,7 @@ export default function AdminResourcesPage() {
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(r)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={deleting===r._id} onClick={()=>remove(r._id)}>Delete</Button>
+                      <Button size="sm" variant="danger" loading={deleting===r.id} onClick={()=>remove(r.id)}>Delete</Button>
                     </div>
                   </td>
                 </tr>))}

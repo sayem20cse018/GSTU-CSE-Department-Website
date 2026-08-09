@@ -47,7 +47,7 @@ export default function AdminLabsPage() {
     try {
       const token = document.cookie.match(/cse_access=([^;]+)/)?.[1];
       const payload = { ...form, facilities:form.facilities.split(',').map(s=>s.trim()).filter(Boolean), softwareInstalled:form.softwareInstalled.split(',').map(s=>s.trim()).filter(Boolean) };
-      const url = editing ? `${API}/${editing._id}` : API;
+      const url = editing ? `${API}/${editing.id}` : API;
       const r   = await fetch(url, { method:editing?'PATCH':'POST', headers:{ 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}) }, body:JSON.stringify(payload), credentials:'include' });
       if (r.ok) { setShowForm(false); load(); }
       else { const e = await r.json() as {message?:string}; alert(e.message??'Save failed'); }
@@ -144,7 +144,7 @@ export default function AdminLabsPage() {
             </tr></thead>
             <tbody>
               {labs.map((l,i)=>(
-                <tr key={l._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white/[0.02]':''}`}>
+                <tr key={l.id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white/[0.02]':''}`}>
                   <td className="px-5 py-4"><p className="font-medium text-white">{l.name}</p><p className="text-xs text-slate-500">{l.location}</p></td>
                   <td className="px-4 py-4 text-center"><Badge variant="neutral">{l.labType}</Badge></td>
                   <td className="px-4 py-4 text-center text-slate-300">{l.capacity??0}</td>
@@ -157,7 +157,7 @@ export default function AdminLabsPage() {
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(l)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={deleting===l._id} onClick={()=>remove(l._id)}>Delete</Button>
+                      <Button size="sm" variant="danger" loading={deleting===l.id} onClick={()=>remove(l.id)}>Delete</Button>
                     </div>
                   </td>
                 </tr>))}

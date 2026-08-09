@@ -9,13 +9,13 @@ import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 
 interface Slide {
-  _id: string; title: string; subtitle: string; tag: string; imageUrl: string;
+  id: string; title: string; subtitle: string; tag: string; imageUrl: string;
   overlayOpacity: number; primaryBtnLabel: string; primaryBtnHref: string;
   secondaryBtnLabel: string; secondaryBtnHref: string;
   align: 'left' | 'center'; isActive: boolean; sortOrder: number;
 }
 
-const EMPTY: Omit<Slide, '_id'> = {
+const EMPTY: Omit<Slide, 'id'> = {
   title: '', subtitle: '', tag: '', imageUrl: '', overlayOpacity: 60,
   primaryBtnLabel: '', primaryBtnHref: '', secondaryBtnLabel: '', secondaryBtnHref: '',
   align: 'left', isActive: true, sortOrder: 0,
@@ -54,7 +54,7 @@ export default function AdminHeroSlidesPage() {
     if (!form.title.trim() || !form.subtitle.trim()) { setErr('Title and subtitle are required.'); return; }
     setSaving(true); setErr('');
     try {
-      if (editing) await adminPatch(`/hero-slides/${editing._id}`, form);
+      if (editing) await adminPatch(`/hero-slides/${editing.id}`, form);
       else await adminPost('/hero-slides', form);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
@@ -163,7 +163,7 @@ export default function AdminHeroSlidesPage() {
         ) : list.length === 0 ? (
           <EmptyState title="No slides yet" description="Add the first hero slide." action={<Button onClick={openNew}>Add Slide</Button>}/>
         ) : list.map((s, i) => (
-          <div key={s._id} className="flex items-center gap-4 bg-slate-900 border border-slate-200 rounded-xl p-4">
+          <div key={s.id} className="flex items-center gap-4 bg-slate-900 border border-slate-200 rounded-xl p-4">
             {/* Thumbnail */}
             <div className="w-28 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-800 flex items-center justify-center">
               {s.imageUrl && !s.imageUrl.startsWith('data:')
@@ -186,7 +186,7 @@ export default function AdminHeroSlidesPage() {
             <div className="flex items-center gap-2 shrink-0">
               <Badge variant={s.isActive ? 'success' : 'neutral'}>{s.isActive ? 'Active' : 'Hidden'}</Badge>
               <Button size="sm" variant="secondary" onClick={() => openEdit(s)}>Edit</Button>
-              <Button size="sm" variant="danger" loading={delId === s._id} onClick={() => del(s._id)}>Del</Button>
+              <Button size="sm" variant="danger" loading={delId === s.id} onClick={() => del(s.id)}>Del</Button>
             </div>
           </div>
         ))}

@@ -52,7 +52,7 @@ export default function AdminProgramsPage() {
     setSaving(true);
     try {
       const token = document.cookie.match(/cse_access=([^;]+)/)?.[1];
-      const url   = editing ? `${API}/${editing._id}` : API;
+      const url   = editing ? `${API}/${editing.id}` : API;
       const method= editing ? 'PATCH' : 'POST';
       const r = await fetch(url, { method, headers:{ 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}) }, body:JSON.stringify(form), credentials:'include' });
       if (r.ok) { setShowForm(false); load(); }
@@ -157,7 +157,7 @@ export default function AdminProgramsPage() {
             </tr></thead>
             <tbody>
               {programs.map((p,i)=>(
-                <tr key={p._id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white/[0.02]':''}`}>
+                <tr key={p.id} className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 ${i%2?'bg-white/[0.02]':''}`}>
                   <td className="px-5 py-4"><p className="font-medium text-white">{p.name}</p><p className="text-xs text-slate-500 mt-0.5">{p.duration}</p></td>
                   <td className="px-4 py-4 text-center"><Badge variant={DEGREE_COLORS[p.degree]??'neutral'}>{p.degree}</Badge></td>
                   <td className="px-4 py-4 text-center text-slate-300">{p.totalCredits}</td>
@@ -165,7 +165,7 @@ export default function AdminProgramsPage() {
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(p)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={deleting===p._id} onClick={()=>remove(p._id)}>Delete</Button>
+                      <Button size="sm" variant="danger" loading={deleting===p.id} onClick={()=>remove(p.id)}>Delete</Button>
                     </div>
                   </td>
                 </tr>))}

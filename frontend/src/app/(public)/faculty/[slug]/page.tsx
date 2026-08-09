@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils/cn';
 
 interface Faculty {
-  _id: string; name: string; title?: string; designation: string;
+  id: string; name: string; title?: string; designation: string;
   email: string; phone?: string; photo?: string; shortBio?: string; fullBio?: string;
   researchInterests: string[]; officeRoom?: string; slug?: string;
   googleScholarUrl?: string; linkedinUrl?: string; orcidId?: string; researchGateUrl?: string;
@@ -21,7 +21,7 @@ async function fetchFacultyBySlug(slug: string): Promise<Faculty | null> {
     const r = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
     if (!r.ok) return null;
     const d = await r.json() as { data: Faculty[] };
-    return d.data?.find(f => f.slug === slug || f._id === slug) ?? null;
+    return d.data?.find(f => f.slug === slug || f.id === slug) ?? null;
   } catch { return null; }
 }
 

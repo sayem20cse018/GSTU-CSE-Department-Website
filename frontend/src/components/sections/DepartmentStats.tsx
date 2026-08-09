@@ -2,17 +2,17 @@
 import { useEffect, useRef, useState } from 'react';
 
 interface Stat {
-  _id: string; key: string; label: string; value: string; icon: string;
+  id: string; key: string; label: string; value: string; icon: string;
   sortOrder: number; isVisible: boolean;
 }
 
 const FALLBACK: Stat[] = [
-  { _id:'1', key:'faculty_members',  label:'Faculty Members',      value:'14+',  icon:'👨‍🏫', sortOrder:1, isVisible:true },
-  { _id:'2', key:'total_students',   label:'Total Students',        value:'800+', icon:'🎓',  sortOrder:2, isVisible:true },
-  { _id:'3', key:'alumni',           label:'Alumni',                value:'500+', icon:'🌍',  sortOrder:3, isVisible:true },
-  { _id:'4', key:'research_pubs',    label:'Research Publications', value:'50+',  icon:'📄',  sortOrder:4, isVisible:true },
-  { _id:'5', key:'running_batches',  label:'Running Batches',       value:'8',    icon:'📚',  sortOrder:5, isVisible:true },
-  { _id:'6', key:'labs',             label:'Laboratories',          value:'6',    icon:'🔬',  sortOrder:6, isVisible:true },
+  { id:'1', key:'faculty_members',  label:'Faculty Members',      value:'14+',  icon:'👨‍🏫', sortOrder:1, isVisible:true },
+  { id:'2', key:'total_students',   label:'Total Students',        value:'800+', icon:'🎓',  sortOrder:2, isVisible:true },
+  { id:'3', key:'alumni',           label:'Alumni',                value:'500+', icon:'🌍',  sortOrder:3, isVisible:true },
+  { id:'4', key:'research_pubs',    label:'Research Publications', value:'50+',  icon:'📄',  sortOrder:4, isVisible:true },
+  { id:'5', key:'running_batches',  label:'Running Batches',       value:'8',    icon:'📚',  sortOrder:5, isVisible:true },
+  { id:'6', key:'labs',             label:'Laboratories',          value:'6',    icon:'🔬',  sortOrder:6, isVisible:true },
 ];
 
 /** Extract numeric part and suffix (e.g. "800+" → [800, '+']) */
@@ -99,7 +99,7 @@ export default function DepartmentStats() {
         <div className={`grid gap-0 divide-x divide-y divide-white/10 ${
           visible.length <= 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'
         }`}>
-          {visible.map(s => <StatCard key={s._id} s={s} active={active}/>)}
+          {visible.map(s => <StatCard key={s.id} s={s} active={active}/>)}
         </div>
       </div>
 

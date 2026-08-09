@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 interface Event {
-  _id: string;
+  id: string;
   title: string;
   slug: string;
   shortDescription?: string;
@@ -33,12 +33,12 @@ async function fetchEvents(): Promise<Event[]> {
 }
 
 const MOCK: Event[] = [
-  { _id:'1', title:'National Programming Contest 2026', slug:'npc-2026', shortDescription:'Annual inter-university competitive programming contest with prizes and certificates for top teams.', type:'competition', startDate: new Date(Date.now() + 5*86400000).toISOString(), venue:'CSE Seminar Hall', mode:'in_person', status:'upcoming', isFeatured:true, isPublished:true },
-  { _id:'2', title:'Workshop on Deep Learning & PyTorch', slug:'dl-pytorch-workshop', shortDescription:'Hands-on 2-day workshop covering neural networks, CNNs, and real-world model deployment.', type:'workshop', startDate: new Date(Date.now() + 10*86400000).toISOString(), venue:'AI Lab, 4th Floor', mode:'in_person', status:'upcoming', isFeatured:false, isPublished:true },
-  { _id:'3', title:'Seminar: Career in Tech — Alumni Insights', slug:'career-tech-seminar', shortDescription:'Distinguished alumni share experiences and career advice for students entering the tech industry.', type:'seminar', startDate: new Date(Date.now() + 15*86400000).toISOString(), venue:'Auditorium, GSTU', mode:'hybrid', status:'upcoming', isFeatured:false, isPublished:true },
-  { _id:'4', title:'CSE Annual Cultural & Sports Day', slug:'cultural-sports-2026', shortDescription:'Inter-batch cultural programs, sports events, and prize-giving ceremony.', type:'cultural', startDate: new Date(Date.now() + 20*86400000).toISOString(), venue:'GSTU Central Field', mode:'in_person', status:'upcoming', isFeatured:false, isPublished:true },
-  { _id:'5', title:'Research Poster Exhibition — Spring 2026', slug:'research-poster-2026', shortDescription:'Final year students present their thesis research in a formal poster exhibition.', type:'conference', startDate: new Date(Date.now() + 25*86400000).toISOString(), venue:'CSE Building Lobby', mode:'in_person', status:'upcoming', isFeatured:true, isPublished:true },
-  { _id:'6', title:'IEEE Student Branch Tech Talk', slug:'ieee-tech-talk', shortDescription:'Monthly IEEE student branch session featuring guest speakers from industry and academia.', type:'seminar', startDate: new Date(Date.now() + 30*86400000).toISOString(), venue:'Room 402, CSE', mode:'in_person', status:'upcoming', isFeatured:false, isPublished:true },
+  { id:'1', title:'National Programming Contest 2026', slug:'npc-2026', shortDescription:'Annual inter-university competitive programming contest with prizes and certificates for top teams.', type:'competition', startDate: new Date(Date.now() + 5*86400000).toISOString(), venue:'CSE Seminar Hall', mode:'in_person', status:'upcoming', isFeatured:true, isPublished:true },
+  { id:'2', title:'Workshop on Deep Learning & PyTorch', slug:'dl-pytorch-workshop', shortDescription:'Hands-on 2-day workshop covering neural networks, CNNs, and real-world model deployment.', type:'workshop', startDate: new Date(Date.now() + 10*86400000).toISOString(), venue:'AI Lab, 4th Floor', mode:'in_person', status:'upcoming', isFeatured:false, isPublished:true },
+  { id:'3', title:'Seminar: Career in Tech — Alumni Insights', slug:'career-tech-seminar', shortDescription:'Distinguished alumni share experiences and career advice for students entering the tech industry.', type:'seminar', startDate: new Date(Date.now() + 15*86400000).toISOString(), venue:'Auditorium, GSTU', mode:'hybrid', status:'upcoming', isFeatured:false, isPublished:true },
+  { id:'4', title:'CSE Annual Cultural & Sports Day', slug:'cultural-sports-2026', shortDescription:'Inter-batch cultural programs, sports events, and prize-giving ceremony.', type:'cultural', startDate: new Date(Date.now() + 20*86400000).toISOString(), venue:'GSTU Central Field', mode:'in_person', status:'upcoming', isFeatured:false, isPublished:true },
+  { id:'5', title:'Research Poster Exhibition — Spring 2026', slug:'research-poster-2026', shortDescription:'Final year students present their thesis research in a formal poster exhibition.', type:'conference', startDate: new Date(Date.now() + 25*86400000).toISOString(), venue:'CSE Building Lobby', mode:'in_person', status:'upcoming', isFeatured:true, isPublished:true },
+  { id:'6', title:'IEEE Student Branch Tech Talk', slug:'ieee-tech-talk', shortDescription:'Monthly IEEE student branch session featuring guest speakers from industry and academia.', type:'seminar', startDate: new Date(Date.now() + 30*86400000).toISOString(), venue:'Room 402, CSE', mode:'in_person', status:'upcoming', isFeatured:false, isPublished:true },
 ];
 
 const TYPE_META: Record<string, { label: string; color: string; bg: string; icon: string }> = {
@@ -202,7 +202,7 @@ export default async function UpcomingEventsSection() {
               const { month, day } = formatEventDate(ev.startDate, ev.endDate);
               const days = daysUntil(ev.startDate);
               return (
-                <article key={ev._id}
+                <article key={ev.id}
                   className="group flex flex-col rounded-xl overflow-hidden border border-slate-200 bg-white hover:border-green-300 hover:shadow-md transition-all duration-300">
 
                   {/* Top colour band + date */}

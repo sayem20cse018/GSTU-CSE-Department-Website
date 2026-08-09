@@ -12,7 +12,7 @@ import { formatDate } from '@/lib/utils/format';
 const CATS = ['general','academic','admission','scholarship','workshop_seminar','recruitment','result','administrative'];
 const EMPTY = { title:'', description:'', category:'general', targetAudience:['all'], isPublished:false, isPinned:false, isUrgent:false, postedByName:'Admin' };
 
-interface Notice { _id:string; title:string; category:string; isPublished:boolean; isPinned:boolean; isUrgent:boolean; publishedAt?:string; createdAt:string; description?:string; postedByName?:string }
+interface Notice { id:string; title:string; category:string; isPublished:boolean; isPinned:boolean; isUrgent:boolean; publishedAt?:string; createdAt:string; description?:string; postedByName?:string }
 
 export default function NoticesPage() {
   const [list, setList]       = useState<Notice[]>([]);
@@ -38,7 +38,7 @@ export default function NoticesPage() {
     if (!form.title.trim()) { setErr('Title is required.'); return; }
     setSaving(true); setErr('');
     try {
-      if (editing) await adminPatch(`/notices/${editing._id}`, form);
+      if (editing) await adminPatch(`/notices/${editing.id}`, form);
       else await adminPost('/notices', form);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
@@ -107,7 +107,7 @@ export default function NoticesPage() {
             </tr></thead>
             <tbody>
               {list.map((n,i)=>(
-                <tr key={n._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
+                <tr key={n.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       {n.isUrgent && <span className="text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded shrink-0">URGENT</span>}
@@ -121,7 +121,7 @@ export default function NoticesPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(n)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId===n._id} onClick={()=>del(n._id)}>Delete</Button>
+                      <Button size="sm" variant="danger" loading={delId===n.id} onClick={()=>del(n.id)}>Delete</Button>
                     </div>
                   </td>
                 </tr>))}

@@ -27,7 +27,7 @@ const EMPTY = {
 };
 
 interface Alumnus {
-  _id:string; name:string; email:string; photo?:string; currentDesignation?:string;
+  id:string; name:string; email:string; photo?:string; currentDesignation?:string;
   currentOrganization?:string; batchYear:number; graduationYear:number; degree:string;
   isProfilePublic:boolean; isFeatured:boolean; isVerified:boolean; approvalStatus:string;
   currentCity?:string; currentCountry?:string; createdAt:string;
@@ -73,8 +73,11 @@ export default function AlumniAdminPage() {
     if (!form.name.trim() || !form.email.trim()) { setErr('Name and email are required.'); return; }
     setSaving(true); setErr('');
     try {
-      if (editing) await adminPatch(`/alumni/${editing._id}`, form);
-      else await adminPost('/alumni', form);
+      // Strip fields not in the backend schema
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { associationRole, isDistinguished, ...payload } = form;
+      if (editing) await adminPatch(`/alumni/${editing.id}`, payload);
+      else await adminPost('/alumni', payload);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
     finally { setSaving(false); }
@@ -209,7 +212,7 @@ export default function AlumniAdminPage() {
             </tr></thead>
             <tbody>
               {list.map((a, i) => (
-                <tr key={a._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'')}>
+                <tr key={a.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'')}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {a.photo ? (
@@ -243,7 +246,7 @@ export default function AlumniAdminPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={() => openEdit(a)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId === a._id} onClick={() => del(a._id)}>Del</Button>
+                      <Button size="sm" variant="danger" loading={delId === a.id} onClick={() => del(a.id)}>Del</Button>
                     </div>
                   </td>
                 </tr>

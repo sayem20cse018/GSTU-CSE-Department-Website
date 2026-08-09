@@ -3,10 +3,10 @@ import SectionHero from '@/components/academics/SectionHero';
 
 export const metadata: Metadata = { title: 'Chairman List — GSTU CSE' };
 
-interface Person { _id:string; name:string; title?:string; designation:string; email:string; photo?:string; shortBio?:string; staffType:string; isActive:boolean; sortOrder:number; joinedAt?:string; }
+interface Person { id:string; name:string; title?:string; designation:string; email:string; photo?:string; shortBio?:string; staffType:string; isActive:boolean; sortOrder:number; joinedAt?:string; }
 
 const MOCK: Person[] = [
-  { _id:'1', name:'Dr. Mrinal Kanti Baowaly', title:'Dr.', designation:'Professor & Chairman', email:'baowaly@gstu.edu.bd', staffType:'chairman', isActive:true, sortOrder:1, shortBio:'Current Chairman of the Department of CSE, GSTU. PhD in Computer Science.' },
+  { id:'1', name:'Dr. Mrinal Kanti Baowaly', title:'Dr.', designation:'Professor & Chairman', email:'baowaly@gstu.edu.bd', staffType:'chairman', isActive:true, sortOrder:1, shortBio:'Current Chairman of the Department of CSE, GSTU. PhD in Computer Science.' },
 ];
 
 async function fetchChairmen(): Promise<Person[]> {
@@ -32,7 +32,7 @@ export default async function ChairmenPage() {
         <div className="container-custom max-w-4xl">
           <div className="space-y-6">
             {list.map((c, i) => (
-              <div key={c._id} className="flex flex-col sm:flex-row gap-6 p-6 border border-slate-200 rounded-2xl hover:border-green-300 hover:shadow-md transition">
+              <div key={c.id} className="flex flex-col sm:flex-row gap-6 p-6 border border-slate-200 rounded-2xl hover:border-green-300 hover:shadow-md transition">
                 {/* Photo */}
                 <div className="shrink-0">
                   {c.photo ? (

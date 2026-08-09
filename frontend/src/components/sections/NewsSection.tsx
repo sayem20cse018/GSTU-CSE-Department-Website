@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils/format';
 
 interface NewsItem {
-  _id: string; title: string; slug: string; excerpt: string;
+  id: string; title: string; slug: string; excerpt: string;
   coverImage?: string; category: string;
   publishedAt: string; authorName: string;
 }
@@ -19,9 +19,9 @@ async function fetchNews(): Promise<NewsItem[]> {
 }
 
 const MOCK: NewsItem[] = [
-  { _id:'1', title:'CSE Students Win Gold at International Programming Contest', slug:'programming-contest-2024', excerpt:'A team of three students secured first place at the ACM ICPC Regional contest held in Dhaka.', category:'achievement', publishedAt:new Date().toISOString(), authorName:'CSE Department' },
-  { _id:'2', title:'New AI & Machine Learning Lab Inaugurated at Campus', slug:'ai-ml-lab', excerpt:'The university inaugurated a state-of-the-art AI/ML research lab equipped with high-performance GPU clusters.', category:'research', publishedAt:new Date(Date.now()-3*86400000).toISOString(), authorName:'Admin' },
-  { _id:'3', title:'Industry-Academia MoU Signed with TechBD Ltd.', slug:'techbd-mou', excerpt:'A Memorandum of Understanding signed to foster internship and collaborative research opportunities.', category:'announcement', publishedAt:new Date(Date.now()-7*86400000).toISOString(), authorName:'Admin' },
+  { id:'1', title:'CSE Students Win Gold at International Programming Contest', slug:'programming-contest-2024', excerpt:'A team of three students secured first place at the ACM ICPC Regional contest held in Dhaka.', category:'achievement', publishedAt:new Date().toISOString(), authorName:'CSE Department' },
+  { id:'2', title:'New AI & Machine Learning Lab Inaugurated at Campus', slug:'ai-ml-lab', excerpt:'The university inaugurated a state-of-the-art AI/ML research lab equipped with high-performance GPU clusters.', category:'research', publishedAt:new Date(Date.now()-3*86400000).toISOString(), authorName:'Admin' },
+  { id:'3', title:'Industry-Academia MoU Signed with TechBD Ltd.', slug:'techbd-mou', excerpt:'A Memorandum of Understanding signed to foster internship and collaborative research opportunities.', category:'announcement', publishedAt:new Date(Date.now()-7*86400000).toISOString(), authorName:'Admin' },
 ];
 
 /** Format date like the image: "July\n28, 2026" */
@@ -109,7 +109,7 @@ export default async function NewsSection() {
           {/* RIGHT — News list with date boxes */}
           <div className="flex flex-col divide-y divide-slate-200 border-l border-slate-200">
             {rest.map((item) => (
-              <div key={item._id} className="flex items-stretch hover:bg-[#e8f5e9] transition-colors group">
+              <div key={item.id} className="flex items-stretch hover:bg-[#e8f5e9] transition-colors group">
                 {/* Date box */}
                 <SplitDate dateStr={item.publishedAt} />
 

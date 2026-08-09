@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 interface Program {
-  _id: string;
+  id: string;
   name: string;
   degree: 'BSc' | 'MSc' | 'PhD';
   duration: string;
@@ -25,7 +25,7 @@ async function fetchPrograms(): Promise<Program[]> {
 
 const MOCK: Program[] = [
   {
-    _id: '1',
+    id: '1',
     name: 'Bachelor of Science in Computer Science & Engineering',
     degree: 'BSc',
     duration: '4 Years',
@@ -37,7 +37,7 @@ const MOCK: Program[] = [
     isActive: true,
   },
   {
-    _id: '2',
+    id: '2',
     name: 'Master of Science in Computer Science & Engineering',
     degree: 'MSc',
     duration: '2 Years',
@@ -49,7 +49,7 @@ const MOCK: Program[] = [
     isActive: true,
   },
   {
-    _id: '3',
+    id: '3',
     name: 'Doctor of Philosophy in Computer Science & Engineering',
     degree: 'PhD',
     duration: '3–5 Years',
@@ -101,7 +101,7 @@ export default async function AcademicProgramsSection() {
             const style = DEGREE_STYLE[prog.degree] ?? DEGREE_STYLE.BSc;
             return (
               <article
-                key={prog._id}
+                key={prog.id}
                 className="flex flex-col border rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                 style={{ borderColor: style.border }}>
 

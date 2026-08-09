@@ -6,7 +6,7 @@ import SectionHero from '@/components/academics/SectionHero';
 import { cn }     from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
 
-interface Notice { _id:string; title:string; category:string; description?:string; isPublished:boolean; isPinned:boolean; isUrgent:boolean; publishedAt?:string; createdAt:string; postedByName?:string; attachments?:{fileUrl:string;fileName:string}[] }
+interface Notice { id:string; title:string; category:string; description?:string; isPublished:boolean; isPinned:boolean; isUrgent:boolean; publishedAt?:string; createdAt:string; postedByName?:string; attachments?:{fileUrl:string;fileName:string}[] }
 
 const CAT_META: Record<string,{label:string;color:string}> = {
   academic:         {label:'Academic',    color:'bg-blue-100 text-blue-700'},
@@ -82,13 +82,13 @@ function NoticesContent() {
               {pinned.length > 0 && (
                 <div className="mb-6">
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Pinned &amp; Urgent</p>
-                  <div className="space-y-3">{pinned.map(n=><NoticeRow key={n._id} notice={n}/>)}</div>
+                  <div className="space-y-3">{pinned.map(n=><NoticeRow key={n.id} notice={n}/>)}</div>
                 </div>)}
               {/* Regular */}
               {regular.length > 0 && (
                 <div>
                   {pinned.length > 0 && <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">All Notices</p>}
-                  <div className="space-y-3">{regular.map(n=><NoticeRow key={n._id} notice={n}/>)}</div>
+                  <div className="space-y-3">{regular.map(n=><NoticeRow key={n.id} notice={n}/>)}</div>
                 </div>)}
             </>
           )}

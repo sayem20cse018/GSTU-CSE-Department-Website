@@ -9,7 +9,7 @@ import { cn }    from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 
 interface Program {
-  _id: string; name: string; degree: string; duration: string;
+  id: string; name: string; degree: string; duration: string;
   totalCredits: number; description: string; highlights: string[];
   totalSeats?: number; isActive: boolean;
 }
@@ -53,7 +53,7 @@ export default function AdmissionsUGPage() {
     setSaving(true); setErr('');
     try {
       const payload = { ...form, highlights: form.highlights.split('\n').map(s=>s.trim()).filter(Boolean) };
-      if (editing) await adminPatch(`/academics/programs/${editing._id}`, payload);
+      if (editing) await adminPatch(`/academics/programs/${editing.id}`, payload);
       else await adminPost('/academics/programs', payload);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
@@ -144,7 +144,7 @@ export default function AdmissionsUGPage() {
             </tr></thead>
             <tbody>
               {list.map((p,i) => (
-                <tr key={p._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
+                <tr key={p.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
                   <td className="px-5 py-4">
                     <p className="font-semibold text-slate-900">{p.name}</p>
                     <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{p.description}</p>
@@ -158,7 +158,7 @@ export default function AdmissionsUGPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(p)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId===p._id} onClick={()=>del(p._id)}>Del</Button>
+                      <Button size="sm" variant="danger" loading={delId===p.id} onClick={()=>del(p.id)}>Del</Button>
                     </div>
                   </td>
                 </tr>

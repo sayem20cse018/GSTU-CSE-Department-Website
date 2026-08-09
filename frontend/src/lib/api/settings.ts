@@ -5,7 +5,7 @@
 import { SITE } from '@/constants';
 
 export interface SiteSettings {
-  _id?: string;
+  id?: string;
   key?: string;
   deptName: string;
   deptShortName: string;

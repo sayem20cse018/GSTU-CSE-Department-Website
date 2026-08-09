@@ -1,6 +1,6 @@
 // ─── Admin profile returned by the backend ───────────────────────────────────
 export interface AdminProfile {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: 'super_admin' | 'admin' | 'editor';

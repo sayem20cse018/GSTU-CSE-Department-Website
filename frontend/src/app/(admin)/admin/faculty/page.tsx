@@ -29,7 +29,7 @@ const EMPTY = {
 };
 
 interface FacultyMember {
-  _id:string; name:string; title?:string; designation:string; email:string;
+  id:string; name:string; title?:string; designation:string; email:string;
   phone?:string; photo?:string; shortBio?:string; officeRoom?:string;
   researchInterests:string[]; googleScholarUrl?:string; linkedinUrl?:string;
   orcidId?:string; isActive:boolean; sortOrder:number;
@@ -85,8 +85,11 @@ export default function PeoplePage() {
     if (!form.name.trim() || !form.email.trim()) { setErr('Name and email are required.'); return; }
     setSaving(true); setErr('');
     try {
-      const payload = { ...form, researchInterests: form.researchInterests.split(',').map(s=>s.trim()).filter(Boolean) };
-      if (editing) await adminPatch(`/faculty/${editing._id}`, payload);
+      // Strip UI-only fields not in backend DTO
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { chairmanFrom, chairmanTo, ...rest } = form;
+      const payload = { ...rest, researchInterests: form.researchInterests.split(',').map(s=>s.trim()).filter(Boolean) };
+      if (editing) await adminPatch(`/faculty/${editing.id}`, payload);
       else await adminPost('/faculty', payload);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
@@ -289,7 +292,7 @@ export default function PeoplePage() {
             </thead>
             <tbody>
               {filtered.map((m, i) => (
-                <tr key={m._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'bg-slate-50/30')}>
+                <tr key={m.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'bg-slate-50/30')}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {m.photo ? (
@@ -324,7 +327,7 @@ export default function PeoplePage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(m)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId===m._id} onClick={()=>del(m._id)}>Del</Button>
+                      <Button size="sm" variant="danger" loading={delId===m.id} onClick={()=>del(m.id)}>Del</Button>
                     </div>
                   </td>
                 </tr>

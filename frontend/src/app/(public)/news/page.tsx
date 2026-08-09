@@ -6,17 +6,17 @@ import { formatDate, truncate } from '@/lib/utils/format';
 
 export const metadata: Metadata = { title: 'News — GSTU CSE' };
 
-interface NewsItem { _id:string; title:string; slug:string; excerpt:string; coverImage?:string; category:string; authorName:string; publishedAt?:string; createdAt:string; isFeatured:boolean }
+interface NewsItem { id:string; title:string; slug:string; excerpt:string; coverImage?:string; category:string; authorName:string; publishedAt?:string; createdAt:string; isFeatured:boolean }
 
 const CAT_COLORS: Record<string,string> = { achievement:'bg-amber-100 text-amber-700', research:'bg-blue-100 text-blue-700', event:'bg-emerald-100 text-emerald-700', announcement:'bg-violet-100 text-violet-700', award:'bg-rose-100 text-rose-700', collaboration:'bg-teal-100 text-teal-700', general:'bg-slate-100 text-slate-600' };
 const GRADIENTS = ['from-blue-600 to-indigo-600','from-violet-600 to-purple-600','from-emerald-600 to-teal-600','from-rose-600 to-pink-600','from-amber-600 to-orange-600'];
 const MOCK: NewsItem[] = [
-  {_id:'1',title:'CSE Students Win Gold at International Programming Contest',slug:'cse-win-gold-ipc-2024',excerpt:'A team of three undergraduate students from the CSE Department secured first place at the ACM ICPC Regional contest.',category:'achievement',authorName:'Dept. of CSE',createdAt:new Date().toISOString(),isFeatured:true},
-  {_id:'2',title:'New AI & Machine Learning Lab Inaugurated',slug:'ai-ml-lab-inauguration',excerpt:'The university inaugurated a state-of-the-art AI/ML research lab equipped with high-performance GPU clusters.',category:'research',authorName:'Admin',createdAt:new Date(Date.now()-3*86400000).toISOString(),isFeatured:false},
-  {_id:'3',title:'Industry-Academia MoU Signed with TechBD Ltd.',slug:'techbd-mou-signed',excerpt:'A Memorandum of Understanding was signed to foster internship, research and placement opportunities.',category:'collaboration',authorName:'Admin',createdAt:new Date(Date.now()-7*86400000).toISOString(),isFeatured:false},
-  {_id:'4',title:'3-Day Cybersecurity Workshop Successfully Completed',slug:'cybersecurity-workshop',excerpt:'Over 120 students participated in an intensive workshop on ethical hacking and penetration testing.',category:'event',authorName:'CSE Club',createdAt:new Date(Date.now()-10*86400000).toISOString(),isFeatured:false},
-  {_id:'5',title:'Dr. Rahman Receives National Research Award 2024',slug:'national-research-award-2024',excerpt:'Dr. Mohammad Rahman of the CSE Department has been honored with the prestigious National Research Award.',category:'award',authorName:'Admin',createdAt:new Date(Date.now()-14*86400000).toISOString(),isFeatured:false},
-  {_id:'6',title:'BSc Admission Test Results Published',slug:'bsc-admission-result-2024',excerpt:'The results of the BSc admission test for the session 2024-25 have been published on the university portal.',category:'announcement',authorName:'Admin',createdAt:new Date(Date.now()-18*86400000).toISOString(),isFeatured:false},
+  {id:'1',title:'CSE Students Win Gold at International Programming Contest',slug:'cse-win-gold-ipc-2024',excerpt:'A team of three undergraduate students from the CSE Department secured first place at the ACM ICPC Regional contest.',category:'achievement',authorName:'Dept. of CSE',createdAt:new Date().toISOString(),isFeatured:true},
+  {id:'2',title:'New AI & Machine Learning Lab Inaugurated',slug:'ai-ml-lab-inauguration',excerpt:'The university inaugurated a state-of-the-art AI/ML research lab equipped with high-performance GPU clusters.',category:'research',authorName:'Admin',createdAt:new Date(Date.now()-3*86400000).toISOString(),isFeatured:false},
+  {id:'3',title:'Industry-Academia MoU Signed with TechBD Ltd.',slug:'techbd-mou-signed',excerpt:'A Memorandum of Understanding was signed to foster internship, research and placement opportunities.',category:'collaboration',authorName:'Admin',createdAt:new Date(Date.now()-7*86400000).toISOString(),isFeatured:false},
+  {id:'4',title:'3-Day Cybersecurity Workshop Successfully Completed',slug:'cybersecurity-workshop',excerpt:'Over 120 students participated in an intensive workshop on ethical hacking and penetration testing.',category:'event',authorName:'CSE Club',createdAt:new Date(Date.now()-10*86400000).toISOString(),isFeatured:false},
+  {id:'5',title:'Dr. Rahman Receives National Research Award 2024',slug:'national-research-award-2024',excerpt:'Dr. Mohammad Rahman of the CSE Department has been honored with the prestigious National Research Award.',category:'award',authorName:'Admin',createdAt:new Date(Date.now()-14*86400000).toISOString(),isFeatured:false},
+  {id:'6',title:'BSc Admission Test Results Published',slug:'bsc-admission-result-2024',excerpt:'The results of the BSc admission test for the session 2024-25 have been published on the university portal.',category:'announcement',authorName:'Admin',createdAt:new Date(Date.now()-18*86400000).toISOString(),isFeatured:false},
 ];
 
 async function fetchNews(page=1, limit=9): Promise<{data:NewsItem[];total:number}> {
@@ -67,7 +67,7 @@ export default async function NewsPage() {
           {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {rest.map((n,i)=>(
-              <article key={n._id} className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-blue-300 transition-all">
+              <article key={n.id} className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-blue-300 transition-all">
                 <div className={cn('h-44 relative bg-gradient-to-br', GRADIENTS[(i+1)%GRADIENTS.length])}>
                   {n.coverImage?<img src={n.coverImage} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>:
                     <div className="absolute inset-0 flex items-center justify-center opacity-20"><svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/></svg></div>}

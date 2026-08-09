@@ -13,7 +13,7 @@ import { formatDate } from '@/lib/utils/format';
 const CATS = ['general','achievement','research','event','announcement','award','collaboration'];
 const EMPTY = { title:'', slug:'', excerpt:'', content:'', coverImage:'', category:'general', tags:'', authorName:'Admin', isPublished:false, isFeatured:false };
 
-interface NewsItem { _id:string; title:string; slug:string; excerpt:string; category:string; authorName:string; isPublished:boolean; isFeatured:boolean; publishedAt?:string; createdAt:string; coverImage?:string }
+interface NewsItem { id:string; title:string; slug:string; excerpt:string; category:string; authorName:string; isPublished:boolean; isFeatured:boolean; publishedAt?:string; createdAt:string; coverImage?:string }
 
 function toSlug(s:string) { return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
 
@@ -45,7 +45,7 @@ export default function AdminNewsPage() {
     setSaving(true); setErr('');
     try {
       const payload = { ...form, tags: form.tags.split(',').map(s=>s.trim()).filter(Boolean) };
-      if (editing) await adminPatch(`/news/${editing._id}`, payload);
+      if (editing) await adminPatch(`/news/${editing.id}`, payload);
       else await adminPost('/news', payload);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
@@ -140,7 +140,7 @@ export default function AdminNewsPage() {
             </tr></thead>
             <tbody>
               {list.map((n,i)=>(
-                <tr key={n._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
+                <tr key={n.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
                   <td className="px-5 py-3">
                     <p className="font-medium text-white line-clamp-1">{n.title}</p>
                     <p className="text-xs text-slate-500 font-mono">{n.slug}</p>
@@ -156,7 +156,7 @@ export default function AdminNewsPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Button size="sm" variant="secondary" onClick={()=>openEdit(n)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId===n._id} onClick={()=>del(n._id)}>Delete</Button>
+                      <Button size="sm" variant="danger" loading={delId===n.id} onClick={()=>del(n.id)}>Delete</Button>
                     </div>
                   </td>
                 </tr>))}

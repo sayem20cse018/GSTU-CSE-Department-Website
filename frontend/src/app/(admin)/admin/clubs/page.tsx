@@ -9,7 +9,7 @@ import { cn }     from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 
 const EMPTY = { name:'', slug:'', description:'', shortDescription:'', logo:'', coverImage:'', advisorName:'', presidentName:'', foundedYear:new Date().getFullYear(), memberCount:0, facebookUrl:'', email:'', isActive:true, isFeatured:false };
-interface Club { _id:string; name:string; slug:string; memberCount:number; foundedYear:number; isActive:boolean; isFeatured:boolean; advisorName?:string; }
+interface Club { id:string; name:string; slug:string; memberCount:number; foundedYear:number; isActive:boolean; isFeatured:boolean; advisorName?:string; }
 const toSlug=(s:string)=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 
 export default function ClubsAdminPage() {
@@ -33,7 +33,7 @@ export default function ClubsAdminPage() {
   function openEdit(c:Club){ setEditing(c); setForm({name:c.name,slug:c.slug,description:'',shortDescription:'',logo:'',coverImage:'',advisorName:c.advisorName??'',presidentName:'',foundedYear:c.foundedYear,memberCount:c.memberCount,facebookUrl:'',email:'',isActive:c.isActive,isFeatured:c.isFeatured}); setErr(''); setOpen(true); }
 
   async function save(){ if(!form.name||!form.slug){setErr('Name and slug required.');return;} setSaving(true);setErr('');
-    try{ if(editing) await adminPatch(`/clubs/${editing._id}`,form); else await adminPost('/clubs',form); setOpen(false);load(); }
+    try{ if(editing) await adminPatch(`/clubs/${editing.id}`,form); else await adminPost('/clubs',form); setOpen(false);load(); }
     catch(e){setErr(e instanceof Error?e.message:'Save failed');}finally{setSaving(false);} }
 
   async function del(id:string){ if(!confirm('Delete club?'))return; setDelId(id);
@@ -88,7 +88,7 @@ export default function ClubsAdminPage() {
           <th className="text-left px-5 py-3">Club</th><th className="text-center px-4 py-3">Members</th>
           <th className="text-center px-4 py-3">Status</th><th className="text-right px-5 py-3">Actions</th></tr></thead>
           <tbody>{list.map((c,i)=>(
-            <tr key={c._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
+            <tr key={c.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
               <td className="px-5 py-3"><p className="font-medium text-white">{c.name}</p>{c.advisorName&&<p className="text-xs text-slate-500">Advisor: {c.advisorName}</p>}</td>
               <td className="px-4 py-3 text-center text-slate-300">{c.memberCount}</td>
               <td className="px-4 py-3 text-center"><div className="flex justify-center gap-1.5">
@@ -96,7 +96,7 @@ export default function ClubsAdminPage() {
                 {c.isFeatured&&<Badge variant="info">Featured</Badge>}</div></td>
               <td className="px-5 py-3"><div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="secondary" onClick={()=>openEdit(c)}>Edit</Button>
-                <Button size="sm" variant="danger" loading={delId===c._id} onClick={()=>del(c._id)}>Delete</Button>
+                <Button size="sm" variant="danger" loading={delId===c.id} onClick={()=>del(c.id)}>Delete</Button>
               </div></td>
             </tr>))}</tbody></table>)}
       </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { cn }     from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
 
-interface Ev { _id:string; title:string; slug:string; description:string; shortDescription?:string; venue:string; startDate:string; endDate?:string; type:string; mode:string; coverImage?:string; status:string; organizerName?:string; organizerContact?:string; onlineLink?:string; speakers?:{name:string;title?:string;organization?:string;bio?:string}[]; schedule?:{time:string;activity:string;speaker?:string}[]; registration?:{isRequired:boolean;formUrl?:string;deadline?:string;maxSeats?:number;registeredCount?:number} }
+interface Ev { id:string; title:string; slug:string; description:string; shortDescription?:string; venue:string; startDate:string; endDate?:string; type:string; mode:string; coverImage?:string; status:string; organizerName?:string; organizerContact?:string; onlineLink?:string; speakers?:{name:string;title?:string;organization?:string;bio?:string}[]; schedule?:{time:string;activity:string;speaker?:string}[]; registration?:{isRequired:boolean;formUrl?:string;deadline?:string;maxSeats?:number;registeredCount?:number} }
 const TYPE_COLORS: Record<string,string> = { seminar:'bg-blue-100 text-blue-700', workshop:'bg-amber-100 text-amber-700', conference:'bg-violet-100 text-violet-700', hackathon:'bg-rose-100 text-rose-700', competition:'bg-emerald-100 text-emerald-700', webinar:'bg-teal-100 text-teal-700', cultural:'bg-pink-100 text-pink-700', other:'bg-slate-100 text-slate-600' };
 
 async function fetchEvent(slug:string): Promise<Ev|null> {

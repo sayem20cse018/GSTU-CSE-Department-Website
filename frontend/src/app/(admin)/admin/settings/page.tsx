@@ -58,8 +58,8 @@ export default function SettingsPage() {
     setSaving(true); setError(''); setSaved(false);
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _id, key, __v, createdAt, updatedAt, ...payload } = form as SiteSettings & {
-        _id?: unknown; key?: unknown; __v?: unknown; createdAt?: unknown; updatedAt?: unknown;
+      const { id, key, __v, createdAt, updatedAt, ...payload } = form as SiteSettings & {
+        id?: unknown; key?: unknown; __v?: unknown; createdAt?: unknown; updatedAt?: unknown;
       };
       await adminPatch<SiteSettings>('/settings', payload);
       setSaved(true);

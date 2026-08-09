@@ -6,7 +6,7 @@ import Button     from '@/components/admin/ui/Button';
 import { cn }     from '@/lib/utils/cn';
 import { adminGet, adminPatch } from '@/lib/api/admin-fetch';
 
-interface Stat { _id: string; key: string; label: string; value: string; icon: string; sortOrder: number; isVisible: boolean; }
+interface Stat { id: string; key: string; label: string; value: string; icon: string; sortOrder: number; isVisible: boolean; }
 
 const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500';
 
@@ -35,20 +35,20 @@ export default function StatisticsAdminPage() {
 
   // Get current value for a stat (edited or original)
   function val<K extends keyof Stat>(s: Stat, key: K): Stat[K] {
-    return (edits[s._id]?.[key] ?? s[key]) as Stat[K];
+    return (edits[s.id]?.[key] ?? s[key]) as Stat[K];
   }
 
   async function save(s: Stat) {
-    const patch = edits[s._id];
+    const patch = edits[s.id];
     if (!patch) return;
-    setSaving(s._id); setErr('');
+    setSaving(s.id); setErr('');
     try {
-      await adminPatch(`/statistics/${s._id}`, patch);
+      await adminPatch(`/statistics/${s.id}`, patch);
       // Update local list
-      setList(prev => prev.map(item => item._id === s._id ? { ...item, ...patch } : item));
-      setEdits(prev => { const next = { ...prev }; delete next[s._id]; return next; });
-      setSaved(s._id);
-      setTimeout(() => setSaved(prev => prev === s._id ? null : prev), 2000);
+      setList(prev => prev.map(item => item.id === s.id ? { ...item, ...patch } : item));
+      setEdits(prev => { const next = { ...prev }; delete next[s.id]; return next; });
+      setSaved(s.id);
+      setTimeout(() => setSaved(prev => prev === s.id ? null : prev), 2000);
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Save failed');
     } finally {
@@ -68,37 +68,37 @@ export default function StatisticsAdminPage() {
       ) : (
         <div className="space-y-3">
           {list.map(s => {
-            const isDirty = !!edits[s._id] && Object.keys(edits[s._id]!).length > 0;
-            const isSaving = saving === s._id;
-            const justSaved = saved === s._id;
+            const isDirty = !!edits[s.id] && Object.keys(edits[s.id]!).length > 0;
+            const isSaving = saving === s.id;
+            const justSaved = saved === s.id;
             return (
-              <div key={s._id}
+              <div key={s.id}
                 className={cn('bg-white border rounded-xl p-5 shadow-sm transition-all',
                   isDirty ? 'border-green-400 shadow-green-100' : 'border-slate-200')}>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
                   {/* Icon */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Icon</label>
-                    <input value={String(val(s, 'icon'))} onChange={e => edit(s._id, 'icon', e.target.value)}
+                    <input value={String(val(s, 'icon'))} onChange={e => edit(s.id, 'icon', e.target.value)}
                       placeholder="👨‍🏫" className={iCls}/>
                   </div>
                   {/* Value */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Value</label>
-                    <input value={String(val(s, 'value'))} onChange={e => edit(s._id, 'value', e.target.value)}
+                    <input value={String(val(s, 'value'))} onChange={e => edit(s.id, 'value', e.target.value)}
                       placeholder="14+" className={iCls}/>
                   </div>
                   {/* Label */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Label</label>
-                    <input value={String(val(s, 'label'))} onChange={e => edit(s._id, 'label', e.target.value)}
+                    <input value={String(val(s, 'label'))} onChange={e => edit(s.id, 'label', e.target.value)}
                       className={iCls}/>
                   </div>
                   {/* Actions */}
                   <div className="flex items-center gap-3">
                     <label className="flex items-center gap-2 cursor-pointer shrink-0">
                       <input type="checkbox" checked={!!val(s, 'isVisible')}
-                        onChange={e => edit(s._id, 'isVisible', e.target.checked)}
+                        onChange={e => edit(s.id, 'isVisible', e.target.checked)}
                         className="accent-green-600 w-4 h-4"/>
                       <span className="text-xs font-medium text-slate-600">Visible</span>
                     </label>

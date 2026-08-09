@@ -12,7 +12,7 @@ import { formatDate } from '@/lib/utils/format';
 
 const CATS = ['event','lab','student_life','faculty','infrastructure','convocation','sports','competition','other'];
 const EMPTY = { title:'', slug:'', description:'', category:'event', coverImage:'', albumDate:'', uploadedByName:'Admin', isPublished:false, isFeatured:false };
-interface Album { _id:string; title:string; slug:string; category:string; mediaCount:number; albumDate:string; isPublished:boolean; isFeatured:boolean; coverImage?:string }
+interface Album { id:string; title:string; slug:string; category:string; mediaCount:number; albumDate:string; isPublished:boolean; isFeatured:boolean; coverImage?:string }
 const toSlug=(s:string)=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 
 export default function AdminGalleryPage() {
@@ -38,7 +38,7 @@ export default function AdminGalleryPage() {
   async function save(){
     if(!form.title||!form.slug||!form.albumDate){setErr('Title, slug and album date are required.');return;}
     setSaving(true);setErr('');
-    try{if(editing)await adminPatch(`/gallery/${editing._id}`,form);else await adminPost('/gallery',form);setOpen(false);load();}
+    try{if(editing)await adminPatch(`/gallery/${editing.id}`,form);else await adminPost('/gallery',form);setOpen(false);load();}
     catch(e){setErr(e instanceof Error?e.message:'Save failed');}finally{setSaving(false);}
   }
 
@@ -96,7 +96,7 @@ export default function AdminGalleryPage() {
         :list.length===0?<EmptyState title="No albums yet" description="Create the first photo album."/>
         :(<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
           {list.map(a=>(
-            <div key={a._id} className="bg-white/5 border border-slate-200 rounded-xl overflow-hidden group">
+            <div key={a.id} className="bg-white/5 border border-slate-200 rounded-xl overflow-hidden group">
               <div className="h-32 bg-slate-800 relative">
                 {a.coverImage?<img src={a.coverImage} alt={a.title} className="w-full h-full object-cover"/>
                   :<div className="w-full h-full flex items-center justify-center text-4xl" aria-hidden="true">🖼️</div>}
@@ -112,7 +112,7 @@ export default function AdminGalleryPage() {
                 </div>
                 <div className="flex gap-2 mt-3">
                   <Button size="sm" variant="secondary" onClick={()=>openEdit(a)} className="flex-1">Edit</Button>
-                  <Button size="sm" variant="danger" loading={delId===a._id} onClick={()=>del(a._id)}>Del</Button>
+                  <Button size="sm" variant="danger" loading={delId===a.id} onClick={()=>del(a.id)}>Del</Button>
                 </div>
               </div>
             </div>))}</div>)}

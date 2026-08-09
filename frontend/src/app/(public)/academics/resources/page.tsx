@@ -83,7 +83,7 @@ function ResourcesContent() {
               {resources.map(r => {
                 const meta = TYPE_META[r.type] ?? TYPE_META.other;
                 return (
-                  <div key={r._id} className={cn('border rounded-xl p-5 hover:shadow-sm transition', r.isPinned?'border-blue-300 bg-blue-50/40':'border-slate-200')}>
+                  <div key={r.id} className={cn('border rounded-xl p-5 hover:shadow-sm transition', r.isPinned?'border-blue-300 bg-blue-50/40':'border-slate-200')}>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">

@@ -98,7 +98,7 @@ export default function CoursesPage() {
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {bySemester[sem].map(c => (
-                      <div key={c._id} className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition">
+                      <div key={c.id} className="border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition">
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded-lg">{c.code}</span>
                           <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-md', TYPE_COLORS[c.type]??'bg-slate-100 text-slate-600')}>{c.type}</span>

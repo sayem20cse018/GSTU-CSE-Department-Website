@@ -12,7 +12,7 @@ import { formatDate } from '@/lib/utils/format';
 
 const TYPES = ['student','faculty','department','research','competition','other'];
 const EMPTY = { title:'', description:'', image:'', type:'student', achievedAt:'', achieverName:'', awardedBy:'', isPublished:false, isFeatured:false };
-interface Ach { _id:string; title:string; type:string; achievedAt:string; achieverName?:string; isPublished:boolean; isFeatured:boolean; }
+interface Ach { id:string; title:string; type:string; achievedAt:string; achieverName?:string; isPublished:boolean; isFeatured:boolean; }
 
 export default function AchievementsAdminPage() {
   const [list,setList]      = useState<Ach[]>([]);
@@ -35,7 +35,7 @@ export default function AchievementsAdminPage() {
   function openEdit(a:Ach){ setEditing(a); setForm({title:a.title,description:'',image:'',type:a.type,achievedAt:a.achievedAt?.slice(0,10)??'',achieverName:a.achieverName??'',awardedBy:'',isPublished:a.isPublished,isFeatured:a.isFeatured}); setErr(''); setOpen(true); }
 
   async function save(){ if(!form.title||!form.achievedAt){setErr('Title and date required.');return;} setSaving(true);setErr('');
-    try{ if(editing) await adminPatch(`/achievements/${editing._id}`,form); else await adminPost('/achievements',form); setOpen(false);load(); }
+    try{ if(editing) await adminPatch(`/achievements/${editing.id}`,form); else await adminPost('/achievements',form); setOpen(false);load(); }
     catch(e){setErr(e instanceof Error?e.message:'Save failed');}finally{setSaving(false);} }
 
   async function del(id:string){ if(!confirm('Delete?'))return; setDelId(id);
@@ -91,7 +91,7 @@ export default function AchievementsAdminPage() {
           <th className="text-center px-4 py-3">Date</th><th className="text-center px-4 py-3">Status</th>
           <th className="text-right px-5 py-3">Actions</th></tr></thead>
           <tbody>{list.map((a,i)=>(
-            <tr key={a._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
+            <tr key={a.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
               <td className="px-5 py-3 font-medium text-white line-clamp-1">{a.title}</td>
               <td className="px-4 py-3 text-center"><Badge variant="neutral">{a.type}</Badge></td>
               <td className="px-4 py-3 text-center text-xs text-slate-400">{formatDate(a.achievedAt)}</td>
@@ -100,7 +100,7 @@ export default function AchievementsAdminPage() {
                 {a.isFeatured&&<Badge variant="info">Featured</Badge>}</div></td>
               <td className="px-5 py-3"><div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="secondary" onClick={()=>openEdit(a)}>Edit</Button>
-                <Button size="sm" variant="danger" loading={delId===a._id} onClick={()=>del(a._id)}>Delete</Button>
+                <Button size="sm" variant="danger" loading={delId===a.id} onClick={()=>del(a.id)}>Delete</Button>
               </div></td>
             </tr>))}</tbody></table>)}
       </div>

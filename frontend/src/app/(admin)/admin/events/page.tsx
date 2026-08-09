@@ -12,7 +12,7 @@ import { formatDate } from '@/lib/utils/format';
 
 const TYPES = ['seminar','workshop','conference','hackathon','competition','cultural','webinar','orientation','other'];
 const EMPTY = { title:'', slug:'', shortDescription:'', venue:'', startDate:'', endDate:'', type:'seminar', mode:'in_person', coverImage:'', organizerName:'Admin', isPublished:false, isFeatured:false };
-interface Ev { _id:string; title:string; slug:string; venue:string; startDate:string; type:string; isPublished:boolean; isFeatured:boolean; status:string }
+interface Ev { id:string; title:string; slug:string; venue:string; startDate:string; type:string; isPublished:boolean; isFeatured:boolean; status:string }
 const toSlug = (s:string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 
 export default function AdminEventsPage() {
@@ -38,7 +38,7 @@ export default function AdminEventsPage() {
   async function save() {
     if (!form.title||!form.slug||!form.venue||!form.startDate){setErr('Title, slug, venue and start date are required.');return;}
     setSaving(true); setErr('');
-    try { if(editing) await adminPatch(`/events/${editing._id}`,form); else await adminPost('/events',form); setOpen(false); load(); }
+    try { if(editing) await adminPatch(`/events/${editing.id}`,form); else await adminPost('/events',form); setOpen(false); load(); }
     catch(e){setErr(e instanceof Error?e.message:'Save failed');} finally{setSaving(false);}
   }
 
@@ -115,14 +115,14 @@ export default function AdminEventsPage() {
             <th className="text-right px-5 py-3">Actions</th>
           </tr></thead>
           <tbody>{list.map((e,i)=>(
-            <tr key={e._id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
+            <tr key={e.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
               <td className="px-5 py-3"><p className="font-medium text-white line-clamp-1">{e.title}</p><p className="text-xs text-slate-500">{e.venue}</p></td>
               <td className="px-4 py-3 text-center hidden sm:table-cell"><Badge variant="neutral">{e.type}</Badge></td>
               <td className="px-4 py-3 text-center"><div className="flex justify-center gap-1.5 flex-wrap"><Badge variant={e.isPublished?'success':'neutral'}>{e.isPublished?'Live':'Draft'}</Badge>{e.isFeatured&&<Badge variant="info">Featured</Badge>}</div></td>
               <td className="px-4 py-3 text-center text-xs text-slate-400 hidden md:table-cell">{formatDate(e.startDate)}</td>
               <td className="px-5 py-3"><div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="secondary" onClick={()=>openEdit(e)}>Edit</Button>
-                <Button size="sm" variant="danger" loading={delId===e._id} onClick={()=>del(e._id)}>Delete</Button>
+                <Button size="sm" variant="danger" loading={delId===e.id} onClick={()=>del(e.id)}>Delete</Button>
               </div></td>
             </tr>))}</tbody>
         </table>)}

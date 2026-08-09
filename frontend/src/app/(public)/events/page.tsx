@@ -6,15 +6,15 @@ import { formatDate } from '@/lib/utils/format';
 
 export const metadata: Metadata = { title: 'Events — GSTU CSE' };
 
-interface Ev { _id:string; title:string; slug:string; shortDescription?:string; description:string; venue:string; startDate:string; endDate?:string; type:string; mode:string; coverImage?:string; status:string; isFeatured:boolean; organizerName?:string }
+interface Ev { id:string; title:string; slug:string; shortDescription?:string; description:string; venue:string; startDate:string; endDate?:string; type:string; mode:string; coverImage?:string; status:string; isFeatured:boolean; organizerName?:string }
 
 const TYPE_COLORS: Record<string,string> = { seminar:'bg-blue-100 text-blue-700', workshop:'bg-amber-100 text-amber-700', conference:'bg-violet-100 text-violet-700', hackathon:'bg-rose-100 text-rose-700', competition:'bg-emerald-100 text-emerald-700', webinar:'bg-teal-100 text-teal-700', cultural:'bg-pink-100 text-pink-700', other:'bg-slate-100 text-slate-600' };
 const GRADIENTS = ['from-blue-600 to-indigo-600','from-violet-600 to-purple-600','from-emerald-600 to-teal-600','from-amber-600 to-orange-600','from-rose-600 to-pink-600'];
 const MOCK: Ev[] = [
-  {_id:'1',title:'National Programming Contest 2024',slug:'npc-2024',shortDescription:'Annual programming contest open to all CSE students.',description:'',venue:'CSE Seminar Hall',startDate:new Date(Date.now()+5*86400000).toISOString(),type:'competition',mode:'in_person',status:'upcoming',isFeatured:true},
-  {_id:'2',title:'Workshop on Deep Learning with PyTorch',slug:'dl-workshop-2024',shortDescription:'Hands-on workshop covering CNNs, RNNs and transformers.',description:'',venue:'AI Lab, Room 302',startDate:new Date(Date.now()+12*86400000).toISOString(),type:'workshop',mode:'in_person',status:'upcoming',isFeatured:false},
-  {_id:'3',title:'Guest Lecture: Industry Trends in Cloud Computing',slug:'cloud-lecture-2024',shortDescription:'A talk by industry experts on the latest in cloud technologies.',description:'',venue:'Conference Room',startDate:new Date(Date.now()+20*86400000).toISOString(),type:'seminar',mode:'hybrid',status:'upcoming',isFeatured:false},
-  {_id:'4',title:'CSE Annual Cultural Program 2024',slug:'cultural-2024',shortDescription:'Annual cultural evening celebrating student talent and creativity.',description:'',venue:'University Auditorium',startDate:new Date(Date.now()-5*86400000).toISOString(),type:'cultural',mode:'in_person',status:'completed',isFeatured:false},
+  {id:'1',title:'National Programming Contest 2024',slug:'npc-2024',shortDescription:'Annual programming contest open to all CSE students.',description:'',venue:'CSE Seminar Hall',startDate:new Date(Date.now()+5*86400000).toISOString(),type:'competition',mode:'in_person',status:'upcoming',isFeatured:true},
+  {id:'2',title:'Workshop on Deep Learning with PyTorch',slug:'dl-workshop-2024',shortDescription:'Hands-on workshop covering CNNs, RNNs and transformers.',description:'',venue:'AI Lab, Room 302',startDate:new Date(Date.now()+12*86400000).toISOString(),type:'workshop',mode:'in_person',status:'upcoming',isFeatured:false},
+  {id:'3',title:'Guest Lecture: Industry Trends in Cloud Computing',slug:'cloud-lecture-2024',shortDescription:'A talk by industry experts on the latest in cloud technologies.',description:'',venue:'Conference Room',startDate:new Date(Date.now()+20*86400000).toISOString(),type:'seminar',mode:'hybrid',status:'upcoming',isFeatured:false},
+  {id:'4',title:'CSE Annual Cultural Program 2024',slug:'cultural-2024',shortDescription:'Annual cultural evening celebrating student talent and creativity.',description:'',venue:'University Auditorium',startDate:new Date(Date.now()-5*86400000).toISOString(),type:'cultural',mode:'in_person',status:'completed',isFeatured:false},
 ];
 
 async function fetchEvents(): Promise<Ev[]> {
@@ -47,7 +47,7 @@ export default async function EventsPage() {
                 Upcoming Events
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {upcoming.map((e,i)=><EventCard key={e._id} event={e} gradient={GRADIENTS[i%GRADIENTS.length]}/>)}
+                {upcoming.map((e,i)=><EventCard key={e.id} event={e} gradient={GRADIENTS[i%GRADIENTS.length]}/>)}
               </div>
             </section>)}
           {/* Past */}
@@ -55,7 +55,7 @@ export default async function EventsPage() {
             <section aria-labelledby="past-heading">
               <h2 id="past-heading" className="text-2xl font-bold text-slate-900 mb-6">Past Events</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80">
-                {past.map((e,i)=><EventCard key={e._id} event={e} gradient={GRADIENTS[(i+2)%GRADIENTS.length]} past/>)}
+                {past.map((e,i)=><EventCard key={e.id} event={e} gradient={GRADIENTS[(i+2)%GRADIENTS.length]} past/>)}
               </div>
             </section>)}
           {events.length===0 && (

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { cn }     from '@/lib/utils/cn';
 import { formatDate } from '@/lib/utils/format';
 
-interface NewsItem { _id:string; title:string; slug:string; excerpt:string; content:string; coverImage?:string; category:string; authorName:string; tags?:string[]; publishedAt?:string; createdAt:string; viewCount?:number }
+interface NewsItem { id:string; title:string; slug:string; excerpt:string; content:string; coverImage?:string; category:string; authorName:string; tags?:string[]; publishedAt?:string; createdAt:string; viewCount?:number }
 const CAT_COLORS: Record<string,string> = { achievement:'bg-amber-100 text-amber-700', research:'bg-blue-100 text-blue-700', event:'bg-emerald-100 text-emerald-700', announcement:'bg-violet-100 text-violet-700', award:'bg-rose-100 text-rose-700', collaboration:'bg-teal-100 text-teal-700', general:'bg-slate-100 text-slate-600' };
 
 async function fetchBySlug(slug:string): Promise<NewsItem|null> {

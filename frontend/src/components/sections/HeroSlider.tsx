@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils/cn';
 const AUTOPLAY_MS = 5500;
 
 interface ApiSlide {
-  _id: string; title: string; subtitle: string; tag: string; imageUrl: string;
+  id: string; title: string; subtitle: string; tag: string; imageUrl: string;
   overlayOpacity: number; primaryBtnLabel: string; primaryBtnHref: string;
   secondaryBtnLabel: string; secondaryBtnHref: string;
   align: 'left' | 'center'; isActive: boolean; sortOrder: number;
@@ -18,7 +18,7 @@ type Slide = StaticSlide;
 
 function apiToSlide(s: ApiSlide): Slide {
   return {
-    id: s._id,
+    id: s.id,
     title: s.title,
     subtitle: s.subtitle,
     tag: s.tag || undefined,

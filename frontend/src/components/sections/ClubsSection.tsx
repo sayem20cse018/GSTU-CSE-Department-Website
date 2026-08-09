@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 interface Club {
-  _id: string;
+  id: string;
   name: string;
   slug: string;
   shortDescription: string;
@@ -18,12 +18,12 @@ interface Club {
 }
 
 const MOCK_CLUBS: Club[] = [
-  { _id:'1', name:'Programming Club',   slug:'programming-club',  shortDescription:'Fostering competitive programming and problem-solving among CSE students.',       foundedYear:2013, memberCount:120, isActive:true, isFeatured:true,  advisorName:'Dr. Mohammad Rahman' },
-  { _id:'2', name:'Robotics Club',      slug:'robotics-club',     shortDescription:'Exploring automation, robotics and embedded systems through hands-on projects.',  foundedYear:2015, memberCount:85,  isActive:true, isFeatured:true,  advisorName:'Mr. Arif Ahmed' },
-  { _id:'3', name:'AI Research Club',   slug:'ai-research-club',  shortDescription:'Conducting research in artificial intelligence, machine learning and data science.',foundedYear:2018, memberCount:70,  isActive:true, isFeatured:false, advisorName:'Dr. Karim Hossain' },
-  { _id:'4', name:'Cyber Security Club',slug:'cybersecurity-club',shortDescription:'Building expertise in ethical hacking, network security and digital privacy.',    foundedYear:2019, memberCount:60,  isActive:true, isFeatured:false, advisorName:'Dr. Fatima Khatun' },
-  { _id:'5', name:'App Dev Club',       slug:'app-dev-club',      shortDescription:'Creating innovative mobile and web applications to solve real-world problems.',    foundedYear:2020, memberCount:95,  isActive:true, isFeatured:false, advisorName:'Ms. Nadia Islam' },
-  { _id:'6', name:'Open Source Club',   slug:'open-source-club',  shortDescription:'Contributing to open source projects and promoting collaborative development.',   foundedYear:2021, memberCount:50,  isActive:true, isFeatured:false, advisorName:'Mr. Tanvir Hasan' },
+  { id:'1', name:'Programming Club',   slug:'programming-club',  shortDescription:'Fostering competitive programming and problem-solving among CSE students.',       foundedYear:2013, memberCount:120, isActive:true, isFeatured:true,  advisorName:'Dr. Mohammad Rahman' },
+  { id:'2', name:'Robotics Club',      slug:'robotics-club',     shortDescription:'Exploring automation, robotics and embedded systems through hands-on projects.',  foundedYear:2015, memberCount:85,  isActive:true, isFeatured:true,  advisorName:'Mr. Arif Ahmed' },
+  { id:'3', name:'AI Research Club',   slug:'ai-research-club',  shortDescription:'Conducting research in artificial intelligence, machine learning and data science.',foundedYear:2018, memberCount:70,  isActive:true, isFeatured:false, advisorName:'Dr. Karim Hossain' },
+  { id:'4', name:'Cyber Security Club',slug:'cybersecurity-club',shortDescription:'Building expertise in ethical hacking, network security and digital privacy.',    foundedYear:2019, memberCount:60,  isActive:true, isFeatured:false, advisorName:'Dr. Fatima Khatun' },
+  { id:'5', name:'App Dev Club',       slug:'app-dev-club',      shortDescription:'Creating innovative mobile and web applications to solve real-world problems.',    foundedYear:2020, memberCount:95,  isActive:true, isFeatured:false, advisorName:'Ms. Nadia Islam' },
+  { id:'6', name:'Open Source Club',   slug:'open-source-club',  shortDescription:'Contributing to open source projects and promoting collaborative development.',   foundedYear:2021, memberCount:50,  isActive:true, isFeatured:false, advisorName:'Mr. Tanvir Hasan' },
 ];
 
 const CLUB_META = [
@@ -65,7 +65,7 @@ export default function ClubsSection() {
           {clubs.map((club, i) => {
             const meta = CLUB_META[i % CLUB_META.length];
             return (
-              <article key={club._id}
+              <article key={club.id}
                 className="group bg-white border border-slate-200 rounded-2xl overflow-hidden
                            hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
