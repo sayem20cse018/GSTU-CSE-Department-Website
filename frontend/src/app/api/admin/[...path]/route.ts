@@ -1,19 +1,15 @@
 /**
  * /api/admin/[...path]
  *
- * Generic proxy for ALL admin CRUD operations.
+ * Generic proxy for ALL admin CRUD + file-upload operations.
  * Reads the httpOnly access cookie (server-side) and forwards it
  * as a Bearer token to the NestJS backend.
  *
- * Usage from client:
- *   fetch('/api/admin/faculty', { method:'POST', body:JSON.stringify(data) })
- *   fetch('/api/admin/notices/123', { method:'PATCH', body:... })
- *   fetch('/api/admin/faculty/123', { method:'DELETE' })
+ * Handles both JSON and multipart/form-data (file uploads).
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-// BACKEND_URL is server-only — works correctly in serverless API routes at runtime.
 const BACKEND = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 async function handler(
@@ -22,7 +18,10 @@ async function handler(
 ) {
   const { path } = await params;
   const backendPath = path.join('/');
-  const backendUrl  = `${BACKEND}/${backendPath}`;
+
+  // Preserve query string
+  const searchParams = req.nextUrl.searchParams.toString();
+  const backendUrl = `${BACKEND}/${backendPath}${searchParams ? `?${searchParams}` : ''}`;
 
   // Read access token from httpOnly cookie (server-side only)
   const cookieStore = await cookies();
@@ -35,52 +34,56 @@ async function handler(
     );
   }
 
-  // Build forwarded request headers
-  const forwardHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
-    Authorization:  `Bearer ${accessToken}`,
+  const backendReq: RequestInit = {
+    method: req.method,
+    headers: { Authorization: `Bearer ${accessToken}` },
   };
 
-  // Forward the request to backend
-  try {
-    const backendReq: RequestInit = {
-      method:  req.method,
-      headers: forwardHeaders,
-    };
+  // Forward body — detect content type to handle both JSON and FormData
+  if (req.method !== 'GET' && req.method !== 'DELETE' && req.method !== 'HEAD') {
+    const contentType = req.headers.get('content-type') ?? '';
 
-    // Forward body for POST / PATCH / PUT
-    if (req.method !== 'GET' && req.method !== 'DELETE') {
+    if (contentType.includes('multipart/form-data')) {
+      // File upload — forward raw FormData (don't set Content-Type, let fetch set boundary)
+      const formData = await req.formData();
+      backendReq.body = formData;
+      // Don't set Content-Type header — fetch sets it automatically with boundary
+    } else {
+      // JSON or other text body
       const text = await req.text();
-      if (text) backendReq.body = text;
+      if (text) {
+        backendReq.body = text;
+        (backendReq.headers as Record<string, string>)['Content-Type'] = 'application/json';
+      }
     }
+  }
 
-    // Timeout: 28s (Vercel function max is 30s)
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 28000);
-    backendReq.signal = controller.signal as AbortSignal;
+  // Timeout: 28s (Vercel function max is 30s)
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 28_000);
+  backendReq.signal = controller.signal as AbortSignal;
 
-    let backendRes: Response;
-    try {
-      backendRes = await fetch(backendUrl, backendReq);
-    } finally {
-      clearTimeout(timeout);
-    }
-
-    // 204 No Content (DELETE success)
-    if (backendRes.status === 204) {
-      return new NextResponse(null, { status: 204 });
-    }
-
-    const data = await backendRes.json().catch(() => null);
-    return NextResponse.json(data ?? {}, { status: backendRes.status });
-
+  let backendRes: Response;
+  try {
+    backendRes = await fetch(backendUrl, backendReq);
   } catch (err) {
+    clearTimeout(timeout);
     console.error('[/api/admin proxy]', err);
     return NextResponse.json(
       { success: false, message: 'Backend unreachable' },
       { status: 503 },
     );
+  } finally {
+    clearTimeout(timeout);
   }
+
+  // 204 No Content (DELETE success)
+  if (backendRes.status === 204) {
+    return new NextResponse(null, { status: 204 });
+  }
+
+  const data = await backendRes.json().catch(() => null);
+  return NextResponse.json(data ?? {}, { status: backendRes.status });
 }
 
 export const GET    = handler;

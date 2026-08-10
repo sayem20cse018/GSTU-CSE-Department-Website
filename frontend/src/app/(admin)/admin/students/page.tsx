@@ -9,7 +9,7 @@ import SearchInput  from '@/components/admin/ui/SearchInput';
 import Pagination   from '@/components/admin/ui/Pagination';
 import { useToast } from '@/components/admin/ui/Toast';
 import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
-import { adminGet, adminDelete } from '@/lib/api/admin-fetch';
+import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
 
 interface StudentRecord {
@@ -27,6 +27,7 @@ interface Stats {
 }
 
 const PAGE_SIZE = 20;
+const EMPTY_FORM = { studentId: '', name: '', session: '' };
 
 export default function AdminStudentsPage() {
   const [records,  setRecords]  = useState<StudentRecord[]>([]);
@@ -35,6 +36,13 @@ export default function AdminStudentsPage() {
   const [query,    setQuery]    = useState('');
   const [page,     setPage]     = useState(1);
   const [tab,      setTab]      = useState<'records' | 'import'>('records');
+
+  // Add/Edit modal
+  const [modalOpen,  setModalOpen]  = useState(false);
+  const [editing,    setEditing]    = useState<StudentRecord | null>(null);
+  const [form,       setForm]       = useState(EMPTY_FORM);
+  const [formErr,    setFormErr]    = useState('');
+  const [saving,     setSaving]     = useState(false);
 
   // Import state
   const [parseResult,   setParseResult]   = useState<ParseResult | null>(null);
@@ -71,6 +79,44 @@ export default function AdminStudentsPage() {
   );
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function openAdd() {
+    setEditing(null);
+    setForm(EMPTY_FORM);
+    setFormErr('');
+    setModalOpen(true);
+  }
+
+  function openEdit(rec: StudentRecord) {
+    setEditing(rec);
+    setForm({ studentId: rec.studentId, name: rec.name, session: rec.session });
+    setFormErr('');
+    setModalOpen(true);
+  }
+
+  async function saveRecord() {
+    if (!form.studentId.trim() || !form.name.trim() || !form.session.trim()) {
+      setFormErr('All fields are required.'); return;
+    }
+    setSaving(true); setFormErr('');
+    try {
+      if (editing) {
+        await adminPatch(`/students/records/${editing.id}`, { name: form.name, session: form.session });
+        toast.success('Record updated!');
+      } else {
+        await adminPost('/students/records', { ...form, studentId: form.studentId.toUpperCase() });
+        toast.success('Student record added!');
+      }
+      setModalOpen(false);
+      loadData();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Save failed';
+      setFormErr(msg);
+      toast.error(msg);
+    } finally { setSaving(false); }
+  }
+
+  const iCls = 'w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 bg-white';
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -130,7 +176,78 @@ export default function AdminStudentsPage() {
       <AdminPageTitle title="Students" />
       {ConfirmDialog}
 
-      <PageHeader title="Student Management" description="Manage CSE student database and registrations"/>
+      <PageHeader title="Student Management" description="Manage CSE student database and registrations"
+        action={
+          <Button onClick={openAdd} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>
+            Add Student
+          </Button>
+        }
+      />
+
+      {/* ── Add/Edit Modal ── */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-bold text-slate-900">
+                {editing ? `Edit — ${editing.studentId}` : 'Add Student Record'}
+              </h3>
+              <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded transition">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+
+            {formErr && (
+              <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">{formErr}</div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Student ID <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={form.studentId}
+                  onChange={e => setForm(p => ({ ...p, studentId: e.target.value.toUpperCase() }))}
+                  placeholder="e.g. 20CSE018"
+                  disabled={!!editing}
+                  className={`${iCls} ${editing ? 'bg-slate-50 cursor-not-allowed' : ''} uppercase`}
+                />
+                {editing && <p className="text-[11px] text-slate-400 mt-1">Student ID cannot be changed.</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={form.name}
+                  onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                  placeholder="Student's full name"
+                  className={iCls}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Session / Batch <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={form.session}
+                  onChange={e => setForm(p => ({ ...p, session: e.target.value }))}
+                  placeholder="e.g. 2020-21"
+                  className={iCls}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <Button onClick={saveRecord} loading={saving} className="flex-1">
+                {editing ? 'Update Record' : 'Add Record'}
+              </Button>
+              <Button variant="secondary" onClick={() => setModalOpen(false)} className="flex-1">Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats row */}
       {stats && (
@@ -189,7 +306,7 @@ export default function AdminStudentsPage() {
                   <th className="text-center px-4 py-3 hidden sm:table-cell">Session</th>
                   <th className="text-center px-4 py-3">Status</th>
                   <th className="text-center px-4 py-3 hidden md:table-cell">Last Login</th>
-                  <th className="text-right px-4 py-3">Action</th>
+                  <th className="text-right px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -232,7 +349,10 @@ export default function AdminStudentsPage() {
                         <span className="ml-1 text-slate-300">({rec.user.totalLoginCount}×)</span>}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button size="sm" variant="danger" onClick={() => del(rec)}>Remove</Button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button size="sm" variant="secondary" onClick={() => openEdit(rec)}>Edit</Button>
+                        <Button size="sm" variant="danger" onClick={() => del(rec)}>Remove</Button>
+                      </div>
                     </td>
                   </tr>
                 ))}

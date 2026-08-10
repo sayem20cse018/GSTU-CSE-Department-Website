@@ -1,7 +1,8 @@
 'use client';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 import { adminGet, adminPatch } from '@/lib/api/admin-fetch';
+import ImageUpload from '@/components/admin/ui/ImageUpload';
 import type { SiteSettings } from '@/lib/api/settings';
 import { SETTINGS_FALLBACK } from '@/lib/api/settings';
 
@@ -19,49 +20,6 @@ const iCls  = 'w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm tex
 const taCls = `${iCls} resize-y`;
 const lCls  = 'block text-xs font-semibold text-slate-700 mb-1.5';
 const sec   = 'text-[10px] font-bold uppercase tracking-widest text-slate-400 pb-2 border-b border-slate-100';
-
-function PhotoUpload({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-  const ref = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
-  const isData = value.startsWith('data:');
-
-  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; e.target.value = '';
-    if (!file || !file.type.startsWith('image/')) { alert('Select an image.'); return; }
-    setBusy(true);
-    const reader = new FileReader();
-    reader.onload = () => { onChange(reader.result as string); setBusy(false); };
-    reader.onerror = () => { setBusy(false); };
-    reader.readAsDataURL(file);
-  }
-
-  return (
-    <div>
-      <label className={lCls}>{label}</label>
-      <div className="flex items-start gap-3">
-        {value && (
-          <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-200 shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={value} alt="" className="w-full h-full object-cover"/>
-          </div>
-        )}
-        <div className="flex-1">
-          <input type="url" value={isData ? '' : value} onChange={e => onChange(e.target.value)}
-            placeholder="https://…" className={`${iCls} mb-2`}/>
-          <input ref={ref} type="file" accept="image/*" className="hidden" onChange={handleFile}/>
-          <button type="button" onClick={() => ref.current?.click()} disabled={busy}
-            className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-green-300 text-green-700 hover:bg-green-50 transition disabled:opacity-50">
-            {busy ? 'Processing…' : '📷 Upload Image'}
-          </button>
-          {value && (
-            <button type="button" onClick={() => onChange('__CLEAR__')}
-              className="ml-2 text-xs text-red-500 hover:text-red-700">× Remove</button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── NO useSearchParams — pure internal state, works without Suspense ──────────
 export default function AboutAdminPage() {
@@ -157,23 +115,28 @@ export default function AboutAdminPage() {
 
           {tab === 'photos' && (<>
             <p className={sec}>About Section Photos — shown in homepage grid (top-left is largest)</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {([
-                ['Photo 1', 'Large top-left', 'aboutImage1'],
-                ['Photo 2', 'Small top-right', 'aboutImage2'],
-                ['Photo 3', 'Small bottom-right', 'aboutImage3'],
-                ['Photo 4', 'Wide bottom', 'aboutImage4'],
-              ] as [string, string, keyof SiteSettings][]).map(([num, pos, key]) => (
-                <div key={key} className="border border-slate-200 rounded-xl p-3 space-y-2">
+                { num: 'Photo 1', pos: 'Large top-left',    imgKey: 'aboutImage1' },
+                { num: 'Photo 2', pos: 'Small top-right',   imgKey: 'aboutImage2' },
+                { num: 'Photo 3', pos: 'Small bottom-right',imgKey: 'aboutImage3' },
+                { num: 'Photo 4', pos: 'Wide bottom',       imgKey: 'aboutImage4' },
+              ] as { num: string; pos: string; imgKey: keyof SiteSettings }[]).map(({ num, pos, imgKey }) => (
+                <div key={imgKey} className="border border-slate-200 rounded-xl p-4 space-y-3 bg-slate-50/50">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-900">{num}</span>
-                    <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{pos}</span>
+                    <span className="text-sm font-bold text-slate-900">{num}</span>
+                    <span className="text-[10px] text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-full">{pos}</span>
                   </div>
-                  <PhotoUpload label="" value={(form[key] as string) ?? ''} onChange={v => F(key, v)}/>
+                  <ImageUpload
+                    label="Photo"
+                    value={(form[imgKey] as string) ?? ''}
+                    onChange={v => F(imgKey, v === '__CLEAR__' ? '__CLEAR__' : v)}
+                    hint="Recommended: 800×600px or larger"
+                  />
                 </div>
               ))}
             </div>
-            <p className="text-xs text-slate-400 mt-1">Recommended: 800×600px or larger. Leave empty to use placeholder.</p>
+            <p className="text-xs text-slate-400 mt-1">Images are auto-compressed (canvas resize). Leave empty to use placeholder.</p>
           </>)}
 
           {tab === 'chairman' && (<>
@@ -188,7 +151,7 @@ export default function AboutAdminPage() {
               <div><label className={lCls}>Email 2 (official)</label>
                 <input type="email" value={form.chairmanEmail2 ?? ''} onChange={e => F('chairmanEmail2', e.target.value)} placeholder="baowaly@gstu.edu.bd" className={iCls}/></div>
             </div>
-            <PhotoUpload label="Chairman Photo" value={form.chairmanPhoto ?? ''} onChange={v => F('chairmanPhoto', v)}/>
+            <ImageUpload label="Chairman Photo" value={form.chairmanPhoto ?? ''} onChange={v => F('chairmanPhoto', v === '__CLEAR__' ? '__CLEAR__' : v)}/>
             <div><label className={lCls}>Message <span className="text-slate-400 font-normal">(blank line = new paragraph)</span></label>
               <textarea rows={10} value={form.chairmanMessage ?? ''} onChange={e => F('chairmanMessage', e.target.value)}
                 placeholder="Welcome to the Department…" className={taCls}/></div>

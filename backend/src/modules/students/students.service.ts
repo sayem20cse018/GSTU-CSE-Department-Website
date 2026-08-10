@@ -194,6 +194,35 @@ export class StudentsService {
     return this.prisma.studentRecord.delete({ where: { id } });
   }
 
+  async addRecord(data: { studentId: string; name: string; session: string }) {
+    const existing = await this.prisma.studentRecord.findUnique({
+      where: { studentId: data.studentId.toUpperCase() },
+    });
+    if (existing) {
+      throw new ConflictException(`Student ID ${data.studentId} already exists`);
+    }
+    return this.prisma.studentRecord.create({
+      data: {
+        studentId: data.studentId.toUpperCase(),
+        name: data.name.trim(),
+        session: data.session.trim(),
+      },
+    });
+  }
+
+  async updateRecord(id: string, data: { name?: string; session?: string }) {
+    const r = await this.prisma.studentRecord.findUnique({ where: { id } });
+    if (!r) throw new NotFoundException('Record not found');
+    return this.prisma.studentRecord.update({
+      where: { id },
+      data: {
+        ...(data.name    ? { name:    data.name.trim()    } : {}),
+        ...(data.session ? { session: data.session.trim() } : {}),
+      },
+      include: { user: { select: { id: true, email: true, lastLoginAt: true, totalLoginCount: true } } },
+    });
+  }
+
   // ─── ADMIN: stats ──────────────────────────────────────────────────────────────
   async getStats() {
     const now = new Date();

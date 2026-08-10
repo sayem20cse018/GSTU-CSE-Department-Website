@@ -1,5 +1,5 @@
 import {
-  Controller, Post, Get, Delete, Body, Req, Res,
+  Controller, Post, Get, Delete, Patch, Body, Req, Res,
   Param, Query, UploadedFile, UseInterceptors,
   HttpCode, HttpStatus, UseGuards, BadRequestException,
 } from '@nestjs/common';
@@ -14,13 +14,16 @@ import { Roles }      from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 
 const SESSION_COOKIE = 'cse_student';
-const COOKIE_OPTS = {
-  httpOnly:  true,
-  sameSite:  'lax' as const,
-  secure:    process.env.NODE_ENV === 'production',
-  maxAge:    7 * 24 * 60 * 60 * 1000, // 7 days
-  path:      '/',
-};
+function getCookieOpts(req: Request) {
+  const isProduction = process.env.NODE_ENV === 'production';
+  return {
+    httpOnly: true,
+    sameSite: isProduction ? ('none' as const) : ('lax' as const),
+    secure: isProduction,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: '/',
+  };
+}
 
 @ApiTags('Students')
 @Controller('students')
@@ -34,8 +37,10 @@ export class StudentsController {
   async register(@Body() dto: StudentRegisterDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
     const result = await this.svc.register(dto, ip);
-    res.cookie(SESSION_COOKIE, result.token, COOKIE_OPTS);
-    return { student: result.student };
+    // Set cookie for direct browser access (development / same-origin)
+    res.cookie(SESSION_COOKIE, result.token, getCookieOpts(req));
+    // Also return token in body so Next.js proxy can set its own httpOnly cookie in production
+    return { student: result.student, token: result.token };
   }
 
   // ─── Public: login ────────────────────────────────────────────────────────
@@ -45,8 +50,8 @@ export class StudentsController {
   async login(@Body() dto: StudentLoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
     const result = await this.svc.login(dto, ip);
-    res.cookie(SESSION_COOKIE, result.token, COOKIE_OPTS);
-    return { student: result.student };
+    res.cookie(SESSION_COOKIE, result.token, getCookieOpts(req));
+    return { student: result.student, token: result.token };
   }
 
   // ─── Public: me (session check) ───────────────────────────────────────────
@@ -79,6 +84,50 @@ export class StudentsController {
     if (token) await this.svc.heartbeat(token);
   }
 
+  // ─── Admin: parse Excel (preview) — must be BEFORE records/:id ──────────
+  @Post('records/parse')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  async parseExcel(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('No file uploaded');
+    return this.svc.parseExcel(file.buffer);
+  }
+
+  // ─── Admin: confirm import — must be BEFORE records/:id ──────────────────
+  @Post('records/import')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  async importStudents(@Body() body: { rows: { studentId: string; name: string; session: string }[] }) {
+    if (!Array.isArray(body?.rows) || body.rows.length === 0) {
+      throw new BadRequestException('No rows to import');
+    }
+    return this.svc.importStudents(body.rows);
+  }
+
+  // ─── Admin: add single student record ────────────────────────────────────
+  @Post('records')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  async addRecord(@Body() body: { studentId: string; name: string; session: string }) {
+    if (!body.studentId || !body.name || !body.session) {
+      throw new BadRequestException('studentId, name, and session are required');
+    }
+    return this.svc.addRecord(body);
+  }
+
+  // ─── Admin: update single student record ─────────────────────────────────
+  @Patch('records/:id')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  async updateRecord(@Param('id') id: string, @Body() body: { name?: string; session?: string }) {
+    return this.svc.updateRecord(id, body);
+  }
+
   // ─── Admin: list imported student records ─────────────────────────────────
   @Get('records')
   @UseGuards(RolesGuard)
@@ -96,29 +145,6 @@ export class StudentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteRecord(@Param('id') id: string) {
     return this.svc.deleteRecord(id);
-  }
-
-  // ─── Admin: parse Excel (preview) ────────────────────────────────────────
-  @Post('records/parse')
-  @UseGuards(RolesGuard)
-  @Roles('admin')
-  @ApiBearerAuth()
-  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
-  async parseExcel(@UploadedFile() file: Express.Multer.File) {
-    if (!file) throw new BadRequestException('No file uploaded');
-    return this.svc.parseExcel(file.buffer);
-  }
-
-  // ─── Admin: confirm import ────────────────────────────────────────────────
-  @Post('records/import')
-  @UseGuards(RolesGuard)
-  @Roles('admin')
-  @ApiBearerAuth()
-  async importStudents(@Body() body: { rows: { studentId: string; name: string; session: string }[] }) {
-    if (!Array.isArray(body?.rows) || body.rows.length === 0) {
-      throw new BadRequestException('No rows to import');
-    }
-    return this.svc.importStudents(body.rows);
   }
 
   // ─── Admin: stats ─────────────────────────────────────────────────────────
