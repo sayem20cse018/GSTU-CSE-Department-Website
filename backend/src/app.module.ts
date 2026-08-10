@@ -18,6 +18,7 @@ import { ClubsModule } from './modules/clubs/clubs.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { HeroSlidesModule } from './modules/hero-slides/hero-slides.module';
+import { StudentsModule }   from './modules/students/students.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { HeroSlidesModule } from './modules/hero-slides/hero-slides.module';
     StatisticsModule,
     SettingsModule,
     HeroSlidesModule,
+    StudentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

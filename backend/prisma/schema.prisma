@@ -785,3 +785,65 @@ model Settings {
 
   @@map("settings")
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STUDENT SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Admin-imported CSE student list (from Excel). Only these students can register.
+model StudentRecord {
+  id         String   @id @default(cuid())
+  studentId  String   @unique   // e.g. "20CSE018"
+  name       String
+  session    String             // e.g. "2020-21"
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user StudentUser?
+
+  @@index([studentId])
+  @@map("student_records")
+}
+
+// Registered student accounts
+model StudentUser {
+  id              String   @id @default(cuid())
+  studentId       String   @unique
+  record          StudentRecord @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
+  name            String
+  email           String   @unique
+  passwordHash    String
+  session         String
+  phone           String?
+  photo           String?
+  isActive        Boolean  @default(true)
+  lastLoginAt     DateTime?
+  lastLoginIp     String?
+  totalLoginCount Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sessions StudentSession[]
+
+  @@index([studentId])
+  @@map("student_users")
+}
+
+// Online session tracking
+model StudentSession {
+  id          String    @id @default(cuid())
+  studentUserId String
+  student     StudentUser @relation(fields: [studentUserId], references: [id], onDelete: Cascade)
+  token       String    @unique
+  ipAddress   String?
+  userAgent   String?
+  loginAt     DateTime  @default(now())
+  lastSeenAt  DateTime  @default(now())
+  logoutAt    DateTime?
+  isActive    Boolean   @default(true)
+
+  @@index([studentUserId])
+  @@index([isActive, lastSeenAt])
+  @@map("student_sessions")
+}

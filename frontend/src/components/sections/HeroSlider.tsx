@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { type Slide as StaticSlide, HERO_SLIDES as FALLBACK_SLIDES } from '@/config/slides';
+import { type Slide as StaticSlide } from '@/config/slides';
 import { cn } from '@/lib/utils/cn';
 
 const AUTOPLAY_MS = 5500;
@@ -135,9 +135,8 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
 
 // ─── Main HeroSlider ──────────────────────────────────────────────────────────
 export default function HeroSlider() {
-  // Start with FALLBACK_SLIDES immediately — no blank flash on load
-  // API data replaces them when ready
-  const [slides,  setSlides]  = useState<Slide[]>(FALLBACK_SLIDES);
+  // Start with empty — no static flash. API data loads in useEffect.
+  const [slides,  setSlides]  = useState<Slide[]>([]);
   const [current, setCurrent] = useState(0);
   const [paused,  setPaused]  = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -147,12 +146,11 @@ export default function HeroSlider() {
       .then(r => r.ok ? r.json() : Promise.reject())
       .then((d: { data?: ApiSlide[] }) => {
         const arr = d?.data;
-        // Only replace if API has real slides
         if (Array.isArray(arr) && arr.length) {
           setSlides(arr.map(apiToSlide));
           setCurrent(0);
         }
-        // If API returns empty → keep FALLBACK_SLIDES showing
+        // If API returns empty → show gradient fallback (no static images)
       })
       .catch(() => { /* keep FALLBACK_SLIDES */ });
   }, []);

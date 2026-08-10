@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, Oswald, Montserrat, Noto_Sans_Bengali } from 'next/font/google';
 import './globals.css';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider }        from '@/context/AuthContext';
+import { StudentAuthProvider } from '@/context/StudentAuthContext';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -56,7 +57,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="bn" className={`${inter.variable} ${jetbrainsMono.variable} ${oswald.variable} ${montserrat.variable} ${notoSansBengali.variable} scroll-smooth`}>
       <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased"
         style={{ fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif' }}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <StudentAuthProvider>
+            {children}
+          </StudentAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );

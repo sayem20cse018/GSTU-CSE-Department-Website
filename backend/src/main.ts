@@ -3,6 +3,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
+const cookieParser = require('cookie-parser');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const compression = require('compression');
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -19,6 +21,7 @@ async function bootstrap() {
   // ── Security ──────────────────────────────────────────────────────────────
   app.use(helmet());
   app.use(compression());
+  app.use(cookieParser());
 
   // ── CORS ──────────────────────────────────────────────────────────────────
   app.enableCors({
@@ -33,8 +36,8 @@ async function bootstrap() {
   // ── Global validation pipe ────────────────────────────────────────────────
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      whitelist: true,          // strip unknown fields silently
+      forbidNonWhitelisted: false, // don't throw on extra fields (Prisma returns id/createdAt/updatedAt)
       transform: true,
       transformOptions: { enableImplicitConversion: true },
     }),

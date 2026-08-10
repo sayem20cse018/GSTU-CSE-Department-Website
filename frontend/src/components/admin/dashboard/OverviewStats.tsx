@@ -19,6 +19,7 @@ export default function OverviewStats() {
       adminGet<unknown[]>('/clubs?admin=true'),
       adminGet<unknown[]>('/alumni?admin=true'),
       adminGet<unknown[]>('/gallery?admin=true'),
+      adminGet<{ totalRecords?: number; totalRegistered?: number; onlineNow?: number }>('/students/stats'),
     ]).then(results => {
       const arr = <T,>(r: PromiseSettledResult<T>): T | null =>
         r.status === 'fulfilled' ? r.value : null;
@@ -26,6 +27,8 @@ export default function OverviewStats() {
         r.status === 'fulfilled' ? (r.value as { pagination?: { total?: number } })?.pagination?.total ?? 0 : 0;
       const len = <T,>(r: PromiseSettledResult<T[]>) =>
         r.status === 'fulfilled' && Array.isArray(r.value) ? r.value.length : 0;
+
+      const studentStats = arr(results[8] as PromiseSettledResult<{ totalRecords?: number; totalRegistered?: number; onlineNow?: number }>);
 
       setStats([
         { label: 'Faculty',      value: len(results[0] as PromiseSettledResult<unknown[]>), icon: '👨‍🏫', href: '/admin/faculty',      color: 'from-blue-600    to-indigo-700' },
@@ -36,6 +39,8 @@ export default function OverviewStats() {
         { label: 'Clubs',        value: len(results[5] as PromiseSettledResult<unknown[]>), icon: '🏫', href: '/admin/clubs',         color: 'from-cyan-600    to-blue-700'   },
         { label: 'Alumni',       value: len(results[6] as PromiseSettledResult<unknown[]>), icon: '🎓', href: '/admin/alumni',        color: 'from-green-600   to-emerald-700'},
         { label: 'Gallery',      value: len(results[7] as PromiseSettledResult<unknown[]>), icon: '📷', href: '/admin/gallery',       color: 'from-fuchsia-600 to-pink-700'   },
+        { label: 'Students',     value: studentStats?.totalRecords ?? 0, icon: '🎒', href: '/admin/students', color: 'from-teal-600 to-cyan-700' },
+        { label: 'Online Now',   value: studentStats?.onlineNow ?? 0,    icon: '🟢', href: '/admin/students', color: 'from-lime-600 to-green-700'},
       ]);
     }).finally(() => setLoading(false));
   }, []);

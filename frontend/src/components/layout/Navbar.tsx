@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
 import { NAV_LINKS, SITE } from '@/constants';
 import { cn } from '@/lib/utils/cn';
+import { useStudentAuth } from '@/context/StudentAuthContext';
 
 type NavLink   = typeof NAV_LINKS[number];
 type ChildLink = { label: string; href: string };
@@ -22,9 +23,9 @@ interface DropdownState {
 function DropdownPortal({
   state, pathname, onClose,
 }: { state: DropdownState; pathname: string; onClose: () => void }) {
-  const panelWidth  = state.twoCol ? 480 : 230;
-  const viewportW   = typeof window !== 'undefined' ? window.innerWidth : 1280;
-  const left        = Math.min(state.left, viewportW - panelWidth - 12);
+  const panelWidth = state.twoCol ? 480 : 230;
+  const viewportW  = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const left       = Math.min(state.left, viewportW - panelWidth - 12);
 
   return createPortal(
     <div
@@ -32,33 +33,24 @@ function DropdownPortal({
       style={{ position: 'fixed', top: state.top, left, width: panelWidth, zIndex: 99999 }}
       className="animate-[fadeIn_0.15s_ease]"
     >
-      {/* Dropdown card */}
       <div className="overflow-hidden rounded-xl shadow-2xl"
         style={{
-          background: 'linear-gradient(160deg, #0f2d18 0%, #0e3d22 50%, #0a2e1a 100%)',
+          background: 'linear-gradient(160deg,#0f2d18 0%,#0e3d22 50%,#0a2e1a 100%)',
           border: '1px solid rgba(134,239,172,0.18)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.05)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.05)',
         }}>
-
-        {/* Thin gold top line */}
         <div className="h-[2px] w-full"
-          style={{ background: 'linear-gradient(90deg,transparent,#fbbf24,transparent)' }}
-        />
-
+          style={{ background: 'linear-gradient(90deg,transparent,#fbbf24,transparent)' }}/>
         <div className={cn('py-1.5', state.twoCol && 'grid grid-cols-2')}>
           {state.children.map((child) => {
             const active = pathname === child.href;
             return (
-              <Link
-                key={child.href}
-                href={child.href}
-                onClick={onClose}
+              <Link key={child.href} href={child.href} onClick={onClose}
                 className="group flex items-center gap-2.5 px-5 py-2.5 transition-all duration-200"
                 style={{ color: active ? '#fbbf24' : 'rgba(220,252,231,0.85)' }}
                 onMouseEnter={e => {
                   if (!active) {
                     e.currentTarget.style.color = '#4ade80';
-                    // animate the dot
                     const dot = e.currentTarget.querySelector('.nav-dot') as HTMLElement;
                     if (dot) dot.style.background = '#4ade80';
                   }
@@ -69,26 +61,15 @@ function DropdownPortal({
                     const dot = e.currentTarget.querySelector('.nav-dot') as HTMLElement;
                     if (dot) dot.style.background = 'rgba(134,239,172,0.5)';
                   }
-                }}
-              >
-                {/* Animated left indicator */}
-                <span
-                  className="nav-dot shrink-0 rounded-full transition-all duration-200"
-                  style={{
-                    width: active ? '6px' : '5px',
-                    height: active ? '6px' : '5px',
-                    background: active ? '#fbbf24' : 'rgba(134,239,172,0.5)',
-                  }}
-                  aria-hidden="true"
-                />
+                }}>
+                <span className="nav-dot shrink-0 rounded-full transition-all duration-200"
+                  style={{ width: active ? '6px' : '5px', height: active ? '6px' : '5px',
+                    background: active ? '#fbbf24' : 'rgba(134,239,172,0.5)' }}
+                  aria-hidden="true"/>
                 <span className="text-[0.81rem] font-medium">{child.label}</span>
-                {/* Arrow that slides in on hover */}
-                <svg
-                  className="ml-auto w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                <svg className="ml-auto w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  style={{ color: '#4ade80' }}
-                  aria-hidden="true"
-                >
+                  style={{ color: '#4ade80' }} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
                 </svg>
               </Link>
@@ -101,13 +82,12 @@ function DropdownPortal({
   );
 }
 
-// ─── NavItem classes ──────────────────────────────────────────────────────────
+// ─── NavItem base classes ─────────────────────────────────────────────────────
 const ITEM_BASE = [
   'relative flex items-center gap-1',
   'px-3 h-[3.25rem]',
   'text-[0.8rem] font-semibold whitespace-nowrap',
   'transition-colors duration-200',
-  // Sliding underline
   'after:absolute after:bottom-0 after:left-0 after:h-[2.5px] after:w-full',
   'after:scale-x-0 after:origin-left after:transition-transform after:duration-250',
   'hover:after:scale-x-100',
@@ -124,8 +104,17 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const navRef   = useRef<HTMLElement>(null);
+  const btnRefs  = useRef<Map<string, HTMLButtonElement>>(new Map());
 
-  // Fetch hidden nav items from settings
+  // Student auth state
+  const { student, isLoading: studentLoading, logout: studentLogout } = useStudentAuth();
+
+  // Student nav children — all shown when logged in, only login + portal when logged out
+  const STUDENT_CHILDREN_LOCKED: readonly ChildLink[] = [
+    { label: 'Student Login',    href: '/student/login' },
+    { label: 'Register Account', href: '/student/register' },
+  ];
+
   useEffect(() => {
     fetch('/api/public/settings')
       .then(r => r.ok ? r.json() : Promise.reject())
@@ -135,7 +124,6 @@ export default function Navbar() {
       })
       .catch(() => {});
   }, []);
-  const btnRefs  = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -147,9 +135,9 @@ export default function Navbar() {
 
   useEffect(() => {
     const fn = (e: MouseEvent) => {
-      const target    = e.target as Node;
-      const inNav     = navRef.current?.contains(target);
-      const inPortal  = document.getElementById('nav-dropdown-portal')?.contains(target);
+      const target   = e.target as Node;
+      const inNav    = navRef.current?.contains(target);
+      const inPortal = document.getElementById('nav-dropdown-portal')?.contains(target);
       if (!inNav && !inPortal) setDropdown(null);
     };
     document.addEventListener('mousedown', fn);
@@ -175,21 +163,25 @@ export default function Navbar() {
     const rect = btn.getBoundingClientRect();
     const link = NAV_LINKS.find(l => l.label === label);
     if (!link || !hasChildren(link)) return;
+
+    // For Students dropdown resolve children based on auth
+    const children: readonly ChildLink[] =
+      link.label === 'Students'
+        ? (student ? link.children : STUDENT_CHILDREN_LOCKED)
+        : link.children;
+
     setDropdown(prev =>
       prev?.label === label ? null : {
         label, left: rect.left, top: rect.bottom + 2,
-        twoCol: link.children.length > 6, children: link.children,
+        twoCol: children.length > 6, children,
       }
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [student]);
 
-  // ─── Shared styles ────────────────────────────────────────────────────────
-  // Active: green underline + green text
-  // Hover:  green text + green underline slides in
   function itemStyle(isActive: boolean, isOpen = false): React.CSSProperties {
-    if (isActive || isOpen) return { color: '#1a7a3c' };  // green when active
-    return { color: '#1a1a1a' };                           // black normally
+    if (isActive || isOpen) return { color: '#1a7a3c' };
+    return { color: '#1a1a1a' };
   }
 
   return (
@@ -200,9 +192,7 @@ export default function Navbar() {
         style={{
           background: '#ffffff',
           backdropFilter: scrolled ? 'blur(12px)' : undefined,
-          borderBottom: scrolled
-            ? '1px solid rgba(0,0,0,0.1)'
-            : '1px solid rgba(0,0,0,0.08)',
+          borderBottom: scrolled ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(0,0,0,0.08)',
           boxShadow: scrolled ? '0 2px 16px rgba(0,0,0,0.10)' : 'none',
         }}
         aria-label="Main navigation"
@@ -210,11 +200,10 @@ export default function Navbar() {
         <div className="container-custom">
           <div className="flex items-center justify-between h-[3.25rem]">
 
-            {/* Spacer for mobile — no logo here (SiteHeader already shows it) */}
             <div className="flex lg:hidden items-center gap-2"/>
 
-            {/* Desktop nav */}
-            <div className="hidden lg:flex items-center flex-1 h-full">
+            {/* Desktop nav items */}
+            <div className="hidden lg:flex items-center flex-1 h-full gap-0">
               {NAV_LINKS.filter(link => !hiddenItems.includes(link.href)).map((link) => {
                 const isActive = pathname === link.href ||
                   (link.href !== '/' && pathname.startsWith(link.href));
@@ -222,9 +211,7 @@ export default function Navbar() {
 
                 const commonCls = cn(
                   ITEM_BASE,
-                  isActive || isOpen
-                    ? 'after:bg-[#1a7a3c] after:scale-x-100'   // green, always visible
-                    : 'after:bg-[#1a7a3c]',                     // green, slides in on hover
+                  (isActive || isOpen) ? 'after:bg-[#1a7a3c] after:scale-x-100' : 'after:bg-[#1a7a3c]',
                 );
 
                 if (hasChildren(link)) {
@@ -241,10 +228,8 @@ export default function Navbar() {
                       onMouseLeave={e => { if (!isActive && !isOpen) e.currentTarget.style.color = '#1a1a1a'; }}
                     >
                       {link.label}
-                      <svg
-                        className={cn('w-3 h-3 transition-transform duration-200', isOpen && 'rotate-180')}
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"
-                      >
+                      <svg className={cn('w-3 h-3 transition-transform duration-200', isOpen && 'rotate-180')}
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
                       </svg>
                     </button>
@@ -252,19 +237,56 @@ export default function Navbar() {
                 }
 
                 return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
+                  <Link key={link.href} href={link.href}
                     aria-current={pathname === link.href ? 'page' : undefined}
                     style={itemStyle(isActive)}
                     className={commonCls}
                     onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = '#1a7a3c'; }}
-                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = '#1a1a1a'; }}
-                  >
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = '#1a1a1a'; }}>
                     {link.label}
                   </Link>
                 );
               })}
+
+              {/* Student avatar / login — after all nav items */}
+              {!studentLoading && (
+                <div className="ml-auto shrink-0 flex items-center gap-2 pl-3">
+                  {student ? (
+                    <>
+                      <Link href="/students"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all"
+                        style={{ background: 'rgba(26,122,60,0.07)', borderColor: 'rgba(26,122,60,0.3)', color: '#166534' }}>
+                        <div className="w-6 h-6 rounded-full bg-green-700 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
+                          {student.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-xs font-semibold hidden md:inline max-w-[90px] truncate">
+                          {student.name.split(' ')[0]}
+                        </span>
+                      </Link>
+                      <button onClick={() => studentLogout()}
+                        title="Student logout"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition border border-transparent hover:border-red-200">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                      </button>
+                    </>
+                  ) : (
+                    <Link href="/student/login"
+                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all"
+                      style={{ color: '#1a7a3c', borderColor: 'rgba(26,122,60,0.35)', background: 'rgba(26,122,60,0.04)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,122,60,0.1)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,122,60,0.04)'; }}>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                      </svg>
+                      Student
+                    </Link>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Mobile hamburger */}
@@ -284,12 +306,11 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* ── Mobile menu ──────────────────────────────────────────────── */}
+        {/* Mobile menu */}
         {mobileOpen && (
           <div id="mobile-menu"
             className="lg:hidden border-t max-h-[80vh] overflow-y-auto"
-            style={{ background: '#ffffff', borderColor: 'rgba(0,0,0,0.08)' }}
-          >
+            style={{ background: '#ffffff', borderColor: 'rgba(0,0,0,0.08)' }}>
             <div className="container-custom py-3 space-y-0.5">
               <div className="px-3 py-2 mb-2 border-b" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
                 <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#1a7a3c' }}>{SITE.shortName}</p>
@@ -299,16 +320,19 @@ export default function Navbar() {
               {NAV_LINKS.filter(link => !hiddenItems.includes(link.href)).map((link) => {
                 if (hasChildren(link)) {
                   const expanded = mobileExpand === link.label;
+                  // For Students on mobile: filter children based on auth
+                  const mobileChildren: readonly ChildLink[] =
+                    link.label === 'Students'
+                      ? (student ? link.children : STUDENT_CHILDREN_LOCKED)
+                      : link.children;
+
                   return (
                     <div key={link.label}>
                       <button
                         onClick={() => setMobileExpand(expanded ? null : link.label)}
                         className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors"
                         style={{ color: '#1a1a1a' }}
-                        aria-expanded={expanded}
-                        onMouseEnter={e => (e.currentTarget.style.color = '#1a7a3c')}
-                        onMouseLeave={e => (e.currentTarget.style.color = '#1a1a1a')}
-                      >
+                        aria-expanded={expanded}>
                         {link.label}
                         <svg className={cn('w-4 h-4 transition-transform', expanded && 'rotate-180')}
                           fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -318,19 +342,10 @@ export default function Navbar() {
                       {expanded && (
                         <div className="ml-3 pl-3 border-l space-y-0.5 mb-1"
                           style={{ borderColor: 'rgba(26,122,60,0.2)' }}>
-                          {link.children.map((child) => (
-                            <Link
-                              key={child.href}
-                              href={child.href}
+                          {mobileChildren.map((child) => (
+                            <Link key={child.href} href={child.href}
                               className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
-                              style={{
-                                color: pathname === child.href ? '#1a7a3c' : '#374151',
-                              }}
-                              onMouseEnter={e => (e.currentTarget.style.color = '#1a7a3c')}
-                              onMouseLeave={e => {
-                                e.currentTarget.style.color = pathname === child.href ? '#1a7a3c' : '#374151';
-                              }}
-                            >
+                              style={{ color: pathname === child.href ? '#1a7a3c' : '#374151' }}>
                               <span className="w-1 h-1 rounded-full shrink-0"
                                 style={{ background: '#1a7a3c' }} aria-hidden="true"/>
                               {child.label}
@@ -342,35 +357,43 @@ export default function Navbar() {
                   );
                 }
                 return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
+                  <Link key={link.href} href={link.href}
                     className="block px-3 py-2.5 text-sm font-semibold rounded-lg transition-colors"
-                    style={{ color: pathname === link.href ? '#1a7a3c' : '#1a1a1a' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#1a7a3c')}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.color = pathname === link.href ? '#1a7a3c' : '#1a1a1a';
-                    }}
-                  >
+                    style={{ color: pathname === link.href ? '#1a7a3c' : '#1a1a1a' }}>
                     {link.label}
                   </Link>
                 );
               })}
 
+              {/* Mobile student CTA */}
               <div className="flex gap-2 pt-3 pb-2 mt-3 border-t"
                 style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
-                <Link href="/student/login"
-                  className="flex-1 text-center text-sm font-bold py-2.5 rounded-lg transition"
-                  style={{ color: '#1a7a3c', border: '1px solid rgba(26,122,60,0.4)' }}>
-                  Student Login
-                </Link>
-                <Link href="/admissions"
-                  className="flex-1 text-center text-sm font-extrabold py-2.5 rounded-lg transition"
-                  style={{ background: '#1a7a3c', color: '#ffffff' }}>
-                  Register
-                </Link>
+                {student ? (
+                  <>
+                    <Link href="/students" className="flex-1 text-center text-sm font-bold py-2.5 rounded-lg"
+                      style={{ background: 'rgba(26,122,60,0.08)', color: '#166534', border: '1px solid rgba(26,122,60,0.3)' }}>
+                      👤 {student.name.split(' ')[0]}
+                    </Link>
+                    <button onClick={() => studentLogout()}
+                      className="flex-1 text-center text-sm font-semibold py-2.5 rounded-lg"
+                      style={{ color: '#dc2626', border: '1px solid rgba(220,38,38,0.3)' }}>
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/student/login" className="flex-1 text-center text-sm font-bold py-2.5 rounded-lg"
+                      style={{ color: '#1a7a3c', border: '1px solid rgba(26,122,60,0.4)' }}>
+                      Student Login
+                    </Link>
+                    <Link href="/student/register" className="flex-1 text-center text-sm font-extrabold py-2.5 rounded-lg"
+                      style={{ background: '#1a7a3c', color: '#ffffff' }}>
+                      Register
+                    </Link>
+                  </>
+                )}
                 <a href="https://moodle.gstu.edu.bd" target="_blank" rel="noopener noreferrer"
-                  className="flex-1 text-center text-sm font-semibold py-2.5 rounded-lg transition"
+                  className="flex-1 text-center text-sm font-semibold py-2.5 rounded-lg"
                   style={{ color: '#374151', border: '1px solid rgba(0,0,0,0.15)' }}>
                   Moodle
                 </a>
@@ -382,11 +405,7 @@ export default function Navbar() {
 
       {/* Portal dropdown */}
       {mounted && dropdown && (
-        <DropdownPortal
-          state={dropdown}
-          pathname={pathname}
-          onClose={() => setDropdown(null)}
-        />
+        <DropdownPortal state={dropdown} pathname={pathname} onClose={() => setDropdown(null)}/>
       )}
     </>
   );
