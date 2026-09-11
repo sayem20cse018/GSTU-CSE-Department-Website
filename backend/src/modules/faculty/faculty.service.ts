@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
@@ -30,16 +30,21 @@ export class FacultyService {
 
   async create(dto: CreateFacultyDto) {
     const { education, publications, awards, officeHours, ...rest } = dto as any;
-    return this.prisma.faculty.create({
-      data: {
-        ...rest,
-        ...(education    ? { education:    { create: education } }    : {}),
-        ...(publications ? { publications: { create: publications } } : {}),
-        ...(awards       ? { awards:       { create: awards } }       : {}),
-        ...(officeHours  ? { officeHours:  { create: officeHours } }  : {}),
-      },
-      include: FACULTY_INCLUDE,
-    });
+    try {
+      return await this.prisma.faculty.create({
+        data: {
+          ...rest,
+          ...(education    ? { education:    { create: education } }    : {}),
+          ...(publications ? { publications: { create: publications } } : {}),
+          ...(awards       ? { awards:       { create: awards } }       : {}),
+          ...(officeHours  ? { officeHours:  { create: officeHours } }  : {}),
+        },
+        include: FACULTY_INCLUDE,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new InternalServerErrorException(`Faculty create failed: ${msg}`);
+    }
   }
 
   async update(id: string, dto: UpdateFacultyDto) {
