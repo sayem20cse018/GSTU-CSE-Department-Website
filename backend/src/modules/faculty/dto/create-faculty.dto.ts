@@ -20,12 +20,17 @@ class EducationDto {
 
 export class CreateFacultyDto {
   @ApiProperty() @IsString() @MinLength(2) name: string;
-  @ApiProperty() @IsString() title: string;
+
+  @ApiPropertyOptional()
+  @IsOptional() @IsString()
+  title?: string;   // e.g. "Dr.", "Prof." — optional
 
   @ApiProperty({
-    enum: ['Professor', 'Associate Professor', 'Assistant Professor', 'Lecturer', 'Adjunct Faculty'],
+    enum: ['Professor', 'Associate Professor', 'Assistant Professor',
+           'Lecturer', 'Senior Lecturer', 'Adjunct Faculty', 'Visiting Professor'],
   })
-  @IsEnum(['Professor', 'Associate Professor', 'Assistant Professor', 'Lecturer', 'Adjunct Faculty'])
+  @IsEnum(['Professor', 'Associate Professor', 'Assistant Professor',
+           'Lecturer', 'Senior Lecturer', 'Adjunct Faculty', 'Visiting Professor'])
   designation: string;
 
   @ApiProperty() @IsEmail() email: string;

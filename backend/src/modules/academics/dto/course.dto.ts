@@ -11,7 +11,7 @@ export class CreateCourseDto {
   code: string;
 
   @ApiProperty({ example: 'Data Structures & Algorithms' })
-  @IsString() @MinLength(3)
+  @IsString() @MinLength(2)
   title: string;
 
   @ApiProperty({ example: 3 })
@@ -26,8 +26,8 @@ export class CreateCourseDto {
   @IsEnum(['BSc', 'MSc', 'PhD'])
   degree: string;
 
-  @ApiProperty({ enum: ['core', 'elective', 'lab', 'sessional'] })
-  @IsEnum(['core', 'elective', 'lab', 'sessional'])
+  @ApiProperty({ enum: ['core', 'elective', 'lab', 'sessional', 'theory', 'practical', 'project'] })
+  @IsEnum(['core', 'elective', 'lab', 'sessional', 'theory', 'practical', 'project'])
   type: string;
 
   @ApiPropertyOptional() @IsOptional() @IsString() description?: string;
