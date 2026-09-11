@@ -8,7 +8,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreateLaboratoryDto {
   @ApiProperty() @IsString() @MinLength(3) name: string;
   @ApiProperty() @IsString() slug: string;
-  @ApiProperty() @IsString() @MinLength(20) description: string;
+  @ApiProperty() @IsString() @MinLength(2) description: string;
   @ApiPropertyOptional() @IsOptional() @IsString() shortDescription?: string;
   @ApiProperty() @IsString() location: string;
 

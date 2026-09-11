@@ -14,7 +14,7 @@ export class CreateProgramDto {
 
   @ApiProperty({ example: '4 Years' }) @IsString() duration: string;
   @ApiProperty({ example: 160 }) @IsNumber() @Min(0) totalCredits: number;
-  @ApiProperty() @IsString() @MinLength(20) description: string;
+  @ApiProperty() @IsString() @MinLength(2) description: string;
   @ApiProperty() @IsString() objectives: string;
   @ApiProperty() @IsString() eligibility: string;
 
