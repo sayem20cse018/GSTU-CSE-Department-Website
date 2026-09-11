@@ -1,10 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { instanceToPlain } from 'class-transformer';
 import { PrismaService } from '../../database/prisma.service';
 
 import type { CreateProgramDto, UpdateProgramDto }                   from './dto/program.dto';
 import type { CreateCourseDto, UpdateCourseDto }                     from './dto/course.dto';
 import type { CreateAcademicResourceDto, UpdateAcademicResourceDto } from './dto/academic-resource.dto';
 import type { CreateLaboratoryDto, UpdateLaboratoryDto }             from './dto/laboratory.dto';
+
+// Prisma data helper — extracts nested relation fields and builds the data object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function plain(dto: unknown): Record<string, any> {
+  return instanceToPlain(dto as object);
+}
 
 @Injectable()
 export class AcademicsService {
@@ -38,13 +45,14 @@ export class AcademicsService {
   }
 
   async createProgram(dto: CreateProgramDto) {
-    const { admissionRequirements, careerOpportunities, ...rest } = dto as any;
+    const { admissionRequirements, careerOpportunities, ...rest } = plain(dto);
     return this.prisma.program.create({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         ...rest,
         ...(admissionRequirements ? { admissionRequirements: { create: admissionRequirements } } : {}),
         ...(careerOpportunities   ? { careerOpportunities:   { create: careerOpportunities } }   : {}),
-      },
+      } as any,
       include: { admissionRequirements: true, careerOpportunities: true },
     });
   }
@@ -52,14 +60,15 @@ export class AcademicsService {
   async updateProgram(id: string, dto: UpdateProgramDto) {
     const p = await this.prisma.program.findUnique({ where: { id } });
     if (!p) throw new NotFoundException(`Program ${id} not found`);
-    const { admissionRequirements, careerOpportunities, ...rest } = dto as any;
+    const { admissionRequirements, careerOpportunities, ...rest } = plain(dto);
     return this.prisma.program.update({
       where: { id },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         ...rest,
         ...(admissionRequirements ? { admissionRequirements: { deleteMany: {}, create: admissionRequirements } } : {}),
         ...(careerOpportunities   ? { careerOpportunities:   { deleteMany: {}, create: careerOpportunities } }   : {}),
-      },
+      } as any,
       include: { admissionRequirements: true, careerOpportunities: true },
     });
   }
@@ -74,9 +83,9 @@ export class AcademicsService {
   findAllCourses(degree?: string, semester?: number, isAdmin = false) {
     return this.prisma.course.findMany({
       where: {
-        ...(isAdmin ? {} : { isActive: true }),
-        ...(degree   ? { degree }   : {}),
-        ...(semester ? { semester } : {}),
+        ...(isAdmin   ? {} : { isActive: true }),
+        ...(degree    ? { degree }   : {}),
+        ...(semester  ? { semester } : {}),
       },
       orderBy: [{ semester: 'asc' }, { sortOrder: 'asc' }, { code: 'asc' }],
       include: { schedule: true },
@@ -96,12 +105,10 @@ export class AcademicsService {
   }
 
   async createCourse(dto: CreateCourseDto) {
-    const { schedule, ...rest } = dto as any;
+    const { schedule, ...rest } = plain(dto);
     return this.prisma.course.create({
-      data: {
-        ...rest,
-        ...(schedule ? { schedule: { create: schedule } } : {}),
-      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: { ...rest, ...(schedule ? { schedule: { create: schedule } } : {}) } as any,
       include: { schedule: true },
     });
   }
@@ -109,13 +116,11 @@ export class AcademicsService {
   async updateCourse(id: string, dto: UpdateCourseDto) {
     const c = await this.prisma.course.findUnique({ where: { id } });
     if (!c) throw new NotFoundException(`Course ${id} not found`);
-    const { schedule, ...rest } = dto as any;
+    const { schedule, ...rest } = plain(dto);
     return this.prisma.course.update({
       where: { id },
-      data: {
-        ...rest,
-        ...(schedule ? { schedule: { deleteMany: {}, create: schedule } } : {}),
-      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: { ...rest, ...(schedule ? { schedule: { deleteMany: {}, create: schedule } } : {}) } as any,
       include: { schedule: true },
     });
   }
@@ -145,8 +150,8 @@ export class AcademicsService {
     return this.prisma.academicResource.findMany({
       where: {
         ...(isAdmin ? {} : { isPublished: true }),
-        ...(type   ? { type }                                              : {}),
-        ...(degree ? { targetDegree: { in: [degree, 'all'] } }            : {}),
+        ...(type   ? { type }                                   : {}),
+        ...(degree ? { targetDegree: { in: [degree, 'all'] } } : {}),
       },
       orderBy: [{ isPinned: 'desc' }, { sortOrder: 'asc' }, { createdAt: 'desc' }],
       include: { files: true },
@@ -160,12 +165,10 @@ export class AcademicsService {
   }
 
   async createResource(dto: CreateAcademicResourceDto) {
-    const { files, ...rest } = dto as any;
+    const { files, ...rest } = plain(dto);
     return this.prisma.academicResource.create({
-      data: {
-        ...rest,
-        ...(files ? { files: { create: files } } : {}),
-      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: { ...rest, ...(files ? { files: { create: files } } : {}) } as any,
       include: { files: true },
     });
   }
@@ -173,13 +176,11 @@ export class AcademicsService {
   async updateResource(id: string, dto: UpdateAcademicResourceDto) {
     const r = await this.prisma.academicResource.findUnique({ where: { id } });
     if (!r) throw new NotFoundException(`Resource ${id} not found`);
-    const { files, ...rest } = dto as any;
+    const { files, ...rest } = plain(dto);
     return this.prisma.academicResource.update({
       where: { id },
-      data: {
-        ...rest,
-        ...(files ? { files: { deleteMany: {}, create: files } } : {}),
-      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: { ...rest, ...(files ? { files: { deleteMany: {}, create: files } } : {}) } as any,
       include: { files: true },
     });
   }
@@ -218,14 +219,15 @@ export class AcademicsService {
   }
 
   async createLab(dto: CreateLaboratoryDto) {
-    const { equipment, images, schedule, ...rest } = dto as any;
+    const { equipment, images, schedule, ...rest } = plain(dto);
     return this.prisma.laboratory.create({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         ...rest,
         ...(equipment ? { equipment: { create: equipment } } : {}),
         ...(images    ? { images:    { create: images } }    : {}),
         ...(schedule  ? { schedule:  { create: schedule } }  : {}),
-      },
+      } as any,
       include: { equipment: true, images: true, schedule: true },
     });
   }
@@ -233,15 +235,16 @@ export class AcademicsService {
   async updateLab(id: string, dto: UpdateLaboratoryDto) {
     const lab = await this.prisma.laboratory.findUnique({ where: { id } });
     if (!lab) throw new NotFoundException(`Lab ${id} not found`);
-    const { equipment, images, schedule, ...rest } = dto as any;
+    const { equipment, images, schedule, ...rest } = plain(dto);
     return this.prisma.laboratory.update({
       where: { id },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         ...rest,
         ...(equipment ? { equipment: { deleteMany: {}, create: equipment } } : {}),
         ...(images    ? { images:    { deleteMany: {}, create: images } }    : {}),
         ...(schedule  ? { schedule:  { deleteMany: {}, create: schedule } }  : {}),
-      },
+      } as any,
       include: { equipment: true, images: true, schedule: true },
     });
   }

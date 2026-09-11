@@ -1,13 +1,14 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { instanceToPlain } from 'class-transformer';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
 
 const FACULTY_INCLUDE = {
-  education:   true,
+  education:    true,
   publications: true,
-  awards:      true,
-  officeHours: true,
+  awards:       true,
+  officeHours:  true,
 } as const;
 
 @Injectable()
@@ -23,34 +24,31 @@ export class FacultyService {
   }
 
   async findOne(id: string) {
-    const faculty = await this.prisma.faculty.findUnique({ where: { id }, include: FACULTY_INCLUDE });
-    if (!faculty) throw new NotFoundException(`Faculty #${id} not found`);
-    return faculty;
+    const f = await this.prisma.faculty.findUnique({ where: { id }, include: FACULTY_INCLUDE });
+    if (!f) throw new NotFoundException(`Faculty #${id} not found`);
+    return f;
   }
 
   async create(dto: CreateFacultyDto) {
-    const { education, publications, awards, officeHours, ...rest } = dto as any;
-    try {
-      return await this.prisma.faculty.create({
-        data: {
-          ...rest,
-          ...(education    ? { education:    { create: education } }    : {}),
-          ...(publications ? { publications: { create: publications } } : {}),
-          ...(awards       ? { awards:       { create: awards } }       : {}),
-          ...(officeHours  ? { officeHours:  { create: officeHours } }  : {}),
-        },
-        include: FACULTY_INCLUDE,
-      });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      throw new InternalServerErrorException(`Faculty create failed: ${msg}`);
-    }
+    const { education, publications, awards, officeHours, ...rest } = instanceToPlain(dto);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.prisma.faculty.create({
+      data: {
+        ...rest,
+        ...(education    ? { education:    { create: education } }    : {}),
+        ...(publications ? { publications: { create: publications } } : {}),
+        ...(awards       ? { awards:       { create: awards } }       : {}),
+        ...(officeHours  ? { officeHours:  { create: officeHours } }  : {}),
+      } as any,
+      include: FACULTY_INCLUDE,
+    });
   }
 
   async update(id: string, dto: UpdateFacultyDto) {
-    const faculty = await this.prisma.faculty.findUnique({ where: { id } });
-    if (!faculty) throw new NotFoundException(`Faculty #${id} not found`);
-    const { education, publications, awards, officeHours, ...rest } = dto as any;
+    const f = await this.prisma.faculty.findUnique({ where: { id } });
+    if (!f) throw new NotFoundException(`Faculty #${id} not found`);
+    const { education, publications, awards, officeHours, ...rest } = instanceToPlain(dto);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.update({
       where: { id },
       data: {
@@ -59,14 +57,14 @@ export class FacultyService {
         ...(publications ? { publications: { deleteMany: {}, create: publications } } : {}),
         ...(awards       ? { awards:       { deleteMany: {}, create: awards } }       : {}),
         ...(officeHours  ? { officeHours:  { deleteMany: {}, create: officeHours } }  : {}),
-      },
+      } as any,
       include: FACULTY_INCLUDE,
     });
   }
 
   async remove(id: string) {
-    const faculty = await this.prisma.faculty.findUnique({ where: { id } });
-    if (!faculty) throw new NotFoundException(`Faculty #${id} not found`);
+    const f = await this.prisma.faculty.findUnique({ where: { id } });
+    if (!f) throw new NotFoundException(`Faculty #${id} not found`);
     return this.prisma.faculty.delete({ where: { id } });
   }
 }
