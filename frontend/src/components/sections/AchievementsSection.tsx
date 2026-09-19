@@ -11,16 +11,24 @@ const TYPE_LABEL: Record<string, string> = {
   student: 'Student', faculty: 'Faculty', other: 'Achievement',
 };
 
+const MOCK_ACHIEVEMENTS: Achievement[] = [
+  { id:'1', title:'CSE Team Wins National Programming Contest 2026', description:'Our undergraduate team secured 1st place at the ICPC Regional Contest, Dhaka Site.', type:'competition', achievedAt: new Date(Date.now()-5*86400000).toISOString(), createdAt: new Date().toISOString(), achieverName:'Team CodeStorm', isFeatured:true },
+  { id:'2', title:'Best Research Paper Award — IEEE Conference 2026', description:'Dr. Rahman received the Best Paper Award for research on Federated Learning.', type:'research', achievedAt: new Date(Date.now()-15*86400000).toISOString(), createdAt: new Date().toISOString(), achieverName:'Dr. Mohammad Rahman', isFeatured:false },
+  { id:'3', title:'Google Developer Scholarship — 3 Students', description:'Three CSE students selected for prestigious Google Developer scholarship.', type:'student', achievedAt: new Date(Date.now()-30*86400000).toISOString(), createdAt: new Date().toISOString(), achieverName:'Batch 2021', isFeatured:false },
+  { id:'4', title:'Department ranked Top 5 — National Academic Survey', description:'GSTU CSE Department ranked among top 5 in the national academic survey.', type:'department', achievedAt: new Date(Date.now()-45*86400000).toISOString(), createdAt: new Date().toISOString(), isFeatured:false },
+];
+
 async function fetchAchievements(): Promise<Achievement[]> {
   try {
     const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    const r = await fetch(`${api}/achievements?isPublished=true&limit=5`, {
+    const r = await fetch(`${api}/achievements?limit=5`, {
       next: { revalidate: 1800 },
     });
-    if (!r.ok) return [];
+    if (!r.ok) return MOCK_ACHIEVEMENTS;
     const d = await r.json() as { data?: Achievement[] };
-    return Array.isArray(d.data) ? d.data.slice(0, 5) : [];
-  } catch { return []; }
+    const arr = Array.isArray(d.data) ? d.data.slice(0, 5) : [];
+    return arr.length ? arr : MOCK_ACHIEVEMENTS;
+  } catch { return MOCK_ACHIEVEMENTS; }
 }
 
 function SplitDate({ dateStr }: { dateStr: string }) {

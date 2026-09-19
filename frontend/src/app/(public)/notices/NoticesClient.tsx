@@ -5,6 +5,7 @@ import Link from 'next/link';
 interface Attachment { fileUrl: string; fileName: string; fileType?: string }
 interface Notice {
   id: string; title: string; category: string; description?: string;
+  coverImage?: string;
   isPublished: boolean; isPinned: boolean; isUrgent: boolean;
   publishedAt?: string; createdAt: string; postedByName?: string;
   attachments?: Attachment[];
@@ -138,64 +139,81 @@ export default function NoticesClient({ initialNotices }: { initialNotices: unkn
 }
 
 function NoticeRow({ notice: n }: { notice: Notice }) {
-  const date     = n.publishedAt ?? n.createdAt;
-  const hasFile  = (n.attachments?.length ?? 0) > 0;
+  const date      = n.publishedAt ?? n.createdAt;
+  const hasFile   = (n.attachments?.length ?? 0) > 0;
   const firstFile = n.attachments?.[0];
 
   return (
-    <div className="px-5 py-4 hover:bg-slate-50 transition-colors" style={{ background: '#fff' }}>
-      <div className="flex items-start justify-between gap-4">
-        {/* Left — date + title */}
-        <div className="flex-1 min-w-0">
-          {/* Date row */}
-          <div className="flex items-center gap-2 mb-1.5">
-            <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            <span className="text-sm font-semibold text-slate-500">{fmtDate(date)}</span>
-
-            {/* Badges */}
-            {n.isUrgent && (
-              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-red-500 text-white ml-1">URGENT</span>
+    <div className="hover:bg-slate-50 transition-colors" style={{ background: '#fff' }}>
+      <div className="flex items-start gap-0">
+        {/* Cover image thumbnail — if exists */}
+        {n.coverImage && (
+          <div className="w-20 shrink-0 self-stretch overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={n.coverImage} alt="" className="w-full h-full object-cover"/>
+          </div>
+        )}
+        <div className="flex items-start justify-between gap-4 flex-1 px-5 py-4">
+          {/* Left — date + title */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span className="text-sm font-semibold text-slate-500">{fmtDate(date)}</span>
+              {n.isUrgent && (
+                <span className="text-[10px] font-black px-2 py-0.5 rounded bg-red-500 text-white ml-1">URGENT</span>
+              )}
+              {n.isPinned && !n.isUrgent && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-600 text-white ml-1">PINNED</span>
+              )}
+            </div>
+            <p className="text-base font-semibold leading-snug" style={{ color: '#1565c0' }}>
+              {n.title}
+            </p>
+            {n.description && (
+              <p className="text-sm text-slate-500 mt-1 line-clamp-2">{n.description}</p>
             )}
-            {n.isPinned && !n.isUrgent && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-600 text-white ml-1">PINNED</span>
+            {n.category && n.category !== 'general' && (
+              <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-wide">
+                {CAT_META[n.category]?.label ?? n.category}
+              </span>
             )}
           </div>
 
-          {/* Title */}
-          <p className="text-base font-semibold text-slate-800 leading-snug" style={{ color: '#1565c0' }}>
-            {n.title}
-          </p>
-
-          {/* Description if any */}
-          {n.description && (
-            <p className="text-sm text-slate-500 mt-1 line-clamp-2">{n.description}</p>
-          )}
-
-          {/* Category tag */}
-          {n.category && n.category !== 'general' && (
-            <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-wide">
-              {CAT_META[n.category]?.label ?? n.category}
-            </span>
-          )}
+          {/* Right — VIEW + DOWNLOAD buttons */}
+          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 shrink-0">
+            {/* VIEW button — always shown */}
+            <a
+              href={hasFile && firstFile ? firstFile.fileUrl : '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded text-sm font-bold transition hover:opacity-90"
+              style={{ background: '#1565c0', color: '#fff', minWidth: '80px', justifyContent: 'center' }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              VIEW
+            </a>
+            {/* DOWNLOAD button — only when file exists */}
+            {hasFile && firstFile && (
+              <a
+                href={`/api/download?url=${encodeURIComponent(firstFile.fileUrl)}&name=${encodeURIComponent(firstFile.fileName ?? 'notice')}`}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded text-sm font-bold transition hover:opacity-90"
+                style={{ background: '#00bcd4', color: '#fff', minWidth: '110px', justifyContent: 'center' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                DOWNLOAD
+              </a>
+            )}
+          </div>
         </div>
-
-        {/* Right — Download button (via proxy to force Save As dialog) */}
-        {hasFile && firstFile && (
-          <a
-            href={`/api/download?url=${encodeURIComponent(firstFile.fileUrl)}&name=${encodeURIComponent(firstFile.fileName ?? 'notice')}`}
-            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
-            style={{ background: '#00bcd4', minWidth: '120px', justifyContent: 'center' }}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-            </svg>
-            DOWNLOAD
-          </a>
-        )}
       </div>
     </div>
   );

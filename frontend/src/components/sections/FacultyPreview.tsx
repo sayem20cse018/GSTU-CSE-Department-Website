@@ -7,11 +7,12 @@ interface FacultyMember {
 
 async function fetchFaculty(): Promise<FacultyMember[]> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
     const res = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
     if (!res.ok) return MOCK;
-    const json = await res.json() as { data: FacultyMember[] };
-    return json.data?.length ? json.data.slice(0, 6) : MOCK;
+    const json = await res.json() as { data?: FacultyMember[] };
+    const arr = Array.isArray(json.data) ? json.data.slice(0, 5) : [];
+    return arr.length ? arr : MOCK;
   } catch { return MOCK; }
 }
 
@@ -60,19 +61,11 @@ export default async function FacultyPreview() {
             Faculty Members
           </h2>
           <div className="flex-1 h-[2px]" style={{ background: '#1a7a3c' }} aria-hidden="true" />
-          <Link href="/faculty"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-xl border transition hover:shadow-sm shrink-0"
-            style={{ color:'#166534', borderColor:'rgba(22,101,52,0.3)' }}>
-            All Faculty
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-          </Link>
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {faculty.map((member, i) => {
+        {/* Cards — max 4 preview cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {faculty.slice(0, 4).map((member, i) => {
             const desig = DESIG_STYLE[member.designation] ?? DESIG_STYLE.Lecturer;
             return (
               <article key={member.id}
@@ -140,6 +133,21 @@ export default async function FacultyPreview() {
               </article>
             );
           })}
+        </div>
+
+        {/* View All Faculty — centered below cards */}
+        <div className="mt-10 flex justify-center">
+          <Link href="/faculty"
+            className="inline-flex items-center gap-2.5 px-8 py-3 rounded-xl text-sm font-bold text-white transition hover:opacity-90 shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #166534, #15803d)' }}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            View All Faculty Members
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </Link>
         </div>
 
       </div>

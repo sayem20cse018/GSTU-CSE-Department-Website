@@ -87,7 +87,7 @@ export default async function UpcomingEventsSection() {
     <section className="py-10 bg-slate-50">
       <div className="container-custom">
 
-        {/* ── Section header ── */}
+        {/* ── Section header — ONE "All Events" link only ── */}
         <div className="flex items-center gap-4 mb-8">
           <h2
             className="text-2xl font-bold uppercase tracking-wide whitespace-nowrap"
@@ -95,15 +95,6 @@ export default async function UpcomingEventsSection() {
             Upcoming Events
           </h2>
           <div className="flex-1 h-[2px]" style={{ background: '#1a7a3c' }} aria-hidden="true" />
-          <Link
-            href="/events"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-xl border shrink-0 transition hover:shadow-sm"
-            style={{ color: '#166534', borderColor: 'rgba(22,101,52,0.3)', fontFamily: 'var(--font-inter)' }}>
-            All Events
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-          </Link>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

@@ -37,12 +37,11 @@ const MOCK: Faculty[] = [
 
 async function fetchFaculty(): Promise<Faculty[]> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    const r = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const r = await fetch(`${api}/faculty`, { cache: 'no-store' });
     if (!r.ok) return MOCK;
-    const d = await r.json() as { data: Faculty[] };
-    // Show only faculty and chairman type, filter out staff/officer
-    const all = d.data ?? [];
+    const d = await r.json() as { data?: Faculty[] };
+    const all = Array.isArray(d.data) ? d.data : [];
     const filtered = all.filter(f => !f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman');
     return filtered.length ? filtered : MOCK;
   } catch { return MOCK; }
