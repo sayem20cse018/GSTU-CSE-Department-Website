@@ -16,6 +16,7 @@ export class AttachmentDto {
 export class CreateNoticeDto {
   @IsString() @MaxLength(300)                          title: string;
   @IsOptional() @IsString()                            description?: string;
+  @IsOptional() @IsString()                            coverImage?: string;
   @IsOptional() @IsString()                            category?: string;
   @IsOptional() @IsArray() @IsString({ each: true })   targetAudience?: string[];
   @IsOptional() @IsBoolean()                           isPublished?: boolean;

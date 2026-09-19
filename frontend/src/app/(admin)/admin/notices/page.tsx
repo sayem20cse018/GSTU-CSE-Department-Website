@@ -7,6 +7,7 @@ import Badge       from '@/components/admin/ui/Badge';
 import EmptyState  from '@/components/admin/ui/EmptyState';
 import SearchInput from '@/components/admin/ui/SearchInput';
 import Pagination  from '@/components/admin/ui/Pagination';
+import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { useToast }   from '@/components/admin/ui/Toast';
 import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import { Select }  from '@/components/admin/ui/FormFields';
@@ -25,13 +26,13 @@ interface Notice {
   description?: string; postedByName?: string; attachments?: Attachment[];
 }
 interface FormState {
-  title: string; description: string; category: string; postedByName: string;
+  title: string; description: string; coverImage: string; category: string; postedByName: string;
   isPublished: boolean; isPinned: boolean; isUrgent: boolean;
   attachments: Attachment[];
 }
 
 const EMPTY: FormState = {
-  title:'', description:'', category:'general', postedByName:'Admin',
+  title:'', description:'', coverImage:'', category:'general', postedByName:'Admin',
   isPublished:false, isPinned:false, isUrgent:false, attachments:[],
 };
 
@@ -112,6 +113,7 @@ export default function NoticesPage() {
     setEditing(n);
     setForm({
       title: n.title, description: n.description ?? '',
+      coverImage: (n as unknown as { coverImage?: string }).coverImage ?? '',
       category: n.category, postedByName: n.postedByName ?? 'Admin',
       isPublished: n.isPublished, isPinned: n.isPinned, isUrgent: n.isUrgent,
       attachments: n.attachments ?? [],
@@ -235,6 +237,13 @@ export default function NoticesPage() {
                   onChange={e=>F('description',e.target.value)}
                   className={`${iCls} resize-none`}/>
               </div>
+
+              {/* Cover image */}
+              <ImageUpload
+                label="Cover Image (optional — shown as featured card background)"
+                value={form.coverImage}
+                onChange={v => F('coverImage', v === '__CLEAR__' ? '' : v)}
+              />
 
               {/* Category + Posted By */}
               <div className="grid grid-cols-2 gap-3">

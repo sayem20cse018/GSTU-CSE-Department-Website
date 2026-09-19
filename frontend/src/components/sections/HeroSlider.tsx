@@ -49,6 +49,9 @@ function SlideBackground({ slide, active }: { slide: Slide; active: boolean }) {
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
           aria-hidden="true"
+          loading={active ? 'eager' : 'lazy'}
+          // @ts-expect-error fetchpriority is valid HTML but not yet in React types
+          fetchpriority={active ? 'high' : 'low'}
         />
       ) : (
         /* Gradient fallback */
@@ -185,7 +188,7 @@ export default function HeroSlider({ initialSlides = [] }: { initialSlides?: Api
 
   return (
     <section
-      className="relative overflow-hidden bg-[#0d1b2e] z-0"
+      className={cn('relative overflow-hidden z-0', slides.length === 0 ? 'bg-white' : 'bg-[#0d1b2e]')}
       style={{ height: '100vh', minHeight: '580px', maxHeight: '960px' }}
       aria-label="Hero slider"
       aria-roledescription="carousel"
@@ -197,7 +200,8 @@ export default function HeroSlider({ initialSlides = [] }: { initialSlides?: Api
         <SlideBackground key={slide.id} slide={slide} active={i === current} />
       ))}
 
-      {/* ── Grid pattern overlay ── */}
+      {/* ── Grid pattern overlay — only shown when slides have loaded ── */}
+      {slides.length > 0 && (
       <div
         className="absolute inset-0 z-[1] opacity-[0.03] pointer-events-none"
         aria-hidden="true"
@@ -206,6 +210,7 @@ export default function HeroSlider({ initialSlides = [] }: { initialSlides?: Api
           backgroundSize: '60px 60px',
         }}
       />
+      )}
 
       {/* ── Slide content ── */}
       <div className="relative z-[2] h-full container-custom flex flex-col justify-center">

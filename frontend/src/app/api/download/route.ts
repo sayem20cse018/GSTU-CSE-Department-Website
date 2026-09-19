@@ -15,17 +15,14 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Missing url parameter', { status: 400 });
   }
 
-  // Only allow known domains to prevent SSRF
+  // Validate URL is parseable
   let parsed: URL;
   try { parsed = new URL(fileUrl); }
   catch { return new NextResponse('Invalid URL', { status: 400 }); }
 
-  const ALLOWED = ['res.cloudinary.com', 'cloudinary.com', 'drive.google.com',
-    'www.w3.org', 'gstu.edu.bd'];
-  const isAllowed = ALLOWED.some(d => parsed.hostname.endsWith(d));
-  if (!isAllowed) {
-    // Still proxy — just stream it through; Cloudinary always allowed
-    // (remove this check if you want to allow any URL)
+  // Only allow http/https
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    return new NextResponse('Only HTTP/HTTPS URLs allowed', { status: 400 });
   }
 
   try {

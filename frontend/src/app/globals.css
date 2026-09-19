@@ -1,24 +1,33 @@
 @import "tailwindcss";
 
-/* ─── Noto Sans Bengali — auto-applied to ALL Bengali text ──────────────────── */
-/* Apply Noto Sans Bengali for all elements globally — fallback chain ensures
-   Latin text uses Inter while Bengali script uses Noto Sans Bengali */
-* {
-  font-family: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui,
-               -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-               'Helvetica Neue', Arial, 'Noto Sans Bengali', sans-serif;
+/* ─── Noto Sans Bengali — professional rendering ────────────────────────────── */
+/* Font-face with unicode-range = browser only downloads Bengali font for Bengali chars */
+@font-face {
+  font-family: 'Noto Sans Bengali Local';
+  src: local('Noto Sans Bengali'), local('NotoSansBengali');
+  unicode-range: U+0980-09FF, U+200C-200D, U+25CC;
+  font-display: swap;
 }
 
-/* Bengali-specific override — higher specificity for Bengali script elements */
+/* Base font stack — Inter for Latin, Noto Sans Bengali for Bengali */
+* {
+  font-family: var(--font-inter), var(--font-bengali), 'Noto Sans Bengali Local',
+               ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Bengali elements — higher specificity, professional rendering */
 :lang(bn), [lang="bn"],
 :is(p, span, h1, h2, h3, h4, h5, h6, a, li, td, th, div, label, button,
-    input, textarea, select):not([class*="font-mono"]) {
-  font-family: var(--font-bengali), var(--font-inter), 'Noto Sans Bengali',
+    input, textarea, select):not([class*="font-mono"]):not([class*="font-oswald"]):not([class*="font-montserrat"]) {
+  font-family: var(--font-bengali), 'Noto Sans Bengali Local', var(--font-inter),
                ui-sans-serif, system-ui, sans-serif;
-  /* Improved Bengali text rendering */
   text-rendering: optimizeLegibility;
-  -webkit-font-feature-settings: 'liga' 1, 'calt' 1;
-  font-feature-settings: 'liga' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'liga' 1, 'calt' 1, 'kern' 1;
+  font-optical-sizing: auto;
+  line-height: 1.8;      /* Bengali text needs more line height */
+  letter-spacing: 0.01em;
 }
 
 /* ─── CSS custom properties ─────────────────────────────────────────────────── */

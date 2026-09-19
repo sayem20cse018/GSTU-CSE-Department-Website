@@ -180,6 +180,7 @@ model Notice {
   id             String             @id @default(cuid())
   title          String
   description    String?
+  coverImage     String?            // Optional cover image for featured display
   category       String             @default("general")
   tags           String[]           @default([])
   targetAudience String[]           @default(["all"])

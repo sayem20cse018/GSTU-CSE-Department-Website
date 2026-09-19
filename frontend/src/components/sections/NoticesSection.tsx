@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils/cn';
 
 interface Notice {
   id: string; title: string; category: string; publishedAt: string; createdAt: string;
-  isUrgent?: boolean; isPinned?: boolean;
+  isUrgent?: boolean; isPinned?: boolean; coverImage?: string;
   attachments?: { fileUrl: string; fileName: string }[];
 }
 
@@ -79,12 +79,26 @@ export default async function NoticesSection() {
           {/* LEFT — Featured notice */}
           {featured ? (
             <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: '280px' }}>
-              <div className="absolute inset-0"
-                style={{ background: 'linear-gradient(155deg, #0b3d1f 0%, #0d4a26 50%, #0a3018 100%)' }}>
-                <div className="absolute inset-0 opacity-[0.06]"
-                  style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '22px 22px' }}
-                  aria-hidden="true" />
-              </div>
+              {/* Background: cover image OR dark gradient */}
+              {featured.coverImage ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={featured.coverImage} alt=""
+                    className="absolute inset-0 w-full h-full object-cover" aria-hidden="true"/>
+                  <div className="absolute inset-0"
+                    style={{ background: 'linear-gradient(to top, rgba(5,46,22,0.92) 0%, rgba(5,46,22,0.4) 60%, transparent 100%)' }}
+                    aria-hidden="true"/>
+                </>
+              ) : (
+                <>
+                  <div className="absolute inset-0"
+                    style={{ background: 'linear-gradient(155deg, #0b3d1f 0%, #0d4a26 50%, #0a3018 100%)' }}>
+                    <div className="absolute inset-0 opacity-[0.06]"
+                      style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '22px 22px' }}
+                      aria-hidden="true" />
+                  </div>
+                </>
+              )}
               <div className="relative p-5 flex flex-col justify-between h-full" style={{ minHeight: '280px' }}>
                 <div className="flex flex-wrap gap-2 mb-3 mt-2">
                   {featured.isUrgent && (

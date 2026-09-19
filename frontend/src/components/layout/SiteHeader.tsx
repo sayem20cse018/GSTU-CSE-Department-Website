@@ -143,14 +143,16 @@ export default async function SiteHeader() {
       {/* ═══════════════════════ TABLET (md–lg) ═══════════════════════ */}
       <header className="hidden md:flex lg:hidden overflow-hidden" style={{ height: '68px', background: '#fff', borderBottom: '3px solid #1a7a3c' }}>
         <Link href="/" className="flex items-center gap-3 px-4 shrink-0">
-          <div className="w-11 h-11 rounded-full border-[2px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
+          <div className="w-11 h-11 flex-shrink-0 flex items-center justify-center">
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={s.deptLogo} alt="" className="w-full h-full object-contain"/>
-              : <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
-                  <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
-                  <text x="40" y="44" textAnchor="middle" dominantBaseline="middle" fontSize="12" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
-                </svg>
+              : <div className="w-full h-full rounded-full border-[2px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
+                  <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
+                    <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
+                    <text x="40" y="44" textAnchor="middle" dominantBaseline="middle" fontSize="12" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
+                  </svg>
+                </div>
             }
           </div>
           <div>
@@ -174,15 +176,17 @@ export default async function SiteHeader() {
       <header className="flex md:hidden items-center justify-between px-4 bg-white" style={{ height: '64px', borderBottom: '3px solid #1a7a3c' }}>
         <Link href="/" className="flex items-center gap-3">
           {/* Bigger logo on mobile */}
-          <div className="w-12 h-12 rounded-full border-[2.5px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
+          <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center">
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={s.deptLogo} alt={s.deptShortName} className="w-full h-full object-contain"/>
-              : <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
-                  <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
-                  <text x="40" y="40" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
-                  <text x="40" y="57" textAnchor="middle" dominantBaseline="middle" fontSize="5" fill="white" opacity="0.8" style={{fontFamily:'Arial,sans-serif',letterSpacing:'1px'}}>GSTU</text>
-                </svg>
+              : <div className="w-full h-full rounded-full border-[2.5px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
+                  <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
+                    <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
+                    <text x="40" y="40" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
+                    <text x="40" y="57" textAnchor="middle" dominantBaseline="middle" fontSize="5" fill="white" opacity="0.8" style={{fontFamily:'Arial,sans-serif',letterSpacing:'1px'}}>GSTU</text>
+                  </svg>
+                </div>
             }
           </div>
           {/* Dept name only — clean, no duplicate label */}
