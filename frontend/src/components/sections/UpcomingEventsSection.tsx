@@ -18,18 +18,18 @@ interface Event {
 
 async function fetchEvents(): Promise<Event[]> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
     const res = await fetch(
       `${api}/events?status=upcoming&limit=6&isPublished=true`,
       { next: { revalidate: 600 } },
     );
-    if (!res.ok) return MOCK;
+    if (!res.ok) return [];
     const json = await res.json() as { data: Event[] | { data: Event[] } };
     const arr = Array.isArray(json.data)
       ? json.data
       : (json.data as { data: Event[] }).data;
-    return arr?.length ? arr : MOCK;
-  } catch { return MOCK; }
+    return arr?.length ? arr : [];
+  } catch { return []; }
 }
 
 const MOCK: Event[] = [
@@ -83,7 +83,6 @@ export default async function UpcomingEventsSection() {
   if (!events.length) return null;
 
   const [featured, ...rest] = events;
-
   return (
     <section className="py-10 bg-slate-50">
       <div className="container-custom">

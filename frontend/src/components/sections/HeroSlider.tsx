@@ -2,27 +2,29 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { type Slide as StaticSlide } from '@/config/slides';
 import { cn } from '@/lib/utils/cn';
 
 const AUTOPLAY_MS = 5500;
 
-interface ApiSlide {
+export interface ApiSlide {
   id: string; title: string; subtitle: string; tag: string; imageUrl: string;
   overlayOpacity: number; primaryBtnLabel: string; primaryBtnHref: string;
   secondaryBtnLabel: string; secondaryBtnHref: string;
   align: 'left' | 'center'; isActive: boolean; sortOrder: number;
 }
 
-type Slide = StaticSlide;
+interface Slide {
+  id: string; title: string; subtitle: string; tag?: string; imageUrl: string;
+  overlayOpacity: number;
+  primaryBtn?: { label: string; href: string };
+  secondaryBtn?: { label: string; href: string };
+  align: 'left' | 'center';
+}
 
 function apiToSlide(s: ApiSlide): Slide {
   return {
-    id: s.id,
-    title: s.title,
-    subtitle: s.subtitle,
-    tag: s.tag || undefined,
-    imageUrl: s.imageUrl ?? '',
+    id: s.id, title: s.title, subtitle: s.subtitle,
+    tag: s.tag || undefined, imageUrl: s.imageUrl ?? '',
     overlayOpacity: s.overlayOpacity ?? 60,
     primaryBtn: s.primaryBtnLabel ? { label: s.primaryBtnLabel, href: s.primaryBtnHref } : undefined,
     secondaryBtn: s.secondaryBtnLabel ? { label: s.secondaryBtnLabel, href: s.secondaryBtnHref } : undefined,
@@ -134,14 +136,15 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
 }
 
 // ─── Main HeroSlider ──────────────────────────────────────────────────────────
-export default function HeroSlider() {
-  // Start with empty — no static flash. API data loads in useEffect.
-  const [slides,  setSlides]  = useState<Slide[]>([]);
+export default function HeroSlider({ initialSlides = [] }: { initialSlides?: ApiSlide[] }) {
+  // Hydrate from SSR-provided slides — no empty-state flash on first load
+  const [slides,  setSlides]  = useState<Slide[]>(() => initialSlides.map(apiToSlide));
   const [current, setCurrent] = useState(0);
   const [paused,  setPaused]  = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    // Refresh slides from API (in case of updates since SSR)
     fetch('/api/public/hero-slides')
       .then(r => r.ok ? r.json() : Promise.reject())
       .then((d: { data?: ApiSlide[] }) => {
@@ -150,9 +153,8 @@ export default function HeroSlider() {
           setSlides(arr.map(apiToSlide));
           setCurrent(0);
         }
-        // If API returns empty → show gradient fallback (no static images)
       })
-      .catch(() => { /* keep FALLBACK_SLIDES */ });
+      .catch(() => { /* keep SSR slides */ });
   }, []);
 
   const total = slides.length;

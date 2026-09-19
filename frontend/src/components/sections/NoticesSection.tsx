@@ -112,9 +112,9 @@ export default async function NoticesSection() {
                   <span className="text-xs" style={{ color: 'rgba(134,239,172,0.6)' }}>
                     {new Date(featured.publishedAt ?? featured.createdAt).toLocaleDateString('en-GB')}
                   </span>
-                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
                     {featured.attachments?.[0] && (
-                      <a href={featured.attachments[0].fileUrl} target="_blank" rel="noopener noreferrer"
+                      <a href={`/api/download?url=${encodeURIComponent(featured.attachments[0].fileUrl)}&name=${encodeURIComponent(featured.attachments[0].fileName ?? 'notice')}`}
                         className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded transition"
                         style={{ background: '#00bcd4', color: '#fff' }}>
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,15 +124,7 @@ export default async function NoticesSection() {
                         DOWNLOAD
                       </a>
                     )}
-                    <Link href="/notices"
-                      className="flex items-center gap-1.5 text-sm font-bold transition-colors hover:text-green-300"
-                      style={{ color: '#4ade80' }}>
-                      Read More
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                  </div>
+                    </div>
                 </div>
               </div>
             </div>
@@ -169,7 +161,7 @@ export default async function NoticesSection() {
                     </h3>
                     <div className="flex items-center gap-3 mt-1">
                       {notice.attachments?.[0] ? (
-                        <a href={notice.attachments[0].fileUrl} target="_blank" rel="noopener noreferrer"
+                        <a href={`/api/download?url=${encodeURIComponent(notice.attachments[0].fileUrl)}&name=${encodeURIComponent(notice.attachments[0].fileName ?? 'notice')}`}
                           className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded transition hover:opacity-80"
                           style={{ background: '#00bcd4', color: '#fff' }}>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,13 +170,7 @@ export default async function NoticesSection() {
                           </svg>
                           DOWNLOAD
                         </a>
-                      ) : (
-                        <Link href="/notices"
-                          className="text-sm font-semibold transition-colors"
-                          style={{ color: '#1a7a3c' }}>
-                          Read More
-                        </Link>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </div>

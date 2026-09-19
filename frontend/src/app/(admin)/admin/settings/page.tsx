@@ -190,6 +190,45 @@ export default function SettingsPage() {
                 <input value={form.footerText} onChange={e => F('footerText', e.target.value)}
                   placeholder="Leave blank to auto-generate" className={iCls}/>
               </div>
+
+              {/* Header accent colour + prefix toggle */}
+              <div className="border-t border-slate-100 pt-4 space-y-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Header Appearance</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={lCls}>Department Name Colour</label>
+                    <div className="flex items-center gap-3">
+                      <input type="color"
+                        value={(form as unknown as Record<string,string>).headerAccentColor || '#1a7a3c'}
+                        onChange={e => F('headerAccentColor' as keyof SiteSettings, e.target.value)}
+                        className="w-10 h-10 rounded-lg border border-slate-300 cursor-pointer p-0.5 bg-white"/>
+                      <input type="text"
+                        value={(form as unknown as Record<string,string>).headerAccentColor || '#1a7a3c'}
+                        onChange={e => F('headerAccentColor' as keyof SiteSettings, e.target.value)}
+                        placeholder="#1a7a3c" maxLength={7}
+                        className={`${iCls} font-mono w-28`}/>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-1">Dept. name color in the header (hex)</p>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <label className={lCls}>Show "Department of" Label</label>
+                    <label className="flex items-center gap-3 cursor-pointer mt-1">
+                      <div className="relative">
+                        <input type="checkbox"
+                          checked={(form as unknown as Record<string,boolean>).showDeptPrefix !== false}
+                          onChange={e => F('showDeptPrefix' as keyof SiteSettings, e.target.checked as unknown as string)}
+                          className="sr-only peer"/>
+                        <div className="w-11 h-6 bg-slate-200 peer-checked:bg-green-600 rounded-full transition-colors"/>
+                        <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"/>
+                      </div>
+                      <span className="text-sm text-slate-700 font-medium">
+                        {(form as unknown as Record<string,boolean>).showDeptPrefix !== false ? 'Showing' : 'Hidden'}
+                      </span>
+                    </label>
+                    <p className="text-[11px] text-slate-400 mt-1">Toggle the small label above the dept name</p>
+                  </div>
+                </div>
+              </div>
             </>
           )}
 

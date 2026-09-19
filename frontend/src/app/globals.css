@@ -1,36 +1,65 @@
 @import "tailwindcss";
 
 /* ─── Noto Sans Bengali — auto-applied to ALL Bengali text ──────────────────── */
-/* Unicode range for Bengali script (U+0980–U+09FF) */
+/* Apply Noto Sans Bengali for all elements globally — fallback chain ensures
+   Latin text uses Inter while Bengali script uses Noto Sans Bengali */
 * {
   font-family: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui,
                -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
                'Helvetica Neue', Arial, 'Noto Sans Bengali', sans-serif;
 }
 
-/* Specific Bengali font override using unicode-range detection */
-@font-face {
-  font-family: 'BengaliAuto';
-  src: local('Noto Sans Bengali');
-  unicode-range: U+0980-09FF;
-}
-
-/* CSS rule: if any element contains Bengali text, use Bengali font */
+/* Bengali-specific override — higher specificity for Bengali script elements */
 :lang(bn), [lang="bn"],
 :is(p, span, h1, h2, h3, h4, h5, h6, a, li, td, th, div, label, button,
     input, textarea, select):not([class*="font-mono"]) {
-  font-family: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-bengali), var(--font-inter), 'Noto Sans Bengali',
+               ui-sans-serif, system-ui, sans-serif;
+  /* Improved Bengali text rendering */
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: 'liga' 1, 'calt' 1;
+  font-feature-settings: 'liga' 1, 'calt' 1;
 }
 
 /* ─── CSS custom properties ─────────────────────────────────────────────────── */
 :root {
-  /* Brand palette */
-  --brand-primary:   #1d4ed8;   /* blue-700  */
-  --brand-dark:      #1e3a5f;   /* deep navy */
-  --brand-accent:    #f59e0b;   /* amber-500 */
-
+  --brand-primary:   #1d4ed8;
+  --brand-dark:      #1e3a5f;
+  --brand-accent:    #f59e0b;
   --bg-base:         #ffffff;
-  --text-base:       #0f172a;   /* slate-900 */
+  --text-base:       #0f172a;
+  --surface:         #f8fafc;
+  --border:          #e2e8f0;
+}
+
+/* Dark mode — activated by .dark on <html> */
+html.dark {
+  --bg-base:   #0f172a;
+  --text-base: #f1f5f9;
+  --surface:   #1e293b;
+  --border:    #334155;
+}
+
+html.dark body {
+  background: var(--bg-base);
+  color: var(--text-base);
+}
+
+html.dark .bg-white        { background: #1e293b !important; }
+html.dark .bg-slate-50     { background: #0f172a !important; }
+html.dark .bg-slate-100    { background: #1e293b !important; }
+html.dark .text-slate-900  { color: #f1f5f9 !important; }
+html.dark .text-slate-800  { color: #e2e8f0 !important; }
+html.dark .text-slate-700  { color: #cbd5e1 !important; }
+html.dark .text-slate-600  { color: #94a3b8 !important; }
+html.dark .text-slate-500  { color: #64748b !important; }
+html.dark .border-slate-200{ border-color: #334155 !important; }
+html.dark .border-slate-300{ border-color: #475569 !important; }
+html.dark .divide-slate-200 > * + * { border-color: #334155 !important; }
+html.dark input, html.dark select, html.dark textarea {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
 }
 
 /* ─── Base styles ────────────────────────────────────────────────────────────── */

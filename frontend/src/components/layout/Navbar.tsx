@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import { NAV_LINKS, SITE } from '@/constants';
 import { cn } from '@/lib/utils/cn';
 import { useStudentAuth } from '@/context/StudentAuthContext';
+import ThemeLangSwitcher from '@/components/ui/ThemeLangSwitcher';
 
 type NavLink   = typeof NAV_LINKS[number];
 type ChildLink = { label: string; href: string };
@@ -251,6 +252,7 @@ export default function Navbar() {
               {/* Student avatar / login — after all nav items */}
               {!studentLoading && (
                 <div className="ml-auto shrink-0 flex items-center gap-2 pl-3">
+                  <ThemeLangSwitcher />
                   {student ? (
                     <>
                       <Link href="/students"
@@ -365,9 +367,10 @@ export default function Navbar() {
                 );
               })}
 
-              {/* Mobile student CTA */}
+              {/* Mobile student CTA + switchers */}
               <div className="flex gap-2 pt-3 pb-2 mt-3 border-t"
                 style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
+                <ThemeLangSwitcher />
                 {student ? (
                   <>
                     <Link href="/students" className="flex-1 text-center text-sm font-bold py-2.5 rounded-lg"

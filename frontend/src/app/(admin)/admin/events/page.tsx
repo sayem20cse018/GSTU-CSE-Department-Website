@@ -11,7 +11,7 @@ import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fe
 import { formatDate } from '@/lib/utils/format';
 
 const TYPES = ['seminar','workshop','conference','hackathon','competition','cultural','webinar','orientation','other'];
-const EMPTY = { title:'', slug:'', shortDescription:'', venue:'', startDate:'', endDate:'', type:'seminar', mode:'in_person', coverImage:'', organizerName:'Admin', isPublished:false, isFeatured:false };
+const EMPTY = { title:'', slug:'', description:'', shortDescription:'', venue:'', startDate:'', endDate:'', type:'seminar', mode:'in_person', coverImage:'', organizerName:'Admin', isPublished:false, isFeatured:false };
 interface Ev { id:string; title:string; slug:string; venue:string; startDate:string; type:string; isPublished:boolean; isFeatured:boolean; status:string }
 const toSlug = (s:string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 
@@ -33,18 +33,23 @@ export default function AdminEventsPage() {
   useEffect(()=>{ load(); },[load]);
 
   const F = (k:keyof typeof EMPTY, v:string|boolean) => setForm(p=>({...p,[k]:v}));
-  function openEdit(e:Ev){ setEditing(e); setForm({title:e.title,slug:e.slug,shortDescription:'',venue:e.venue,startDate:e.startDate?.slice(0,10)??'',endDate:'',type:e.type,mode:'in_person',coverImage:'',organizerName:'Admin',isPublished:e.isPublished,isFeatured:e.isFeatured}); setErr(''); setOpen(true); }
+  function openEdit(e:Ev){ setEditing(e); setForm({title:e.title,slug:e.slug,description:'',shortDescription:'',venue:e.venue,startDate:e.startDate?.slice(0,10)??'',endDate:'',type:e.type,mode:'in_person',coverImage:'',organizerName:'Admin',isPublished:e.isPublished,isFeatured:e.isFeatured}); setErr(''); setOpen(true); }
 
   async function save() {
     if (!form.title||!form.slug||!form.venue||!form.startDate){setErr('Title, slug, venue and start date are required.');return;}
     setSaving(true); setErr('');
-    try { if(editing) await adminPatch(`/events/${editing.id}`,form); else await adminPost('/events',form); setOpen(false); load(); }
+    try {
+      const payload = { ...form, description: form.description || form.shortDescription || '' };
+      if (editing) { await adminPatch(`/events/${editing.id}`, payload); } else { await adminPost('/events', payload); }
+      setOpen(false); load(); }
     catch(e){setErr(e instanceof Error?e.message:'Save failed');} finally{setSaving(false);}
   }
 
   async function del(id:string) {
     if(!confirm('Delete this event?'))return; setDelId(id);
-    try{await adminDelete(`/events/${id}`);load();} catch(e){alert(e instanceof Error?e.message:'Error');} finally{setDelId(null);}
+    try { await adminDelete(`/events/${id}`); load(); }
+    catch(e) { alert(e instanceof Error?e.message:'Error'); }
+    finally { setDelId(null); }
   }
 
   return (
@@ -65,6 +70,8 @@ export default function AdminEventsPage() {
               <input value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
             <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Short Description</label>
               <textarea rows={2} value={form.shortDescription} onChange={e=>F('shortDescription',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
+            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Description</label>
+              <textarea rows={5} value={form.description} onChange={e=>F('description',e.target.value)} placeholder="Write a detailed description of the event…" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-y"/></div>
             <div className="grid grid-cols-2 gap-3">
               <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Type</label>
                 <select value={form.type} onChange={e=>F('type',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">

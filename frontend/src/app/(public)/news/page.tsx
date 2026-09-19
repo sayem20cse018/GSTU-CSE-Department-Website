@@ -1,90 +1,195 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import SectionHero from '@/components/academics/SectionHero';
-import { cn }      from '@/lib/utils/cn';
-import { formatDate, truncate } from '@/lib/utils/format';
+import { formatDate } from '@/lib/utils/format';
 
-export const metadata: Metadata = { title: 'News — GSTU CSE' };
+export const metadata: Metadata = { title: 'All News — GSTU CSE' };
+export const dynamic = 'force-dynamic';
 
-interface NewsItem { id:string; title:string; slug:string; excerpt:string; coverImage?:string; category:string; authorName:string; publishedAt?:string; createdAt:string; isFeatured:boolean }
+interface NewsItem {
+  id: string; title: string; slug: string; excerpt: string;
+  coverImage?: string; category: string;
+  authorName: string; publishedAt?: string; createdAt: string;
+  isFeatured: boolean;
+}
 
-const CAT_COLORS: Record<string,string> = { achievement:'bg-amber-100 text-amber-700', research:'bg-blue-100 text-blue-700', event:'bg-emerald-100 text-emerald-700', announcement:'bg-violet-100 text-violet-700', award:'bg-rose-100 text-rose-700', collaboration:'bg-teal-100 text-teal-700', general:'bg-slate-100 text-slate-600' };
-const GRADIENTS = ['from-blue-600 to-indigo-600','from-violet-600 to-purple-600','from-emerald-600 to-teal-600','from-rose-600 to-pink-600','from-amber-600 to-orange-600'];
-const MOCK: NewsItem[] = [
-  {id:'1',title:'CSE Students Win Gold at International Programming Contest',slug:'cse-win-gold-ipc-2024',excerpt:'A team of three undergraduate students from the CSE Department secured first place at the ACM ICPC Regional contest.',category:'achievement',authorName:'Dept. of CSE',createdAt:new Date().toISOString(),isFeatured:true},
-  {id:'2',title:'New AI & Machine Learning Lab Inaugurated',slug:'ai-ml-lab-inauguration',excerpt:'The university inaugurated a state-of-the-art AI/ML research lab equipped with high-performance GPU clusters.',category:'research',authorName:'Admin',createdAt:new Date(Date.now()-3*86400000).toISOString(),isFeatured:false},
-  {id:'3',title:'Industry-Academia MoU Signed with TechBD Ltd.',slug:'techbd-mou-signed',excerpt:'A Memorandum of Understanding was signed to foster internship, research and placement opportunities.',category:'collaboration',authorName:'Admin',createdAt:new Date(Date.now()-7*86400000).toISOString(),isFeatured:false},
-  {id:'4',title:'3-Day Cybersecurity Workshop Successfully Completed',slug:'cybersecurity-workshop',excerpt:'Over 120 students participated in an intensive workshop on ethical hacking and penetration testing.',category:'event',authorName:'CSE Club',createdAt:new Date(Date.now()-10*86400000).toISOString(),isFeatured:false},
-  {id:'5',title:'Dr. Rahman Receives National Research Award 2024',slug:'national-research-award-2024',excerpt:'Dr. Mohammad Rahman of the CSE Department has been honored with the prestigious National Research Award.',category:'award',authorName:'Admin',createdAt:new Date(Date.now()-14*86400000).toISOString(),isFeatured:false},
-  {id:'6',title:'BSc Admission Test Results Published',slug:'bsc-admission-result-2024',excerpt:'The results of the BSc admission test for the session 2024-25 have been published on the university portal.',category:'announcement',authorName:'Admin',createdAt:new Date(Date.now()-18*86400000).toISOString(),isFeatured:false},
-];
-
-async function fetchNews(page=1, limit=9): Promise<{data:NewsItem[];total:number}> {
+async function fetchAllNews(): Promise<NewsItem[]> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    const r = await fetch(`${api}/news?page=${page}&limit=${limit}`, { next:{revalidate:600} });
-    if (!r.ok) return {data:MOCK,total:MOCK.length};
-    const d = await r.json() as {data:{data:NewsItem[];pagination:{total:number}}};
-    if (!d.data?.data?.length) return {data:MOCK,total:MOCK.length};
-    return {data:d.data.data, total:d.data.pagination.total};
-  } catch { return {data:MOCK,total:MOCK.length}; }
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const r = await fetch(`${api}/news?limit=50`, { cache: 'no-store' });
+    if (!r.ok) return [];
+    const d = await r.json() as { data?: { data?: NewsItem[] } | NewsItem[] };
+    const raw = d.data;
+    const arr = Array.isArray(raw) ? raw : (raw as { data?: NewsItem[] })?.data;
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+
+const CAT: Record<string, string> = {
+  achievement: 'bg-amber-100 text-amber-700', research: 'bg-blue-100 text-blue-700',
+  event: 'bg-emerald-100 text-emerald-700', announcement: 'bg-violet-100 text-violet-700',
+  award: 'bg-rose-100 text-rose-700', collaboration: 'bg-teal-100 text-teal-700',
+  general: 'bg-slate-100 text-slate-600',
+};
+
+function SplitDate({ dateStr }: { dateStr: string }) {
+  const d = new Date(dateStr);
+  return (
+    <div className="shrink-0 w-[72px] flex flex-col items-center justify-center py-3 px-1 text-center"
+      style={{ background: '#1b2a4a', color: '#fff', minHeight: '72px' }}>
+      <span className="block text-[11px] font-semibold leading-tight">
+        {d.toLocaleDateString('en-US', { month: 'long' })}
+      </span>
+      <span className="block text-[15px] font-bold leading-tight mt-0.5"
+        style={{ fontFamily: 'var(--font-oswald)' }}>{d.getDate()},</span>
+      <span className="block text-[13px] font-semibold leading-tight">{d.getFullYear()}</span>
+    </div>
+  );
 }
 
 export default async function NewsPage() {
-  const {data:news} = await fetchNews();
-  const [featured, ...rest] = news;
+  const all = await fetchAllNews();
+  const sorted = [...all].sort((a, b) =>
+    new Date(b.publishedAt ?? b.createdAt).getTime() -
+    new Date(a.publishedAt ?? a.createdAt).getTime()
+  );
+  const [featured, ...rest] = sorted;
 
   return (
-    <>
-      <SectionHero tag="Department News" title="News & Updates"
-        description="Latest news, achievements, research highlights and announcements from the CSE Department."
-        breadcrumbs={[{label:'Home',href:'/'},{label:'News'}]}/>
-      <main className="bg-white section-py">
-        <div className="container-custom">
-          {/* Featured */}
-          {featured && (
-            <article className="mb-12 group grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className={cn('h-64 lg:h-auto relative bg-gradient-to-br', GRADIENTS[0])}>
-                {featured.coverImage ? <img src={featured.coverImage} alt="" className="w-full h-full object-cover"/> :
-                  <div className="absolute inset-0 flex items-center justify-center opacity-20" aria-hidden="true">
-                    <svg className="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                  </div>}
-                <span className="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-md bg-white/90 text-slate-700">Featured</span>
-              </div>
-              <div className="p-8 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={cn('text-xs font-bold px-2 py-0.5 rounded-md', CAT_COLORS[featured.category]??CAT_COLORS.general)}>{featured.category}</span>
-                  <span className="text-xs text-slate-400">{formatDate(featured.publishedAt??featured.createdAt)} · {featured.authorName}</span>
-                </div>
-                <h2 className="text-2xl font-bold text-slate-900 group-hover:text-blue-700 transition mb-3 leading-snug">{featured.title}</h2>
-                <p className="text-slate-500 leading-relaxed mb-5">{featured.excerpt}</p>
-                <Link href={`/news/${featured.slug}`} className="inline-flex items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900 transition">
-                  Read full article <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </Link>
-              </div>
-            </article>)}
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rest.map((n,i)=>(
-              <article key={n.id} className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:border-blue-300 transition-all">
-                <div className={cn('h-44 relative bg-gradient-to-br', GRADIENTS[(i+1)%GRADIENTS.length])}>
-                  {n.coverImage?<img src={n.coverImage} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>:
-                    <div className="absolute inset-0 flex items-center justify-center opacity-20"><svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/></svg></div>}
-                  <span className={cn('absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md', CAT_COLORS[n.category]??CAT_COLORS.general)}>{n.category}</span>
-                </div>
-                <div className="p-5">
-                  <p className="text-xs text-slate-400 mb-2">{formatDate(n.publishedAt??n.createdAt)} · {n.authorName}</p>
-                  <h3 className="font-bold text-slate-900 group-hover:text-blue-700 transition leading-snug mb-2 line-clamp-2">{n.title}</h3>
-                  <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed mb-3">{truncate(n.excerpt,120)}</p>
-                  <Link href={`/news/${n.slug}`} className="text-sm font-semibold text-blue-700 hover:text-blue-900 transition inline-flex items-center gap-1">
-                    Read more <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                  </Link>
-                </div>
-              </article>))}
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* Breadcrumb */}
+      <div style={{ background: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>
+        <div className="container-custom py-2.5">
+          <nav className="text-sm text-slate-500 flex items-center gap-1.5">
+            <Link href="/" className="hover:text-slate-700 transition">Home</Link>
+            <span>›</span>
+            <span className="text-slate-800 font-medium">News</span>
+          </nav>
         </div>
-      </main>
-    </>
+      </div>
+
+      <div className="container-custom py-10">
+        {/* Title */}
+        <h1 className="text-3xl font-bold text-slate-900 mb-1"
+          style={{ fontFamily: 'var(--font-oswald)', letterSpacing: '0.04em' }}>
+          ALL NEWS
+        </h1>
+        <div className="h-[2px] bg-slate-200 mb-8" aria-hidden="true" />
+
+        {all.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-5xl mb-4">📰</div>
+            <p className="text-slate-600 font-semibold">No news published yet.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-slate-200 mb-10">
+            {/* LEFT — featured */}
+            {featured && (
+              <div className="relative overflow-hidden" style={{ minHeight: '340px' }}>
+                {featured.coverImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={featured.coverImage} alt={featured.title}
+                    className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center"
+                    style={{ background: 'linear-gradient(135deg,#1a7a3c,#0d4423)' }}>
+                    <svg className="w-24 h-24 opacity-15 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                  </div>
+                )}
+                <div className="absolute inset-0"
+                  style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%)' }}
+                  aria-hidden="true" />
+                <div className="absolute top-4 left-4">
+                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-md"
+                    style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', backdropFilter: 'blur(4px)' }}>
+                    Latest
+                  </span>
+                </div>
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded mb-2 ${CAT[featured.category] ?? CAT.general}`}>
+                    {featured.category}
+                  </span>
+                  <h2 className="text-white font-bold leading-snug mb-2 uppercase"
+                    style={{ fontFamily: 'var(--font-oswald)', fontSize: '1.15rem', letterSpacing: '0.03em' }}>
+                    <Link href={`/news/${featured.slug}`} className="hover:text-green-300 transition-colors">
+                      {featured.title}
+                    </Link>
+                  </h2>
+                  <p className="text-slate-300 text-sm line-clamp-2 mb-3">{featured.excerpt}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-green-300/80">
+                      {formatDate(featured.publishedAt ?? featured.createdAt)} · {featured.authorName}
+                    </span>
+                    <Link href={`/news/${featured.slug}`}
+                      className="text-sm font-bold text-green-400 hover:text-green-300 transition-colors">
+                      Read More →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* RIGHT — list */}
+            <div className="flex flex-col divide-y divide-slate-200 border-l border-slate-200">
+              {rest.slice(0, 6).map(item => (
+                <div key={item.id} className="flex items-stretch hover:bg-[#e8f5e9] transition-colors group">
+                  <SplitDate dateStr={item.publishedAt ?? item.createdAt} />
+                  <div className="flex flex-col justify-center px-4 py-3 flex-1 min-w-0">
+                    <span className={`inline-block self-start text-[9px] font-bold px-1.5 py-0.5 rounded mb-1 ${CAT[item.category] ?? CAT.general}`}>
+                      {item.category}
+                    </span>
+                    <h3 className="font-bold uppercase text-slate-900 group-hover:text-[#1a7a3c] transition-colors line-clamp-2 leading-snug"
+                      style={{ fontFamily: 'var(--font-oswald)', fontSize: '0.88rem', letterSpacing: '0.02em' }}>
+                      <Link href={`/news/${item.slug}`}>{item.title}</Link>
+                    </h3>
+                    <Link href={`/news/${item.slug}`}
+                      className="mt-1 text-xs font-semibold transition-colors"
+                      style={{ color: '#1a7a3c' }}>
+                      Read More →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ALL older news below */}
+        {rest.length > 6 && (
+          <>
+            <h2 className="text-lg font-bold text-slate-700 mb-4 uppercase tracking-wide"
+              style={{ fontFamily: 'var(--font-oswald)' }}>More News</h2>
+            <div className="border border-slate-200 divide-y divide-slate-200 rounded">
+              {rest.slice(6).map(item => (
+                <div key={item.id} className="flex items-stretch hover:bg-slate-50 transition-colors group">
+                  <SplitDate dateStr={item.publishedAt ?? item.createdAt} />
+                  <div className="flex flex-col justify-center px-4 py-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${CAT[item.category] ?? CAT.general}`}>
+                        {item.category}
+                      </span>
+                      <span className="text-[10px] text-slate-400">{item.authorName}</span>
+                    </div>
+                    <h3 className="font-bold text-slate-900 group-hover:text-[#1a7a3c] transition-colors line-clamp-2 leading-snug"
+                      style={{ fontSize: '0.88rem' }}>
+                      <Link href={`/news/${item.slug}`}>{item.title}</Link>
+                    </h3>
+                  </div>
+                  <div className="flex items-center pr-5">
+                    <Link href={`/news/${item.slug}`}
+                      className="text-xs font-semibold shrink-0 hover:underline"
+                      style={{ color: '#1a7a3c' }}>
+                      Read More
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

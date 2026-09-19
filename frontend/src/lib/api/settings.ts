@@ -42,6 +42,10 @@ export interface SiteSettings {
   aboutImage3?: string;
   aboutImage4?: string;
   hiddenNavItems?: string[];
+  // Header customisation (admin-controlled)
+  headerAccentColor?: string;   // dept name color, default #1a7a3c
+  showDeptPrefix?: boolean;     // show "Department of" label, default true
+  customNavItems?: string;      // JSON string of custom nav items
 }
 
 // Fallback from hardcoded constants — used when backend is unreachable
@@ -69,13 +73,15 @@ export const SETTINGS_FALLBACK: SiteSettings = {
 /** Server-side fetch — used by Server Components */
 export async function fetchSettings(): Promise<SiteSettings> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    // BACKEND_URL is server-only (not exposed to browser) — use it for SSR
+    const api = process.env.BACKEND_URL
+      ?? process.env.NEXT_PUBLIC_API_URL
+      ?? 'http://localhost:4000/api';
     const r = await fetch(`${api}/settings`, {
       cache: 'no-store',   // always fresh — no stale logo/name on refresh
     });
     if (!r.ok) return SETTINGS_FALLBACK;
     const d = await r.json() as { data?: SiteSettings; success?: boolean } | SiteSettings;
-    // Handle both wrapped { data: ... } and plain response
     const payload = 'data' in d && d.data ? d.data : d as SiteSettings;
     return { ...SETTINGS_FALLBACK, ...payload };
   } catch {

@@ -182,13 +182,10 @@ function NoticeRow({ notice: n }: { notice: Notice }) {
           )}
         </div>
 
-        {/* Right — Download button */}
+        {/* Right — Download button (via proxy to force Save As dialog) */}
         {hasFile && firstFile && (
           <a
-            href={firstFile.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            download
+            href={`/api/download?url=${encodeURIComponent(firstFile.fileUrl)}&name=${encodeURIComponent(firstFile.fileName ?? 'notice')}`}
             className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
             style={{ background: '#00bcd4', minWidth: '120px', justifyContent: 'center' }}
           >

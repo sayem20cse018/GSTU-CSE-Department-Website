@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono, Oswald, Montserrat, Noto_Sans_Bengali } from 'ne
 import './globals.css';
 import { AuthProvider }        from '@/context/AuthContext';
 import { StudentAuthProvider } from '@/context/StudentAuthContext';
+import { ThemeProvider }       from '@/context/ThemeContext';
+import { LanguageProvider }    from '@/context/LanguageContext';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -41,7 +43,8 @@ const notoSansBengali = Noto_Sans_Bengali({
   subsets: ['bengali'],
   display: 'swap',
   weight: ['400', '500', '600', '700'],
-  preload: false,
+  preload: true,   // preload so Bengali text renders immediately without FOUT
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
@@ -59,7 +62,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         style={{ fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif' }}>
         <AuthProvider>
           <StudentAuthProvider>
-            {children}
+            <ThemeProvider>
+              <LanguageProvider>
+                {children}
+              </LanguageProvider>
+            </ThemeProvider>
           </StudentAuthProvider>
         </AuthProvider>
       </body>

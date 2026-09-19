@@ -16,40 +16,48 @@ export default async function SiteHeader() {
         <Link href="/" className="flex items-center gap-5 px-8 shrink-0 bg-white group" style={{ minWidth: '440px' }} aria-label="Homepage">
           {/* Logo */}
           <div className="relative shrink-0" style={{ width: '68px', height: '68px' }}>
-            {/* Subtle glow ring */}
-            <div className="absolute inset-0 rounded-full opacity-20 blur-md" style={{ background: '#1a7a3c' }} aria-hidden="true"/>
-            <div className="relative w-full h-full rounded-full overflow-hidden border-[2.5px] bg-white flex items-center justify-center shadow-md" style={{ borderColor: '#1a7a3c' }}>
-              {s.deptLogo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={s.deptLogo} alt={s.deptShortName} className="w-full h-full object-contain p-1.5"/>
-              ) : (
-                <svg viewBox="0 0 80 80" className="w-11 h-11" fill="none">
-                  <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
-                  <rect x="26" y="27" width="28" height="22" rx="2" fill="white" opacity="0.9"/>
-                  {[31,36,41,46].map(x => <g key={x}>
-                    <line x1={x} y1="23" x2={x} y2="27" stroke="white" strokeWidth="2.2"/>
-                    <line x1={x} y1="49" x2={x} y2="53" stroke="white" strokeWidth="2.2"/>
-                  </g>)}
-                  {[31,36,41].map(y => <g key={y}>
-                    <line x1="22" y1={y} x2="26" y2={y} stroke="white" strokeWidth="2.2"/>
-                    <line x1="54" y1={y} x2="58" y2={y} stroke="white" strokeWidth="2.2"/>
-                  </g>)}
-                  <text x="40" y="40" textAnchor="middle" dominantBaseline="middle" fontSize="8" fontWeight="900" fill="#dc2626" style={{fontFamily:'Arial,sans-serif',letterSpacing:'0.5px'}}>CSE</text>
-                  <text x="40" y="61" textAnchor="middle" dominantBaseline="middle" fontSize="5" fontWeight="bold" fill="white" opacity="0.85" style={{fontFamily:'Arial,sans-serif',letterSpacing:'1.5px'}}>GSTU</text>
-                </svg>
-              )}
-            </div>
+            {s.deptLogo ? (
+              /* Uploaded logo — show as-is, no forced round crop */
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={s.deptLogo}
+                alt={s.deptShortName}
+                className="w-full h-full object-contain"
+                style={{ maxWidth: '68px', maxHeight: '68px' }}
+              />
+            ) : (
+              /* SVG fallback — round green circle */
+              <>
+                <div className="absolute inset-0 rounded-full opacity-20 blur-md" style={{ background: '#1a7a3c' }} aria-hidden="true"/>
+                <div className="relative w-full h-full rounded-full overflow-hidden border-[2.5px] bg-white flex items-center justify-center shadow-md" style={{ borderColor: '#1a7a3c' }}>
+                  <svg viewBox="0 0 80 80" className="w-11 h-11" fill="none">
+                    <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
+                    <rect x="26" y="27" width="28" height="22" rx="2" fill="white" opacity="0.9"/>
+                    {[31,36,41,46].map(x => <g key={x}>
+                      <line x1={x} y1="23" x2={x} y2="27" stroke="white" strokeWidth="2.2"/>
+                      <line x1={x} y1="49" x2={x} y2="53" stroke="white" strokeWidth="2.2"/>
+                    </g>)}
+                    {[31,36,41].map(y => <g key={y}>
+                      <line x1="22" y1={y} x2="26" y2={y} stroke="white" strokeWidth="2.2"/>
+                      <line x1="54" y1={y} x2="58" y2={y} stroke="white" strokeWidth="2.2"/>
+                    </g>)}
+                    <text x="40" y="40" textAnchor="middle" dominantBaseline="middle" fontSize="8" fontWeight="900" fill="#dc2626" style={{fontFamily:'Arial,sans-serif',letterSpacing:'0.5px'}}>CSE</text>
+                    <text x="40" y="61" textAnchor="middle" dominantBaseline="middle" fontSize="5" fontWeight="bold" fill="white" opacity="0.85" style={{fontFamily:'Arial,sans-serif',letterSpacing:'1.5px'}}>GSTU</text>
+                  </svg>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Text */}
           <div>
-            <p className="leading-none mb-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:600, fontSize:'0.6rem', letterSpacing:'0.22em', textTransform:'uppercase', color:'#6b7280' }}>
-              Department of
+            <p className="leading-none mb-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:800, fontSize:'0.62rem', letterSpacing:'0.22em', textTransform:'uppercase', color:'#111827' }}>
+              {s.showDeptPrefix !== false ? 'Department of' : ''}
             </p>
-            <p className="leading-tight group-hover:opacity-80 transition-opacity" style={{ fontFamily:'var(--font-montserrat)', fontWeight:900, fontSize:'1.55rem', letterSpacing:'-0.01em', color:'#1a7a3c', textTransform:'uppercase' }}>
+            <p className="leading-tight group-hover:opacity-80 transition-opacity" style={{ fontFamily:'var(--font-montserrat)', fontWeight:900, fontSize:'1.55rem', letterSpacing:'-0.01em', color: s.headerAccentColor || '#1a7a3c', textTransform:'uppercase' }}>
               {deptCore}
             </p>
-            <p className="mt-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:500, fontSize:'0.6rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'#9ca3af' }}>
+            <p className="mt-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:700, fontSize:'0.6rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'#111827' }}>
               {s.universityName}
             </p>
           </div>
@@ -138,7 +146,7 @@ export default async function SiteHeader() {
           <div className="w-11 h-11 rounded-full border-[2px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={s.deptLogo} alt="" className="w-full h-full object-contain p-0.5"/>
+              ? <img src={s.deptLogo} alt="" className="w-full h-full object-contain"/>
               : <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
                   <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
                   <text x="40" y="44" textAnchor="middle" dominantBaseline="middle" fontSize="12" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
@@ -169,7 +177,7 @@ export default async function SiteHeader() {
           <div className="w-12 h-12 rounded-full border-[2.5px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={s.deptLogo} alt={s.deptShortName} className="w-full h-full object-contain p-0.5"/>
+              ? <img src={s.deptLogo} alt={s.deptShortName} className="w-full h-full object-contain"/>
               : <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
                   <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
                   <text x="40" y="40" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
