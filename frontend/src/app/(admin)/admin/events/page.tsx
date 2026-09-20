@@ -1,138 +1,263 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
-import PageHeader from '@/components/admin/ui/PageHeader';
-import Button     from '@/components/admin/ui/Button';
-import Badge      from '@/components/admin/ui/Badge';
-import EmptyState from '@/components/admin/ui/EmptyState';
+import PageHeader  from '@/components/admin/ui/PageHeader';
+import Button      from '@/components/admin/ui/Button';
+import Badge       from '@/components/admin/ui/Badge';
+import EmptyState  from '@/components/admin/ui/EmptyState';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
-import { cn }     from '@/lib/utils/cn';
+import SearchInput from '@/components/admin/ui/SearchInput';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import { cn }         from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
 
 const TYPES = ['seminar','workshop','conference','hackathon','competition','cultural','webinar','orientation','other'];
-const EMPTY = { title:'', slug:'', description:'', shortDescription:'', venue:'', startDate:'', endDate:'', type:'seminar', mode:'in_person', coverImage:'', organizerName:'Admin', isPublished:false, isFeatured:false };
-interface Ev { id:string; title:string; slug:string; venue:string; startDate:string; type:string; isPublished:boolean; isFeatured:boolean; status:string }
+const EMPTY = {
+  title:'', slug:'', description:'', shortDescription:'',
+  venue:'', startDate:'', endDate:'', type:'seminar',
+  mode:'in_person', coverImage:'', organizerName:'Admin',
+  isPublished:false, isFeatured:false,
+};
+
+interface Ev {
+  id:string; title:string; slug:string; venue:string;
+  startDate:string; type:string; isPublished:boolean;
+  isFeatured:boolean; status:string;
+}
+
 const toSlug = (s:string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 
+const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500';
+
 export default function AdminEventsPage() {
-  const [list, setList]     = useState<Ev[]>([]);
-  const [loading,setLoading]= useState(true);
-  const [form, setForm]     = useState(EMPTY);
-  const [editing,setEditing]= useState<Ev|null>(null);
-  const [open, setOpen]     = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [delId, setDelId]   = useState<string|null>(null);
-  const [err, setErr]       = useState('');
+  const [list,    setList]    = useState<Ev[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [form,    setForm]    = useState(EMPTY);
+  const [editing, setEditing] = useState<Ev|null>(null);
+  const [open,    setOpen]    = useState(false);
+  const [saving,  setSaving]  = useState(false);
+  const [delId,   setDelId]   = useState<string|null>(null);
+  const [err,     setErr]     = useState('');
+  const [query,   setQuery]   = useState('');
+
+  const toast = useToast();
+  const { confirm, ConfirmDialog } = useConfirm();
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { const r = await adminGet<{data:Ev[]}>('/events?admin=true&limit=50'); setList((r as {data:Ev[]}).data??[]); }
-    catch { setList([]); } finally { setLoading(false); }
+    try {
+      const r = await adminGet<{data:Ev[]}>('/events?admin=true&limit=100');
+      setList((r as {data:Ev[]}).data ?? []);
+    } catch { toast.error('Failed to load events'); setList([]); }
+    finally { setLoading(false); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(()=>{ load(); },[load]);
+  useEffect(() => { load(); }, [load]);
 
-  const F = (k:keyof typeof EMPTY, v:string|boolean) => setForm(p=>({...p,[k]:v}));
-  function openEdit(e:Ev){ setEditing(e); setForm({title:e.title,slug:e.slug,description:'',shortDescription:'',venue:e.venue,startDate:e.startDate?.slice(0,10)??'',endDate:'',type:e.type,mode:'in_person',coverImage:'',organizerName:'Admin',isPublished:e.isPublished,isFeatured:e.isFeatured}); setErr(''); setOpen(true); }
+  const F = (k: keyof typeof EMPTY, v: string|boolean) => setForm(p => ({ ...p, [k]: v }));
+
+  function openNew() { setEditing(null); setForm(EMPTY); setErr(''); setOpen(true); }
+  function openEdit(e: Ev) {
+    setEditing(e);
+    setForm({
+      title: e.title, slug: e.slug, description: '', shortDescription: '',
+      venue: e.venue, startDate: e.startDate?.slice(0,10) ?? '', endDate: '',
+      type: e.type, mode: 'in_person', coverImage: '', organizerName: 'Admin',
+      isPublished: e.isPublished, isFeatured: e.isFeatured,
+    });
+    setErr(''); setOpen(true);
+  }
 
   async function save() {
-    if (!form.title||!form.slug||!form.venue||!form.startDate){setErr('Title, slug, venue and start date are required.');return;}
+    if (!form.title || !form.slug || !form.venue || !form.startDate) {
+      setErr('Title, slug, venue and start date are required.'); return;
+    }
     setSaving(true); setErr('');
     try {
       const payload = { ...form, description: form.description || form.shortDescription || '' };
-      if (editing) { await adminPatch(`/events/${editing.id}`, payload); } else { await adminPost('/events', payload); }
-      setOpen(false); load(); }
-    catch(e){setErr(e instanceof Error?e.message:'Save failed');} finally{setSaving(false);}
+      if (editing) { await adminPatch(`/events/${editing.id}`, payload); toast.success('Event updated!'); }
+      else         { await adminPost('/events', payload);                 toast.success('Event created!'); }
+      setOpen(false); load();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Save failed';
+      setErr(msg); toast.error(msg);
+    } finally { setSaving(false); }
   }
 
-  async function del(id:string) {
-    if(!confirm('Delete this event?'))return; setDelId(id);
-    try { await adminDelete(`/events/${id}`); load(); }
-    catch(e) { alert(e instanceof Error?e.message:'Error'); }
+  async function del(ev: Ev) {
+    const ok = await confirm({
+      title: `Delete "${ev.title}"?`,
+      description: 'This event will be permanently removed.',
+      confirmLabel: 'Delete',
+    });
+    if (!ok) return;
+    setDelId(ev.id);
+    try { await adminDelete(`/events/${ev.id}`); toast.success('Event deleted'); load(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : 'Delete failed'); }
     finally { setDelId(null); }
   }
+
+  const filtered = query
+    ? list.filter(e => e.title.toLowerCase().includes(query.toLowerCase()) || e.type.includes(query.toLowerCase()))
+    : list;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <AdminPageTitle title="Manage Events" />
-      <PageHeader title="Events" description={`${list.length} event${list.length!==1?'s':''}`}
-        action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Event</Button>}/>
+      {ConfirmDialog}
 
-      {open&&(<div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-xl p-6 max-h-[92vh] overflow-y-auto">
-          <h3 className="text-lg font-bold text-slate-900 mb-5">{editing?'Edit':'Add'} Event</h3>
-          {err&&<p className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2 text-sm mb-4">{err}</p>}
-          <div className="space-y-4">
-            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Title *</label>
-              <input value={form.title} onChange={e=>{F('title',e.target.value);if(!editing)F('slug',toSlug(e.target.value));}}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
-            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Slug *</label>
-              <input value={form.slug} onChange={e=>F('slug',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
-            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Short Description</label>
-              <textarea rows={2} value={form.shortDescription} onChange={e=>F('shortDescription',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"/></div>
-            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Description</label>
-              <textarea rows={5} value={form.description} onChange={e=>F('description',e.target.value)} placeholder="Write a detailed description of the event…" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-y"/></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Type</label>
-                <select value={form.type} onChange={e=>F('type',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                  {TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Mode</label>
-                <select value={form.mode} onChange={e=>F('mode',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                  {['in_person','online','hybrid'].map(m=><option key={m} value={m}>{m.replace('_',' ')}</option>)}</select></div>
+      <PageHeader title="Events" description={`${list.length} event${list.length!==1?'s':''}`}
+        action={
+          <Button onClick={openNew} icon={
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+          }>Add Event</Button>
+        }/>
+
+      <div className="mb-4">
+        <SearchInput value={query} onChange={setQuery} placeholder="Search events…" className="max-w-xs"/>
+      </div>
+
+      {/* ── Modal ── */}
+      {open && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-xl p-6 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-bold text-slate-900">{editing?'Edit':'Add'} Event</h3>
+              <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
             </div>
-            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Venue *</label>
-              <input value={form.venue} onChange={e=>F('venue',e.target.value)} placeholder="Seminar Hall, CSE Building"
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Start Date *</label>
-                <input type="date" value={form.startDate} onChange={e=>F('startDate',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">End Date</label>
-                <input type="date" value={form.endDate} onChange={e=>F('endDate',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
+            {err && <p className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">{err}</p>}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Title *</label>
+                <input value={form.title}
+                  onChange={e=>{F('title',e.target.value);if(!editing)F('slug',toSlug(e.target.value));}}
+                  className={iCls}/>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Slug *</label>
+                <input value={form.slug} onChange={e=>F('slug',e.target.value)} className={`${iCls} font-mono`}/>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Short Description</label>
+                <textarea rows={2} value={form.shortDescription} onChange={e=>F('shortDescription',e.target.value)} className={`${iCls} resize-none`}/>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Description</label>
+                <textarea rows={5} value={form.description} onChange={e=>F('description',e.target.value)}
+                  placeholder="Write a detailed description of the event…" className={`${iCls} resize-y`}/>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Type</label>
+                  <select value={form.type} onChange={e=>F('type',e.target.value)} className={iCls}>
+                    {TYPES.map(t=><option key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Mode</label>
+                  <select value={form.mode} onChange={e=>F('mode',e.target.value)} className={iCls}>
+                    {['in_person','online','hybrid'].map(m=><option key={m} value={m}>{m.replace('_',' ')}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Venue *</label>
+                <input value={form.venue} onChange={e=>F('venue',e.target.value)}
+                  placeholder="Seminar Hall, CSE Building" className={iCls}/>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Start Date *</label>
+                  <input type="date" value={form.startDate} onChange={e=>F('startDate',e.target.value)} className={iCls}/>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">End Date</label>
+                  <input type="date" value={form.endDate} onChange={e=>F('endDate',e.target.value)} className={iCls}/>
+                </div>
+              </div>
+              <ImageUpload label="Cover Image" value={form.coverImage} onChange={v => F('coverImage', v)}/>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Organizer</label>
+                <input value={form.organizerName} onChange={e=>F('organizerName',e.target.value)} className={iCls}/>
+              </div>
+              <div className="flex gap-5">
+                {[{k:'isPublished',l:'Published'},{k:'isFeatured',l:'Featured'}].map(({k,l})=>(
+                  <label key={k} className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={form[k as keyof typeof form] as boolean}
+                      onChange={e=>F(k as keyof typeof EMPTY, e.target.checked)}
+                      className="w-4 h-4 accent-green-600"/>
+                    <span className="text-sm font-medium text-slate-700">{l}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-            <ImageUpload
-              label="Cover Image"
-              value={form.coverImage}
-              onChange={v => F('coverImage', v)}
-            />
-            <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Organizer</label>
-              <input value={form.organizerName} onChange={e=>F('organizerName',e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"/></div>
-            <div className="flex gap-4">
-              {[{k:'isPublished',l:'Published'},{k:'isFeatured',l:'Featured'}].map(({k,l})=>(
-                <label key={k} className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form[k as keyof typeof form] as boolean} onChange={e=>F(k as keyof typeof EMPTY,e.target.checked)} className="accent-green-600"/>
-                  <span className="text-sm font-medium text-slate-700">{l}</span></label>))}
+
+            <div className="flex gap-3 mt-6">
+              <Button onClick={save} loading={saving} className="flex-1">{editing?'Update':'Create'}</Button>
+              <Button variant="secondary" onClick={()=>setOpen(false)} className="flex-1">Cancel</Button>
             </div>
-          </div>
-          <div className="flex gap-3 mt-6">
-            <Button onClick={save} loading={saving} className="flex-1">{editing?'Update':'Create'}</Button>
-            <Button variant="secondary" onClick={()=>setOpen(false)} className="flex-1">Cancel</Button>
           </div>
         </div>
-      </div>)}
+      )}
 
+      {/* ── Table ── */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
-        :list.length===0?<EmptyState title="No events yet" description="Schedule the first event."/>
-        :(<table className="w-full text-sm">
-          <thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
-            <th className="text-left px-5 py-3">Event</th>
-            <th className="text-center px-4 py-3 hidden sm:table-cell">Type</th>
-            <th className="text-center px-4 py-3">Status</th>
-            <th className="text-center px-4 py-3 hidden md:table-cell">Date</th>
-            <th className="text-right px-5 py-3">Actions</th>
-          </tr></thead>
-          <tbody>{list.map((e,i)=>(
-            <tr key={e.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
-              <td className="px-5 py-3"><p className="font-medium text-white line-clamp-1">{e.title}</p><p className="text-xs text-slate-500">{e.venue}</p></td>
-              <td className="px-4 py-3 text-center hidden sm:table-cell"><Badge variant="neutral">{e.type}</Badge></td>
-              <td className="px-4 py-3 text-center"><div className="flex justify-center gap-1.5 flex-wrap"><Badge variant={e.isPublished?'success':'neutral'}>{e.isPublished?'Live':'Draft'}</Badge>{e.isFeatured&&<Badge variant="info">Featured</Badge>}</div></td>
-              <td className="px-4 py-3 text-center text-xs text-slate-400 hidden md:table-cell">{formatDate(e.startDate)}</td>
-              <td className="px-5 py-3"><div className="flex items-center justify-end gap-2">
-                <Button size="sm" variant="secondary" onClick={()=>openEdit(e)}>Edit</Button>
-                <Button size="sm" variant="danger" loading={delId===e.id} onClick={()=>del(e.id)}>Delete</Button>
-              </div></td>
-            </tr>))}</tbody>
-        </table>)}
+        {loading ? (
+          <div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
+        ) : filtered.length === 0 ? (
+          <EmptyState title={query ? `No events matching "${query}"` : 'No events yet'}
+            description={query ? 'Try a different search.' : 'Schedule the first event.'}
+            action={!query ? <Button onClick={openNew}>Add Event</Button> : undefined}/>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                <th className="text-left px-5 py-3">Event</th>
+                <th className="text-center px-4 py-3 hidden sm:table-cell">Type</th>
+                <th className="text-center px-4 py-3">Status</th>
+                <th className="text-center px-4 py-3 hidden md:table-cell">Date</th>
+                <th className="text-right px-5 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((e, i) => (
+                <tr key={e.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors', i%2 ? 'bg-white' : '')}>
+                  <td className="px-5 py-3">
+                    <p className="font-medium text-slate-900 line-clamp-1">{e.title}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{e.venue}</p>
+                  </td>
+                  <td className="px-4 py-3 text-center hidden sm:table-cell">
+                    <Badge variant="neutral">{e.type}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex justify-center gap-1.5 flex-wrap">
+                      <Badge variant={e.isPublished?'success':'neutral'}>{e.isPublished?'Live':'Draft'}</Badge>
+                      {e.isFeatured && <Badge variant="info">Featured</Badge>}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-center text-xs text-slate-400 hidden md:table-cell">
+                    {formatDate(e.startDate)}
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button size="sm" variant="secondary" onClick={() => openEdit(e)}>Edit</Button>
+                      <Button size="sm" variant="danger" loading={delId===e.id} onClick={() => del(e)}>Delete</Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

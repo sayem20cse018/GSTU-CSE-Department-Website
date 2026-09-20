@@ -43,8 +43,8 @@ export default function AdminGalleryPage() {
   }
 
   async function del(id:string){
-    if(!confirm('Delete this album?'))return;setDelId(id);
-    try{await adminDelete(`/gallery/${id}`);load();}catch(e){alert(e instanceof Error?e.message:'Error');}finally{setDelId(null);}
+    setDelId(id);
+    try{await adminDelete(`/gallery/${id}`);load();}catch(e){ console.error(e); }finally{setDelId(null);}
   }
 
   return (

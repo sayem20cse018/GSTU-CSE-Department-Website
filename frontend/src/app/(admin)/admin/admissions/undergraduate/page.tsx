@@ -61,10 +61,10 @@ export default function AdmissionsUGPage() {
   }
 
   async function del(id: string) {
-    if (!confirm('Delete this program?')) return;
+    
     setDelId(id);
     try { await adminDelete(`/academics/programs/${id}`); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : 'Error'); }
+    catch (e) { console.error(e); }
     finally { setDelId(null); }
   }
 

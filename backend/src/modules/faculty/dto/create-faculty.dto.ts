@@ -27,11 +27,11 @@ export class CreateFacultyDto {
 
   @ApiProperty({
     enum: ['Professor', 'Associate Professor', 'Assistant Professor',
-           'Lecturer', 'Senior Lecturer', 'Adjunct Faculty', 'Visiting Professor'],
+           'Lecturer', 'Senior Lecturer', 'Adjunct Faculty', 'Visiting Professor',
+           'Administrative Officer', 'Section Officer', 'Assistant Officer', 'System Analyst'],
   })
-  @IsEnum(['Professor', 'Associate Professor', 'Assistant Professor',
-           'Lecturer', 'Senior Lecturer', 'Adjunct Faculty', 'Visiting Professor'])
-  designation: string;
+  @IsOptional() @IsString()
+  designation?: string;
 
   @ApiProperty() @IsEmail() email: string;
   @ApiPropertyOptional() @IsOptional() @IsString() phone?: string;

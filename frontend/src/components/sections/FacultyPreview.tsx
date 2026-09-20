@@ -64,66 +64,53 @@ export default async function FacultyPreview() {
         </div>
 
         {/* Cards — max 4 preview cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {faculty.slice(0, 4).map((member, i) => {
-            const desig = DESIG_STYLE[member.designation] ?? DESIG_STYLE.Lecturer;
+            const desig = DESIG_STYLE[member.designation] ?? { bg:'rgba(26,122,60,0.1)', text:'#166534' };
             return (
               <article key={member.id}
-                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-green-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-green-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
-                {/* Top strip */}
-                <div className="h-1.5 w-full" style={{ background:'linear-gradient(90deg,#166534,#4ade80,#166534)' }} aria-hidden="true"/>
-
-                <div className="p-5">
-                  <div className="flex items-start gap-4">
-                    {/* Avatar */}
-                    <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center text-white font-bold text-xl shadow-md"
-                      style={{ background: member.photo ? 'transparent' : AVATAR_BKGS[i % AVATAR_BKGS.length] }}>
-                      {member.photo
-                        // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={member.photo} alt={member.name} className="w-full h-full object-cover object-top"/>
-                        : getInitials(member.name)
-                      }
+                {/* Big photo area */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                  {member.photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={member.photo} alt={member.name}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"/>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-4xl font-black text-white"
+                      style={{ background: AVATAR_BKGS[i % AVATAR_BKGS.length] }}>
+                      {getInitials(member.name)}
                     </div>
+                  )}
+                  {/* Gradient overlay at bottom */}
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" aria-hidden="true"/>
+                </div>
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-slate-900 group-hover:text-green-700 transition leading-tight">
-                        <Link href={`/faculty/${member.slug ?? member.id}`}>
-                          {member.title} {member.name}
-                        </Link>
-                      </h3>
-                      <span className="inline-block mt-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
-                        style={{ background: desig.bg, color: desig.text }}>
-                        {member.designation}
-                      </span>
-                    </div>
-                  </div>
+                {/* Content below image */}
+                <div className="p-4">
+                  <h3 className="font-bold text-slate-900 group-hover:text-green-700 transition leading-tight text-base mb-1">
+                    <Link href={`/faculty/${member.slug ?? member.id}`}>
+                      {member.title} {member.name}
+                    </Link>
+                  </h3>
+                  <span className="inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full mb-3"
+                    style={{ background: desig.bg, color: desig.text }}>
+                    {member.designation}
+                  </span>
 
                   {/* Research interests */}
                   {member.researchInterests && member.researchInterests.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {member.researchInterests.slice(0,3).map(r => (
-                        <span key={r} className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
-                          {r}
-                        </span>
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {member.researchInterests.slice(0,2).map(r => (
+                        <span key={r} className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{r}</span>
                       ))}
                     </div>
                   )}
 
-                  {/* Email */}
-                  <a href={`mailto:${member.email}`}
-                    className="mt-3 flex items-center gap-1.5 text-xs text-slate-400 hover:text-green-700 transition truncate">
-                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    <span className="truncate">{member.email}</span>
-                  </a>
-
-                  {/* Profile link */}
                   <Link href={`/faculty/${member.slug ?? member.id}`}
-                    className="mt-4 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90"
-                    style={{ background:'linear-gradient(135deg,#166534,#15803d)' }}>
+                    className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90"
+                    style={{ background: 'linear-gradient(135deg,#166534,#15803d)' }}>
                     View Profile
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>

@@ -38,8 +38,8 @@ export default function AchievementsAdminPage() {
     try{ if(editing) await adminPatch(`/achievements/${editing.id}`,form); else await adminPost('/achievements',form); setOpen(false);load(); }
     catch(e){setErr(e instanceof Error?e.message:'Save failed');}finally{setSaving(false);} }
 
-  async function del(id:string){ if(!confirm('Delete?'))return; setDelId(id);
-    try{await adminDelete(`/achievements/${id}`);load();}catch(e){alert(e instanceof Error?e.message:'Error');}finally{setDelId(null);} }
+  async function del(id:string){  setDelId(id);
+    try{await adminDelete(`/achievements/${id}`);load();}catch(e){ console.error(e); }finally{setDelId(null);} }
 
   return (
     <div className="p-6 max-w-6xl mx-auto">

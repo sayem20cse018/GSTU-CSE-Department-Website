@@ -71,10 +71,10 @@ export default function ResearchAreasPage() {
   }
 
   async function del(id: string) {
-    if (!confirm('Delete this research area?')) return;
+    
     setDelId(id);
     try { await adminDelete(`/research/areas/${id}`); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : 'Error'); }
+    catch (e) { console.error(e); }
     finally { setDelId(null); }
   }
 

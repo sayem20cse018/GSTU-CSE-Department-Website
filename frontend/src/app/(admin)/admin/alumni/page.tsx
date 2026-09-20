@@ -84,10 +84,10 @@ export default function AlumniAdminPage() {
   }
 
   async function del(id: string) {
-    if (!confirm('Delete this alumni record?')) return;
+    
     setDelId(id);
     try { await adminDelete(`/alumni/${id}`); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : 'Error'); }
+    catch (e) { console.error(e); }
     finally { setDelId(null); }
   }
 

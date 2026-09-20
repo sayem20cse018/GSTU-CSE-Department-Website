@@ -74,10 +74,10 @@ export default function PublicationsPage() {
   }
 
   async function del(id: string) {
-    if (!confirm('Delete this publication?')) return;
+    
     setDelId(id);
     try { await adminDelete(`/research/publications/${id}`); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : 'Error'); }
+    catch (e) { console.error(e); }
     finally { setDelId(null); }
   }
 
