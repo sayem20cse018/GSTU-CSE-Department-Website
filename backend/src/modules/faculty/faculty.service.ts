@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { instanceToPlain } from 'class-transformer';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
@@ -41,17 +41,22 @@ export class FacultyService {
       sortOrder: 0,
       ...rest,
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.prisma.faculty.create({
-      data: {
-        ...data,
-        ...(education    ? { education:    { create: education as object[] } }    : {}),
-        ...(publications ? { publications: { create: publications as object[] } } : {}),
-        ...(awards       ? { awards:       { create: awards as object[] } }       : {}),
-        ...(officeHours  ? { officeHours:  { create: officeHours as object[] } }  : {}),
-      } as any,
-      include: FACULTY_INCLUDE,
-    });
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return await this.prisma.faculty.create({
+        data: {
+          ...data,
+          ...(education    ? { education:    { create: education as object[] } }    : {}),
+          ...(publications ? { publications: { create: publications as object[] } } : {}),
+          ...(awards       ? { awards:       { create: awards as object[] } }       : {}),
+          ...(officeHours  ? { officeHours:  { create: officeHours as object[] } }  : {}),
+        } as any,
+        include: FACULTY_INCLUDE,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new InternalServerErrorException('Faculty create failed: ' + msg.slice(0, 300));
+    }
   }
 
   async update(id: string, dto: UpdateFacultyDto) {
