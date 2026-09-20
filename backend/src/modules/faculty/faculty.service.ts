@@ -1,8 +1,13 @@
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { instanceToPlain } from 'class-transformer';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
+
+// Convert a DTO class instance to a plain object without class-transformer
+// (instanceToPlain returns class constructors for some fields; JSON round-trip is safer)
+function toPlain(dto: object): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(dto)) as Record<string, unknown>;
+}
 
 const FACULTY_INCLUDE = {
   education:    true,
@@ -30,11 +35,10 @@ export class FacultyService {
   }
 
   async create(dto: CreateFacultyDto) {
-    const plain = instanceToPlain(dto) as Record<string, unknown>;
+    const plain = toPlain(dto);
     const { education, publications, awards, officeHours, ...rest } = plain;
-    // Provide defaults for Prisma NOT NULL columns
     const data = {
-      designation: 'Lecturer',   // default if not provided
+      designation: 'Lecturer',
       staffType: 'faculty',
       employmentStatus: 'full_time',
       isActive: true,
@@ -62,7 +66,7 @@ export class FacultyService {
   async update(id: string, dto: UpdateFacultyDto) {
     const f = await this.prisma.faculty.findUnique({ where: { id } });
     if (!f) throw new NotFoundException(`Faculty #${id} not found`);
-    const plain = instanceToPlain(dto) as Record<string, unknown>;
+    const plain = toPlain(dto);
     const { education, publications, awards, officeHours, ...rest } = plain;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.update({
