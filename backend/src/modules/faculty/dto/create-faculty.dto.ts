@@ -25,11 +25,7 @@ export class CreateFacultyDto {
   @IsOptional() @IsString()
   title?: string;   // e.g. "Dr.", "Prof." — optional
 
-  @ApiProperty({
-    enum: ['Professor', 'Associate Professor', 'Assistant Professor',
-           'Lecturer', 'Senior Lecturer', 'Adjunct Faculty', 'Visiting Professor',
-           'Administrative Officer', 'Section Officer', 'Assistant Officer', 'System Analyst'],
-  })
+  @ApiProperty({ description: 'Designation e.g. Professor, Lecturer, Administrative Officer' })
   @IsOptional() @IsString()
   designation?: string;
 

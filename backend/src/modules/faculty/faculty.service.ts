@@ -30,15 +30,25 @@ export class FacultyService {
   }
 
   async create(dto: CreateFacultyDto) {
-    const { education, publications, awards, officeHours, ...rest } = instanceToPlain(dto);
+    const plain = instanceToPlain(dto) as Record<string, unknown>;
+    const { education, publications, awards, officeHours, ...rest } = plain;
+    // Provide defaults for Prisma NOT NULL columns
+    const data = {
+      designation: 'Lecturer',   // default if not provided
+      staffType: 'faculty',
+      employmentStatus: 'full_time',
+      isActive: true,
+      sortOrder: 0,
+      ...rest,
+    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.create({
       data: {
-        ...rest,
-        ...(education    ? { education:    { create: education } }    : {}),
-        ...(publications ? { publications: { create: publications } } : {}),
-        ...(awards       ? { awards:       { create: awards } }       : {}),
-        ...(officeHours  ? { officeHours:  { create: officeHours } }  : {}),
+        ...data,
+        ...(education    ? { education:    { create: education as object[] } }    : {}),
+        ...(publications ? { publications: { create: publications as object[] } } : {}),
+        ...(awards       ? { awards:       { create: awards as object[] } }       : {}),
+        ...(officeHours  ? { officeHours:  { create: officeHours as object[] } }  : {}),
       } as any,
       include: FACULTY_INCLUDE,
     });
@@ -47,16 +57,17 @@ export class FacultyService {
   async update(id: string, dto: UpdateFacultyDto) {
     const f = await this.prisma.faculty.findUnique({ where: { id } });
     if (!f) throw new NotFoundException(`Faculty #${id} not found`);
-    const { education, publications, awards, officeHours, ...rest } = instanceToPlain(dto);
+    const plain = instanceToPlain(dto) as Record<string, unknown>;
+    const { education, publications, awards, officeHours, ...rest } = plain;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.update({
       where: { id },
       data: {
         ...rest,
-        ...(education    ? { education:    { deleteMany: {}, create: education } }    : {}),
-        ...(publications ? { publications: { deleteMany: {}, create: publications } } : {}),
-        ...(awards       ? { awards:       { deleteMany: {}, create: awards } }       : {}),
-        ...(officeHours  ? { officeHours:  { deleteMany: {}, create: officeHours } }  : {}),
+        ...(education    ? { education:    { deleteMany: {}, create: education as object[] } }    : {}),
+        ...(publications ? { publications: { deleteMany: {}, create: publications as object[] } } : {}),
+        ...(awards       ? { awards:       { deleteMany: {}, create: awards as object[] } }       : {}),
+        ...(officeHours  ? { officeHours:  { deleteMany: {}, create: officeHours as object[] } }  : {}),
       } as any,
       include: FACULTY_INCLUDE,
     });
