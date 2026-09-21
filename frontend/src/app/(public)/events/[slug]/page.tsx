@@ -9,10 +9,10 @@ const TYPE_COLORS: Record<string,string> = { seminar:'bg-blue-100 text-blue-700'
 
 async function fetchEvent(slug:string): Promise<Ev|null> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    const r = await fetch(`${api}/events/${slug}`, { next:{revalidate:600} });
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const r = await fetch(`${api}/events/${slug}`, { cache: 'no-store' });
     if (!r.ok) return null;
-    const d = await r.json() as {data:Ev};
+    const d = await r.json() as { data?: Ev };
     return d.data ?? null;
   } catch { return null; }
 }
@@ -20,7 +20,17 @@ async function fetchEvent(slug:string): Promise<Ev|null> {
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}): Promise<Metadata> {
   const {slug} = await params;
   const e = await fetchEvent(slug);
-  return { title: e ? `${e.title} — GSTU CSE Events` : 'Event — GSTU CSE' };
+  if (!e) return { title: 'Event — GSTU CSE' };
+  return {
+    title: `${e.title} — GSTU CSE Events`,
+    description: e.shortDescription ?? e.description?.slice(0, 160),
+    openGraph: {
+      title: e.title,
+      description: e.shortDescription ?? e.description?.slice(0, 160),
+      type: 'website',
+      images: e.coverImage ? [{ url: e.coverImage, width: 1200, height: 630, alt: e.title }] : [],
+    },
+  };
 }
 
 export default async function EventDetailPage({params}:{params:Promise<{slug:string}>}) {

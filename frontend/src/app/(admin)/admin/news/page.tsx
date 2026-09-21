@@ -103,7 +103,7 @@ export default function AdminNewsPage() {
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-white">{editing?'Edit Article':'Write Article'}</h3>
+              <h3 className="text-lg font-bold text-slate-900">{editing?'Edit Article':'Write Article'}</h3>
               <div className="flex rounded-lg border border-slate-200 overflow-hidden">
                 {(['basic','content'] as const).map(t=><button key={t} onClick={()=>setTab(t)} className={cn('px-3 py-1.5 text-xs font-semibold transition',tab===t?'bg-blue-600 text-white':'text-slate-400 hover:bg-white/5')}>{t==='basic'?'Basic Info':'Content'}</button>)}
               </div>
@@ -175,7 +175,7 @@ export default function AdminNewsPage() {
               {paged.map((n,i)=>(
                 <tr key={n.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
                   <td className="px-5 py-3">
-                    <p className="font-medium text-white line-clamp-1">{n.title}</p>
+                    <p className="font-medium text-slate-900 line-clamp-1">{n.title}</p>
                     <p className="text-xs text-slate-500 font-mono">{n.slug}</p>
                   </td>
                   <td className="px-4 py-3 text-center hidden sm:table-cell"><Badge variant="neutral">{n.category}</Badge></td>

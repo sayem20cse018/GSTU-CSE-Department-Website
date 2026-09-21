@@ -9,10 +9,10 @@ const CAT_COLORS: Record<string,string> = { achievement:'bg-amber-100 text-amber
 
 async function fetchBySlug(slug:string): Promise<NewsItem|null> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    const r = await fetch(`${api}/news/${slug}`, { next:{revalidate:600} });
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const r = await fetch(`${api}/news/${slug}`, { cache: 'no-store' });
     if (!r.ok) return null;
-    const d = await r.json() as {data:NewsItem};
+    const d = await r.json() as { data?: NewsItem };
     return d.data ?? null;
   } catch { return null; }
 }
@@ -20,7 +20,19 @@ async function fetchBySlug(slug:string): Promise<NewsItem|null> {
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}): Promise<Metadata> {
   const {slug} = await params;
   const n = await fetchBySlug(slug);
-  return { title: n ? `${n.title} — GSTU CSE News` : 'News — GSTU CSE', description: n?.excerpt };
+  if (!n) return { title: 'News — GSTU CSE' };
+  return {
+    title: `${n.title} — GSTU CSE`,
+    description: n.excerpt,
+    openGraph: {
+      title: n.title,
+      description: n.excerpt,
+      type: 'article',
+      publishedTime: n.publishedAt ?? n.createdAt,
+      authors: [n.authorName],
+      images: n.coverImage ? [{ url: n.coverImage, width: 1200, height: 630, alt: n.title }] : [],
+    },
+  };
 }
 
 export default async function NewsDetailPage({params}:{params:Promise<{slug:string}>}) {

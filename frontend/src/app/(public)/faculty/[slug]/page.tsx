@@ -16,12 +16,17 @@ interface Faculty {
 
 async function fetchFacultyBySlug(slug: string): Promise<Faculty | null> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    // Try by ID if looks like ObjectId, else search by slug from list
-    const r = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    // Try direct by ID first, then search in list by slug
+    const byId = await fetch(`${api}/faculty/${slug}`, { cache: 'no-store' });
+    if (byId.ok) {
+      const d = await byId.json() as { data?: Faculty };
+      if (d.data) return d.data;
+    }
+    const r = await fetch(`${api}/faculty`, { cache: 'no-store' });
     if (!r.ok) return null;
-    const d = await r.json() as { data: Faculty[] };
-    return d.data?.find(f => f.slug === slug || f.id === slug) ?? null;
+    const d = await r.json() as { data?: Faculty[] };
+    return (d.data ?? []).find(f => f.slug === slug || f.id === slug) ?? null;
   } catch { return null; }
 }
 

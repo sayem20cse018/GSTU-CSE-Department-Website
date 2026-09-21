@@ -35,12 +35,14 @@ const MOCK: Album[] = [
 
 async function fetchAlbums(): Promise<Album[]> {
   try {
-    const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    const res = await fetch(`${api}/gallery?isPublished=true&limit=50`, { next: { revalidate: 600 } });
-    if (!res.ok) return MOCK;
-    const json = await res.json() as { data: Album[] };
-    return json.data?.length ? json.data : MOCK;
-  } catch { return MOCK; }
+    const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+    const res = await fetch(`${api}/gallery?isPublished=true&limit=50`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const json = await res.json() as { data: Album[] | { data: Album[] } };
+    const raw = json.data;
+    const arr = Array.isArray(raw) ? raw : (raw as { data?: Album[] })?.data;
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
 }
 
 function formatDate(d: string) {

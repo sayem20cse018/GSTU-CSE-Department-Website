@@ -21,6 +21,8 @@ interface Publication {
   url?: string;
   isPublished: boolean;
   createdAt: string;
+  facultyId?: string;
+  facultyName?: string;
 }
 
 const EMPTY: Omit<Publication, 'id' | 'createdAt'> = {
@@ -44,8 +46,21 @@ export default function PublicationsPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { setList(await adminGet<Publication[]>('/research/publications')); }
-    catch { setList([]); } finally { setLoading(false); }
+    try {
+      // Aggregate publications from all faculty members
+      const faculty = await adminGet<{id:string; name:string; publications?:{id:string;title:string;authors:string;venue:string;year:number;type:string;doi?:string;url?:string}[]}[]>('/faculty');
+      const pubs: Publication[] = [];
+      for (const f of (Array.isArray(faculty) ? faculty : [])) {
+        for (const p of (f.publications ?? [])) {
+          pubs.push({
+            id: p.id, title: p.title, authors: p.authors, venue: p.venue,
+            year: p.year, type: (p.type === 'conference' ? 'conference' : 'journal') as PubType,
+            doi: p.doi, url: p.url, isPublished: true, createdAt: '', facultyId: f.id, facultyName: f.name,
+          });
+        }
+      }
+      setList(pubs);
+    } catch { setList([]); } finally { setLoading(false); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -66,19 +81,15 @@ export default function PublicationsPage() {
     }
     setSaving(true); setErr('');
     try {
-      if (editing) await adminPatch(`/research/publications/${editing.id}`, form);
-      else await adminPost('/research/publications', form);
-      setOpen(false); load();
+      // Publications are managed via Faculty profile
+      // This is a read-only aggregate view — editing redirects to faculty page
+      setErr('To edit publications, please use the Faculty & Staff page and edit the faculty member\'s profile.');
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
     finally { setSaving(false); }
   }
 
-  async function del(id: string) {
-    
-    setDelId(id);
-    try { await adminDelete(`/research/publications/${id}`); load(); }
-    catch (e) { console.error(e); }
-    finally { setDelId(null); }
+  async function del(_id: string) {
+    setErr('To delete publications, edit the faculty member\'s profile in the Faculty & Staff page.');
   }
 
   const journalCount    = list.filter(p => p.type === 'journal').length;
@@ -92,15 +103,16 @@ export default function PublicationsPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Research Publications</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            {journalCount} journal · {conferenceCount} conference
+            {journalCount} journal · {conferenceCount} conference · aggregated from faculty profiles
           </p>
         </div>
-        <Button onClick={openNew} icon={
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
-          </svg>}>
-          Add Publication
-        </Button>
+        <a href="/admin/faculty"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-xl text-sm font-bold hover:bg-green-600 transition">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+          </svg>
+          Add via Faculty Profile
+        </a>
       </div>
 
       {/* Type tabs */}
