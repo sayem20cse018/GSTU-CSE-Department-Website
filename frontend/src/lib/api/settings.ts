@@ -45,7 +45,9 @@ export interface SiteSettings {
   // Header customisation (admin-controlled)
   headerAccentColor?: string;   // dept name color, default #1a7a3c
   showDeptPrefix?: boolean;     // show "Department of" label, default true
+  headerFont?: string;          // font family for dept name
   customNavItems?: string;      // JSON string of custom nav items
+  headerRightBg?: string;       // right panel background color (gradient/solid)
 }
 
 // Fallback from hardcoded constants — used when backend is unreachable

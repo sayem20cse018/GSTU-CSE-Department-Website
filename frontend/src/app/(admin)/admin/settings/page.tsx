@@ -51,7 +51,7 @@ export default function SettingsPage() {
     if (admin) setProfForm({ name: admin.name ?? '', email: admin.email ?? '' });
   }, [admin]);
 
-  const F = (k: keyof SiteSettings, v: string | number) => {
+  const F = (k: keyof SiteSettings, v: string | number | boolean) => {
     setForm(p => ({ ...p, [k]: v })); setSaved(false);
   };
 
@@ -191,9 +191,11 @@ export default function SettingsPage() {
                   placeholder="Leave blank to auto-generate" className={iCls}/>
               </div>
 
-              {/* Header accent colour + prefix toggle */}
-              <div className="border-t border-slate-100 pt-4 space-y-4">
+              {/* Header appearance controls */}
+              <div className="border-t border-slate-100 pt-4 space-y-5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Header Appearance</p>
+
+                {/* Color + prefix row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className={lCls}>Department Name Colour</label>
@@ -206,9 +208,9 @@ export default function SettingsPage() {
                         value={(form as unknown as Record<string,string>).headerAccentColor || '#1a7a3c'}
                         onChange={e => F('headerAccentColor' as keyof SiteSettings, e.target.value)}
                         placeholder="#1a7a3c" maxLength={7}
-                        className={`${iCls} font-mono w-28`}/>
+                        className={`${iCls} font-mono`}/>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1">Dept. name color in the header (hex)</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Dept. name colour in the header</p>
                   </div>
                   <div className="flex flex-col justify-center">
                     <label className={lCls}>Show "Department of" Label</label>
@@ -216,7 +218,7 @@ export default function SettingsPage() {
                       <div className="relative">
                         <input type="checkbox"
                           checked={(form as unknown as Record<string,boolean>).showDeptPrefix !== false}
-                          onChange={e => F('showDeptPrefix' as keyof SiteSettings, e.target.checked as unknown as string)}
+                          onChange={e => F('showDeptPrefix' as keyof SiteSettings, e.target.checked)}
                           className="sr-only peer"/>
                         <div className="w-11 h-6 bg-slate-200 peer-checked:bg-green-600 rounded-full transition-colors"/>
                         <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5"/>
@@ -227,6 +229,59 @@ export default function SettingsPage() {
                     </label>
                     <p className="text-[11px] text-slate-400 mt-1">Toggle the small label above the dept name</p>
                   </div>
+                </div>
+
+                {/* Font selector */}
+                <div>
+                  <label className={lCls}>Department Name Font</label>
+                  <select
+                    value={(form as unknown as Record<string,string>).headerFont || 'montserrat'}
+                    onChange={e => F('headerFont' as keyof SiteSettings, e.target.value)}
+                    className={iCls}>
+                    <option value="montserrat">Montserrat (Default — Bold, Modern)</option>
+                    <option value="oswald">Oswald (Condensed, Strong)</option>
+                    <option value="inter">Inter (Clean, Professional)</option>
+                    <option value="serif">Georgia / Serif (Traditional Academic)</option>
+                    <option value="bengali">Noto Sans Bengali (Bengali Script)</option>
+                  </select>
+                  <p className="text-[11px] text-slate-400 mt-1">Font used for the department name in the header</p>
+                  {/* Preview */}
+                  <div className="mt-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
+                    <span className="text-[11px] text-slate-400 block mb-1">Preview:</span>
+                    <span
+                      className="text-lg font-black uppercase"
+                      style={{
+                        color: (form as unknown as Record<string,string>).headerAccentColor || '#1a7a3c',
+                        fontFamily: {
+                          montserrat: 'var(--font-montserrat)',
+                          oswald:     'var(--font-oswald)',
+                          inter:      'var(--font-inter)',
+                          serif:      'Georgia, serif',
+                          bengali:    'var(--font-bengali)',
+                        }[(form as unknown as Record<string,string>).headerFont || 'montserrat'] || 'var(--font-montserrat)',
+                      }}>
+                      Computer Science &amp; Engineering
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right panel colour */}
+                <div>
+                  <label className={lCls}>Header Right Panel Colour</label>
+                  <div className="flex items-center gap-3">
+                    <input type="color"
+                      value={(form as unknown as Record<string,string>).headerRightBg || '#1a7a3c'}
+                      onChange={e => F('headerRightBg' as keyof SiteSettings, e.target.value)}
+                      className="w-10 h-10 rounded-lg border border-slate-300 cursor-pointer p-0.5 bg-white"/>
+                    <input type="text"
+                      value={(form as unknown as Record<string,string>).headerRightBg || '#1a7a3c'}
+                      onChange={e => F('headerRightBg' as keyof SiteSettings, e.target.value)}
+                      placeholder="#1a7a3c" maxLength={7}
+                      className={`${iCls} font-mono`}/>
+                    <button type="button" onClick={() => F('headerRightBg' as keyof SiteSettings, '#1a7a3c')}
+                      className="text-xs text-slate-400 hover:text-slate-600 underline shrink-0">Reset</button>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">Background colour of the green right panel in the header</p>
                 </div>
               </div>
             </>

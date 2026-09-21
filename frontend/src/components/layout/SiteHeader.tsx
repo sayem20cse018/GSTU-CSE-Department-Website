@@ -7,6 +7,20 @@ export default async function SiteHeader() {
   const s        = await fetchSettings().catch(() => SETTINGS_FALLBACK);
   const deptCore = s.deptName.replace(/^Department\s+of\s*/i, '');
 
+  // Dynamic values from settings
+  const accentColor  = (s as unknown as Record<string,string>).headerAccentColor || '#1a7a3c';
+  const rightBg      = (s as unknown as Record<string,string>).headerRightBg || '#1a7a3c';
+  const rightBgGrad  = `linear-gradient(115deg, ${rightBg}cc 0%, ${rightBg} 55%, ${rightBg}aa 100%)`;
+  const stripeBg     = rightBg;
+  const selectedFont = (s as unknown as Record<string,string>).headerFont || 'montserrat';
+  const fontFamily   = {
+    montserrat: 'var(--font-montserrat)',
+    oswald:     'var(--font-oswald)',
+    inter:      'var(--font-inter)',
+    serif:      'Georgia, "Times New Roman", serif',
+    bengali:    'var(--font-bengali)',
+  }[selectedFont] ?? 'var(--font-montserrat)';
+
   return (
     <>
       {/* ═══════════════════════ DESKTOP (lg+) ════════════════════════ */}
@@ -54,7 +68,7 @@ export default async function SiteHeader() {
             <p className="leading-none mb-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:800, fontSize:'0.62rem', letterSpacing:'0.22em', textTransform:'uppercase', color:'#111827' }}>
               {s.showDeptPrefix !== false ? 'Department of' : ''}
             </p>
-            <p className="leading-tight group-hover:opacity-80 transition-opacity" style={{ fontFamily:'var(--font-montserrat)', fontWeight:900, fontSize:'1.55rem', letterSpacing:'-0.01em', color: s.headerAccentColor || '#1a7a3c', textTransform:'uppercase' }}>
+            <p className="leading-tight group-hover:opacity-80 transition-opacity" style={{ fontFamily, fontWeight:900, fontSize:'1.55rem', letterSpacing:'-0.01em', color: accentColor, textTransform:'uppercase' }}>
               {deptCore}
             </p>
             <p className="mt-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:700, fontSize:'0.6rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'#111827' }}>
@@ -66,17 +80,14 @@ export default async function SiteHeader() {
         {/* ── DIAGONAL STRIPES ────────────────────────────────────────── */}
         <div className="relative shrink-0 self-stretch" style={{ width: '60px', overflow: 'hidden' }} aria-hidden="true">
           <div className="absolute inset-0 bg-white"/>
-          {/* Main diagonal */}
-          <div className="absolute inset-0" style={{ background: '#1a7a3c', clipPath: 'polygon(45% 0%, 100% 0%, 55% 100%, 0% 100%)' }}/>
-          {/* White accent gap */}
+          <div className="absolute inset-0" style={{ background: stripeBg, clipPath: 'polygon(45% 0%, 100% 0%, 55% 100%, 0% 100%)' }}/>
           <div className="absolute inset-0 bg-white" style={{ clipPath: 'polygon(68% 0%, 77% 0%, 32% 100%, 23% 100%)' }}/>
-          {/* Thin second stripe */}
-          <div className="absolute inset-0" style={{ background: '#1a7a3c', clipPath: 'polygon(79% 0%, 100% 0%, 100% 100%, 55% 100%)' }}/>
+          <div className="absolute inset-0" style={{ background: stripeBg, clipPath: 'polygon(79% 0%, 100% 0%, 100% 100%, 55% 100%)' }}/>
         </div>
 
-        {/* ── RIGHT: dark green ────────────────────────────────────────── */}
+        {/* ── RIGHT: dynamic color ─────────────────────────────────────── */}
         <div className="relative flex-1 flex items-center justify-between pl-5 pr-8 overflow-hidden"
-          style={{ background: 'linear-gradient(115deg, #0f4a20 0%, #1a7a3c 55%, #124d26 100%)' }}>
+          style={{ background: rightBgGrad }}>
 
           {/* Dot pattern */}
           <svg className="absolute inset-0 w-full h-full opacity-[0.1] pointer-events-none" aria-hidden="true">
@@ -141,13 +152,13 @@ export default async function SiteHeader() {
       </header>
 
       {/* ═══════════════════════ TABLET (md–lg) ═══════════════════════ */}
-      <header className="hidden md:flex lg:hidden overflow-hidden" style={{ height: '68px', background: '#fff', borderBottom: '3px solid #1a7a3c' }}>
+      <header className="hidden md:flex lg:hidden overflow-hidden" style={{ height: '68px', background: '#fff', borderBottom: `3px solid ${accentColor}` }}>
         <Link href="/" className="flex items-center gap-3 px-4 shrink-0">
           <div className="w-11 h-11 flex-shrink-0 flex items-center justify-center">
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={s.deptLogo} alt="" className="w-full h-full object-contain"/>
-              : <div className="w-full h-full rounded-full border-[2px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
+              : <div className="w-full h-full rounded-full border-[2px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: accentColor }}>
                   <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
                     <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
                     <text x="40" y="44" textAnchor="middle" dominantBaseline="middle" fontSize="12" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
@@ -157,11 +168,11 @@ export default async function SiteHeader() {
           </div>
           <div>
             <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400" style={{ fontFamily: 'var(--font-montserrat)' }}>Dept. of</p>
-            <p className="font-black leading-tight uppercase text-sm" style={{ fontFamily: 'var(--font-montserrat)', color: '#1a7a3c' }}>{deptCore}</p>
+            <p className="font-black leading-tight uppercase text-sm" style={{ fontFamily, color: accentColor }}>{deptCore}</p>
             <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider" style={{ fontFamily: 'var(--font-montserrat)' }}>{s.universityShortName}</p>
           </div>
         </Link>
-        <div className="flex-1 flex items-center justify-end px-4 gap-2" style={{ background: 'linear-gradient(90deg, #0f4a20, #1a7a3c)' }}>
+        <div className="flex-1 flex items-center justify-end px-4 gap-2" style={{ background: rightBgGrad }}>
           <HeaderSearch dark />
           <Link href="/contact" className="text-xs text-white/75 hover:text-white transition">Contact</Link>
           <span className="text-white/30">|</span>
@@ -173,14 +184,15 @@ export default async function SiteHeader() {
       </header>
 
       {/* ═══════════════════════ MOBILE ═══════════════════════════════ */}
-      <header className="flex md:hidden items-center justify-between px-4 bg-white" style={{ height: '64px', borderBottom: '3px solid #1a7a3c' }}>
-        <Link href="/" className="flex items-center gap-3">
-          {/* Bigger logo on mobile */}
-          <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center">
+      <header className="flex md:hidden flex-col items-center justify-center px-4 bg-white py-3" style={{ borderBottom: `3px solid ${accentColor}`, minHeight: '72px' }}>
+        {/* Center: logo + dept + uni — Khulna University style */}
+        <Link href="/" className="flex flex-col items-center gap-1.5 text-center">
+          {/* Logo */}
+          <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center">
             {s.deptLogo
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={s.deptLogo} alt={s.deptShortName} className="w-full h-full object-contain"/>
-              : <div className="w-full h-full rounded-full border-[2.5px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: '#1a7a3c' }}>
+              : <div className="w-full h-full rounded-full border-[2.5px] overflow-hidden bg-white flex items-center justify-center shadow-sm" style={{ borderColor: accentColor }}>
                   <svg viewBox="0 0 80 80" className="w-9 h-9" fill="none">
                     <path d="M40 8 L16 20 L16 42 C16 58 28 68 40 72 C52 68 64 58 64 42 L64 20 Z" fill="#dc2626"/>
                     <text x="40" y="40" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="900" fill="white" style={{fontFamily:'Arial,sans-serif'}}>CSE</text>
@@ -189,19 +201,21 @@ export default async function SiteHeader() {
                 </div>
             }
           </div>
-          {/* Dept name only — clean, no duplicate label */}
-          <div>
-            <p className="font-black leading-tight uppercase text-sm" style={{ fontFamily: 'var(--font-montserrat)', color: '#1a7a3c' }}>
-              {deptCore}
-            </p>
-            <p className="text-[9px] text-slate-400 leading-tight" style={{ fontFamily: 'var(--font-montserrat)' }}>
-              {s.universityShortName}
-            </p>
-          </div>
+          {/* Dept name */}
+          {(s as unknown as Record<string,boolean>).showDeptPrefix !== false && (
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400" style={{ fontFamily: 'var(--font-montserrat)', lineHeight: 1 }}>Department of</p>
+          )}
+          <p className="font-black uppercase leading-tight text-base" style={{ fontFamily, color: accentColor, lineHeight: 1.1 }}>
+            {deptCore}
+          </p>
+          <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider" style={{ fontFamily: 'var(--font-montserrat)' }}>
+            {s.universityName}
+          </p>
         </Link>
-        <div className="flex items-center gap-2">
-          <Link href="/student/login" className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border text-green-800" style={{ borderColor: '#1a7a3c' }}>Login</Link>
-          <Link href="/admissions" className="text-[11px] font-extrabold px-2.5 py-1.5 rounded-lg text-white" style={{ background: '#1a7a3c' }}>Register</Link>
+        {/* Login/Register row below */}
+        <div className="flex items-center gap-2 mt-2">
+          <Link href="/student/login" className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border" style={{ borderColor: accentColor, color: accentColor }}>Student Login</Link>
+          <Link href="/admissions" className="text-[11px] font-extrabold px-3 py-1.5 rounded-lg text-white" style={{ background: accentColor }}>Register</Link>
         </div>
       </header>
     </>
