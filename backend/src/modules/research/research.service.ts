@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { instanceToPlain } from 'class-transformer';
 import { PrismaService } from '../../database/prisma.service';
 
 const GROUP_INCLUDE = { projects: true } as const;
@@ -28,12 +27,13 @@ export class ResearchService {
   }
 
   async create(dto: object) {
-    const { projects, ...rest } = instanceToPlain(dto) as Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { projects, ...rest } = dto as Record<string, any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.researchGroup.create({
       data: {
         ...rest,
-        ...(projects ? { projects: { create: projects } } : {}),
+        ...(Array.isArray(projects) && projects.length ? { projects: { create: projects } } : {}),
       } as any,
       include: GROUP_INCLUDE,
     });
@@ -42,13 +42,16 @@ export class ResearchService {
   async update(id: string, dto: object) {
     const g = await this.prisma.researchGroup.findUnique({ where: { id } });
     if (!g) throw new NotFoundException(`Research group ${id} not found`);
-    const { projects, ...rest } = instanceToPlain(dto) as Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { projects, ...rest } = dto as Record<string, any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.researchGroup.update({
       where: { id },
       data: {
         ...rest,
-        ...(projects ? { projects: { deleteMany: {}, create: projects } } : {}),
+        ...(Array.isArray(projects)
+          ? { projects: { deleteMany: {}, ...(projects.length ? { create: projects } : {}) } }
+          : {}),
       } as any,
       include: GROUP_INCLUDE,
     });

@@ -36,10 +36,10 @@ async function bootstrap() {
   // ── Global validation pipe ────────────────────────────────────────────────
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,          // strip unknown fields silently
-      forbidNonWhitelisted: false, // don't throw on extra fields (Prisma returns id/createdAt/updatedAt)
+      whitelist: true,
+      forbidNonWhitelisted: false,
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
+      transformOptions: { enableImplicitConversion: false },
     }),
   );
 

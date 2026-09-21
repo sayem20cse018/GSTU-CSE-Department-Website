@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { instanceToPlain } from 'class-transformer';
 import { PrismaService } from '../../database/prisma.service';
 
 import type { CreateProgramDto, UpdateProgramDto }                   from './dto/program.dto';
@@ -7,10 +6,10 @@ import type { CreateCourseDto, UpdateCourseDto }                     from './dto
 import type { CreateAcademicResourceDto, UpdateAcademicResourceDto } from './dto/academic-resource.dto';
 import type { CreateLaboratoryDto, UpdateLaboratoryDto }             from './dto/laboratory.dto';
 
-// Prisma data helper — extracts nested relation fields and builds the data object
+// Prisma data helper — direct cast (DTO is already a plain object from NestJS)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function plain(dto: unknown): Record<string, any> {
-  return instanceToPlain(dto as object);
+  return dto as Record<string, any>;
 }
 
 @Injectable()
