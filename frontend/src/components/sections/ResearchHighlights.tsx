@@ -37,16 +37,12 @@ const FEATURED_PROJECTS = [
   },
 ];
 
-
 export default function ResearchHighlights() {
   return (
     <section className="section-py bg-white">
-
       <div className="container-custom">
-
         {/* Header */}
         <div className="text-center mb-14">
-
           <p className="text-sm font-semibold text-blue-600 uppercase tracking-widest mb-3">
             Innovation & Research
           </p>
@@ -59,15 +55,12 @@ export default function ResearchHighlights() {
             Our faculty members and students are working on advanced research
             areas in computer science and engineering.
           </p>
-
         </div>
-
 
         {/* Research Areas */}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-16">
-
-          {RESEARCH_AREAS.map((area)=>(
+          {RESEARCH_AREAS.map((area) => (
             <div
               key={area.name}
               className="
@@ -82,11 +75,7 @@ export default function ResearchHighlights() {
               transition-all
               "
             >
-
-              <div className="text-4xl mb-3">
-                {area.icon}
-              </div>
-
+              <div className="text-4xl mb-3">{area.icon}</div>
 
               <h3 className="text-sm font-semibold text-slate-800">
                 {area.name}
@@ -95,14 +84,9 @@ export default function ResearchHighlights() {
               <p className="text-xs text-slate-500 mt-2">
                 {area.count} Projects
               </p>
-
-
             </div>
           ))}
-
         </div>
-
-
 
         {/* Project Cards */}
 
@@ -110,16 +94,11 @@ export default function ResearchHighlights() {
           Featured Research Projects
         </h3>
 
-
         <div className="grid md:grid-cols-3 gap-7">
-
-
-        {
-          FEATURED_PROJECTS.map((project)=>(
-
-          <article
-          key={project.id}
-          className="
+          {FEATURED_PROJECTS.map((project) => (
+            <article
+              key={project.id}
+              className="
           bg-white
           rounded-3xl
           border border-slate-200
@@ -130,16 +109,12 @@ export default function ResearchHighlights() {
           transition-all
           flex flex-col
           "
-          >
+            >
+              {/* Top */}
 
-
-            {/* Top */}
-
-            <div className="flex justify-between items-center mb-5">
-
-
-              <span
-              className="
+              <div className="flex justify-between items-center mb-5">
+                <span
+                  className="
               text-xs
               font-semibold
               text-blue-700
@@ -148,13 +123,12 @@ export default function ResearchHighlights() {
               py-1.5
               rounded-full
               "
-              >
-                {project.area}
-              </span>
+                >
+                  {project.area}
+                </span>
 
-
-              <span
-              className={`
+                <span
+                  className={`
               text-xs
               font-semibold
               px-3
@@ -162,70 +136,46 @@ export default function ResearchHighlights() {
               rounded-full
 
               ${
-                project.status==="active"
-                ?
-                "bg-green-50 text-green-700"
-                :
-                "bg-slate-100 text-slate-600"
+                project.status === "active"
+                  ? "bg-green-50 text-green-700"
+                  : "bg-slate-100 text-slate-600"
               }
 
               `}
-              >
+                >
+                  {project.status === "active" ? "● Active" : "✓ Completed"}
+                </span>
+              </div>
 
-                {
-                  project.status==="active"
-                  ?
-                  "● Active"
-                  :
-                  "✓ Completed"
-                }
+              {/* Title */}
 
-              </span>
-
-
-            </div>
-
-
-
-            {/* Title */}
-
-            <h4
-            className="
+              <h4
+                className="
             text-lg
             font-bold
             text-slate-900
             leading-snug
             mb-4
             "
-            >
+              >
+                {project.title}
+              </h4>
 
-              {project.title}
-
-            </h4>
-
-
-
-            <p
-            className="
+              <p
+                className="
             text-sm
             text-slate-600
             leading-relaxed
             mb-6
             "
-            >
+              >
+                {project.description}
+              </p>
 
-              {project.description}
+              {/* Details */}
 
-            </p>
-
-
-
-
-            {/* Details */}
-
-
-            <div
-            className="
+              <div
+                className="
             border-t
             border-slate-200
             pt-5
@@ -233,72 +183,41 @@ export default function ResearchHighlights() {
             text-sm
             mt-auto
             "
-            >
+              >
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Principal Investigator</span>
 
+                  <span className="font-semibold text-slate-800">
+                    {project.pi}
+                  </span>
+                </div>
 
-              <div className="flex justify-between">
-                <span className="text-slate-500">
-                  Principal Investigator
-                </span>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Funding</span>
 
-                <span className="font-semibold text-slate-800">
-                  {project.pi}
-                </span>
+                  <span className="font-semibold text-slate-800">
+                    {project.funding}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Year</span>
+
+                  <span className="font-semibold text-slate-800">
+                    {project.year}
+                  </span>
+                </div>
               </div>
-
-
-
-              <div className="flex justify-between">
-
-                <span className="text-slate-500">
-                  Funding
-                </span>
-
-                <span className="font-semibold text-slate-800">
-                  {project.funding}
-                </span>
-
-              </div>
-
-
-
-
-              <div className="flex justify-between">
-
-                <span className="text-slate-500">
-                  Year
-                </span>
-
-                <span className="font-semibold text-slate-800">
-                  {project.year}
-                </span>
-
-              </div>
-
-
-
-            </div>
-
-
-          </article>
-
-          ))
-        }
-
-
+            </article>
+          ))}
         </div>
-
-
-
 
         {/* Button */}
 
         <div className="text-center mt-12">
-
-
           <Link
-          href="/research"
-          className="
+            href="/research"
+            className="
           inline-flex
           items-center
           gap-2
@@ -313,37 +232,23 @@ export default function ResearchHighlights() {
           transition
           "
           >
-
             View All Research
-
-
             <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-
               <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 8l4 4m0 0l-4 4m4-4H3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
               />
-
             </svg>
-
-
           </Link>
-
-
         </div>
-
-
-
       </div>
-
-
     </section>
   );
 }

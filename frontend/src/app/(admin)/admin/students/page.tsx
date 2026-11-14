@@ -324,7 +324,7 @@ export default function AdminStudentsPage() {
                   <tr><td colSpan={6}>
                     <EmptyState title={query ? 'No matching records' : 'No students imported yet'}
                       description={query ? 'Try a different search.' : 'Use the Import tab to upload an Excel file.'}
-                      action={!query ? <button onClick={() => setTab('import')} className="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-semibold">Import Students</button> : undefined}/>
+                      action={!query ? <button onClick={() => setTab('import')} className="px-4 py-2 bg-green-700 text-slate-900 rounded-lg text-sm font-semibold">Import Students</button> : undefined}/>
                   </td></tr>
                 ) : paged.map(rec => (
                   <tr key={rec.id} className="hover:bg-slate-50 transition-colors">

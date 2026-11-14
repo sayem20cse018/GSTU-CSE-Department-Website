@@ -10,10 +10,13 @@ import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import type { Laboratory } from '@/lib/api/academics';
 
+import ImageUpload from '@/components/admin/ui/ImageUpload';
+
 function toSlug(s: string) { return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
 
-const EMPTY = { name:'', slug:'', description:'', shortDescription:'', location:'', capacity:0,
-  workstations:0, inCharge:'', inChargeEmail:'', labType:'both' as 'teaching'|'research'|'both',
+const EMPTY = { name:'', slug:'', description:'', shortDescription:'', coverImage:'',
+  location:'', capacity:0, workstations:0, inCharge:'', inChargeEmail:'',
+  labType:'both' as 'teaching'|'research'|'both',
   facilities:'', softwareInstalled:'', isActive:true, isFeatured:false };
 
 export default function AdminLabsPage() {
@@ -41,6 +44,7 @@ export default function AdminLabsPage() {
   function openEdit(l: Laboratory) {
     setEditing(l);
     setForm({ name:l.name, slug:l.slug, description:l.description, shortDescription:l.shortDescription??'',
+      coverImage:'',
       location:l.location, capacity:l.capacity??0, workstations:l.workstations??0,
       inCharge:l.inCharge??'', inChargeEmail:l.inChargeEmail??'',
       labType:l.labType as typeof EMPTY.labType,
@@ -117,6 +121,7 @@ export default function AdminLabsPage() {
                 <input value={form.inCharge} onChange={e=>F('inCharge',e.target.value)} placeholder="Dr. Rahman" className={iCls}/></div>
               <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Description</label>
                 <textarea rows={3} value={form.description} onChange={e=>F('description',e.target.value)} className={`${iCls} resize-none`}/></div>
+              <ImageUpload label="Cover Image" value={form.coverImage} onChange={v=>F('coverImage',v)} hint="Lab cover photo (optional)"/>
               <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Facilities (comma separated)</label>
                 <input value={form.facilities} onChange={e=>F('facilities',e.target.value)} placeholder="AC, Projector, UPS" className={iCls}/></div>
               <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Software Installed (comma separated)</label>

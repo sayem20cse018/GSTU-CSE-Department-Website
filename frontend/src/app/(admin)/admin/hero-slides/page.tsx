@@ -168,7 +168,7 @@ export default function AdminHeroSlidesPage() {
               }
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-white text-sm truncate">{s.title}</p>
+              <p className="font-semibold text-slate-100 text-sm truncate">{s.title}</p>
               <p className="text-xs text-slate-500 truncate mt-0.5">{s.subtitle}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-[10px] text-slate-600">Order: {s.sortOrder}</span>

@@ -6,6 +6,9 @@ import Button      from '@/components/admin/ui/Button';
 import Badge       from '@/components/admin/ui/Badge';
 import EmptyState  from '@/components/admin/ui/EmptyState';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import SearchInput from '@/components/admin/ui/SearchInput';
 import { cn }      from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
@@ -45,11 +48,18 @@ export default function AlumniAdminPage() {
   const [saving, setSaving]   = useState(false);
   const [delId, setDelId]     = useState<string | null>(null);
   const [err, setErr]         = useState('');
+  const [query, setQuery]     = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+
+  const toast = useToast();
+  const { confirm, ConfirmDialog } = useConfirm();
 
   const load = useCallback(async () => {
     setLoading(true);
     try { setList(await adminGet<Alumnus[]>('/alumni?admin=true')); }
-    catch { setList([]); } finally { setLoading(false); }
+    catch { toast.error('Failed to load'); setList([]); }
+    finally { setLoading(false); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -76,29 +86,60 @@ export default function AlumniAdminPage() {
       // Strip fields not in the backend schema
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { associationRole, isDistinguished, ...payload } = form;
-      if (editing) await adminPatch(`/alumni/${editing.id}`, payload);
-      else await adminPost('/alumni', payload);
+      if (editing) { await adminPatch(`/alumni/${editing.id}`, payload); toast.success('Updated!'); }
+      else          { await adminPost('/alumni', payload);               toast.success('Added!'); }
       setOpen(false); load();
-    } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
+    } catch (e) { const m=e instanceof Error?e.message:'Save failed'; setErr(m); toast.error(m); }
     finally { setSaving(false); }
   }
 
-  async function del(id: string) {
-    
-    setDelId(id);
-    try { await adminDelete(`/alumni/${id}`); load(); }
-    catch (e) { console.error(e); }
+  async function quickApprove(a: Alumnus, status: string) {
+    try {
+      await adminPatch(`/alumni/${a.id}`, { approvalStatus: status });
+      toast.success(`${a.name} ${status}`);
+      load();
+    } catch (e) { toast.error(e instanceof Error?e.message:'Failed'); }
+  }
+
+  async function del(a: Alumnus) {
+    const ok = await confirm({ title: `Remove "${a.name}" from alumni?`, description: 'This will permanently delete the alumni record.', confirmLabel: 'Remove' });
+    if (!ok) return;
+    setDelId(a.id);
+    try { await adminDelete(`/alumni/${a.id}`); toast.success('Removed'); load(); }
+    catch (e) { toast.error(e instanceof Error?e.message:'Delete failed'); }
     finally { setDelId(null); }
   }
 
   const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500';
   const statusColor: Record<string, 'success' | 'danger' | 'neutral'> = { approved:'success', rejected:'danger', pending:'neutral' };
+  const filtered = list.filter(a => {
+    const q = query.toLowerCase();
+    const matchQ = !q || a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q);
+    const matchS = !statusFilter || a.approvalStatus === statusFilter;
+    return matchQ && matchS;
+  });
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <AdminPageTitle title="Alumni" />
+      {ConfirmDialog}
       <PageHeader title="Alumni Directory" description={`${list.length} alumni record${list.length !== 1 ? 's' : ''}`}
         action={<Button onClick={openNew} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Alumni</Button>}/>
+
+      {/* Search + filter */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4 items-start sm:items-center">
+        <SearchInput value={query} onChange={setQuery} placeholder="Search alumni…" className="max-w-xs"/>
+        <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}
+          className="border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        {(query||statusFilter) && (
+          <p className="text-xs text-slate-500">{filtered.length} results</p>
+        )}
+      </div>
 
       {/* Modal */}
       {open && (
@@ -211,7 +252,7 @@ export default function AlumniAdminPage() {
               <th className="text-right px-5 py-3">Actions</th>
             </tr></thead>
             <tbody>
-              {list.map((a, i) => (
+              {filtered.map((a, i) => (
                 <tr key={a.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'')}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
@@ -244,9 +285,17 @@ export default function AlumniAdminPage() {
                     </div>
                   </td>
                   <td className="px-5 py-3">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2 flex-wrap">
+                      {a.approvalStatus === 'pending' && (
+                        <>
+                          <button onClick={() => quickApprove(a, 'approved')}
+                            className="text-[10px] font-bold px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-700 transition">✓ Approve</button>
+                          <button onClick={() => quickApprove(a, 'rejected')}
+                            className="text-[10px] font-bold px-2 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition">✗ Reject</button>
+                        </>
+                      )}
                       <Button size="sm" variant="secondary" onClick={() => openEdit(a)}>Edit</Button>
-                      <Button size="sm" variant="danger" loading={delId === a.id} onClick={() => del(a.id)}>Del</Button>
+                      <Button size="sm" variant="danger" loading={delId === a.id} onClick={() => del(a)}>Del</Button>
                     </div>
                   </td>
                 </tr>

@@ -381,7 +381,7 @@ export default function NoticesPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       {n.isUrgent && (
-                        <span className="text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded shrink-0">URGENT</span>
+                        <span className="text-[10px] font-bold bg-red-500 text-slate-900 px-1.5 py-0.5 rounded shrink-0">URGENT</span>
                       )}
                       {n.isPinned && !n.isUrgent && (
                         <span className="text-[10px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded shrink-0">PIN</span>

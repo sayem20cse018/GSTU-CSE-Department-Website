@@ -107,7 +107,7 @@ export default function PublicationsPage() {
           </p>
         </div>
         <a href="/admin/faculty"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-xl text-sm font-bold hover:bg-green-600 transition">
+          className="inline-flex items-center gap-2 px-4 py-2 bg-green-700 text-slate-900 rounded-xl text-sm font-bold hover:bg-green-600 transition">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
           </svg>

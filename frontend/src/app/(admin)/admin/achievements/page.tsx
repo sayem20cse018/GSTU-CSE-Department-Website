@@ -1,12 +1,15 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
-import PageHeader from '@/components/admin/ui/PageHeader';
-import Button     from '@/components/admin/ui/Button';
-import Badge      from '@/components/admin/ui/Badge';
-import EmptyState from '@/components/admin/ui/EmptyState';
+import PageHeader  from '@/components/admin/ui/PageHeader';
+import Button      from '@/components/admin/ui/Button';
+import Badge       from '@/components/admin/ui/Badge';
+import EmptyState  from '@/components/admin/ui/EmptyState';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
-import { cn }     from '@/lib/utils/cn';
+import SearchInput from '@/components/admin/ui/SearchInput';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import { cn }         from '@/lib/utils/cn';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
 
@@ -15,37 +18,63 @@ const EMPTY = { title:'', description:'', image:'', type:'student', achievedAt:'
 interface Ach { id:string; title:string; type:string; achievedAt:string; achieverName?:string; isPublished:boolean; isFeatured:boolean; }
 
 export default function AchievementsAdminPage() {
-  const [list,setList]      = useState<Ach[]>([]);
-  const [loading,setLoading]= useState(true);
-  const [open,setOpen]      = useState(false);
-  const [form,setForm]      = useState(EMPTY);
-  const [editing,setEditing]= useState<Ach|null>(null);
-  const [saving,setSaving]  = useState(false);
-  const [delId,setDelId]    = useState<string|null>(null);
-  const [err,setErr]        = useState('');
+  const [list,    setList]    = useState<Ach[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [open,    setOpen]    = useState(false);
+  const [form,    setForm]    = useState(EMPTY);
+  const [editing, setEditing] = useState<Ach|null>(null);
+  const [saving,  setSaving]  = useState(false);
+  const [delId,   setDelId]   = useState<string|null>(null);
+  const [err,     setErr]     = useState('');
+  const [query,   setQuery]   = useState('');
 
-  const load = useCallback(async()=>{
+  const toast = useToast();
+  const { confirm, ConfirmDialog } = useConfirm();
+
+  const load = useCallback(async () => {
     setLoading(true);
-    try{ setList(await adminGet<Ach[]>('/achievements?admin=true')); }
-    catch{ setList([]); }finally{ setLoading(false); }
-  },[]);
-  useEffect(()=>{ load(); },[load]);
+    try { setList(await adminGet<Ach[]>('/achievements?admin=true')); }
+    catch { toast.error('Failed to load'); setList([]); }
+    finally { setLoading(false); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => { load(); }, [load]);
 
-  const F=(k:keyof typeof EMPTY,v:string|boolean)=>setForm(p=>({...p,[k]:v}));
-  function openEdit(a:Ach){ setEditing(a); setForm({title:a.title,description:'',image:'',type:a.type,achievedAt:a.achievedAt?.slice(0,10)??'',achieverName:a.achieverName??'',awardedBy:'',isPublished:a.isPublished,isFeatured:a.isFeatured}); setErr(''); setOpen(true); }
+  const F = (k: keyof typeof EMPTY, v: string|boolean) => setForm(p => ({...p, [k]: v}));
+  function openEdit(a: Ach) { setEditing(a); setForm({title:a.title, description:'', image:'', type:a.type, achievedAt:a.achievedAt?.slice(0,10)??'', achieverName:a.achieverName??'', awardedBy:'', isPublished:a.isPublished, isFeatured:a.isFeatured}); setErr(''); setOpen(true); }
 
-  async function save(){ if(!form.title||!form.achievedAt){setErr('Title and date required.');return;} setSaving(true);setErr('');
-    try{ if(editing) await adminPatch(`/achievements/${editing.id}`,form); else await adminPost('/achievements',form); setOpen(false);load(); }
-    catch(e){setErr(e instanceof Error?e.message:'Save failed');}finally{setSaving(false);} }
+  async function save() {
+    if (!form.title || !form.achievedAt) { setErr('Title and date required.'); return; }
+    setSaving(true); setErr('');
+    try {
+      if (editing) { await adminPatch(`/achievements/${editing.id}`, form); toast.success('Updated!'); }
+      else         { await adminPost('/achievements', form);                toast.success('Created!'); }
+      setOpen(false); load();
+    } catch(e) { const m=e instanceof Error?e.message:'Save failed'; setErr(m); toast.error(m); }
+    finally { setSaving(false); }
+  }
 
-  async function del(id:string){  setDelId(id);
-    try{await adminDelete(`/achievements/${id}`);load();}catch(e){ console.error(e); }finally{setDelId(null);} }
+  async function del(a: Ach) {
+    const ok = await confirm({ title:`Delete "${a.title}"?`, confirmLabel:'Delete' });
+    if (!ok) return;
+    setDelId(a.id);
+    try { await adminDelete(`/achievements/${a.id}`); toast.success('Deleted'); load(); }
+    catch(e) { toast.error(e instanceof Error?e.message:'Delete failed'); }
+    finally { setDelId(null); }
+  }
+
+  const filtered = query ? list.filter(a => a.title.toLowerCase().includes(query.toLowerCase())) : list;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <AdminPageTitle title="Manage Achievements"/>
+      {ConfirmDialog}
       <PageHeader title="Achievements" description={`${list.length} achievement${list.length!==1?'s':''}`}
         action={<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}} icon={<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>}>Add Achievement</Button>}/>
+
+      <div className="mb-4">
+        <SearchInput value={query} onChange={setQuery} placeholder="Search achievements…" className="max-w-xs"/>
+      </div>
 
       {open&&(<div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
         <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-y-auto">
@@ -85,14 +114,14 @@ export default function AchievementsAdminPage() {
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         {loading?<div className="p-6 space-y-3">{[1,2,3].map(i=><div key={i} className="h-14 bg-slate-100 rounded-xl animate-pulse"/>)}</div>
-        :list.length===0?<EmptyState title="No achievements yet" description="Add the first achievement."/>
-        :(<table className="w-full text-sm"><thead><tr className="border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
+        :filtered.length===0?<EmptyState title={query?`No results for "${query}"`:'No achievements yet'} description={query?'Try different search.':'Add the first achievement.'} action={!query?<Button onClick={()=>{setEditing(null);setForm(EMPTY);setErr('');setOpen(true);}}>Add Achievement</Button>:undefined}/>
+        :(<table className="w-full text-sm"><thead><tr className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500 font-semibold uppercase tracking-wider">
           <th className="text-left px-5 py-3">Title</th><th className="text-center px-4 py-3">Type</th>
           <th className="text-center px-4 py-3">Date</th><th className="text-center px-4 py-3">Status</th>
           <th className="text-right px-5 py-3">Actions</th></tr></thead>
-          <tbody>{list.map((a,i)=>(
+          <tbody>{filtered.map((a,i)=>(
             <tr key={a.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50',i%2?'bg-white':'')}>
-              <td className="px-5 py-3 font-medium text-white line-clamp-1">{a.title}</td>
+              <td className="px-5 py-3 font-medium text-slate-900 line-clamp-1">{a.title}</td>
               <td className="px-4 py-3 text-center"><Badge variant="neutral">{a.type}</Badge></td>
               <td className="px-4 py-3 text-center text-xs text-slate-400">{formatDate(a.achievedAt)}</td>
               <td className="px-4 py-3 text-center"><div className="flex justify-center gap-1.5 flex-wrap">
@@ -100,7 +129,7 @@ export default function AchievementsAdminPage() {
                 {a.isFeatured&&<Badge variant="info">Featured</Badge>}</div></td>
               <td className="px-5 py-3"><div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="secondary" onClick={()=>openEdit(a)}>Edit</Button>
-                <Button size="sm" variant="danger" loading={delId===a.id} onClick={()=>del(a.id)}>Delete</Button>
+                <Button size="sm" variant="danger" loading={delId===a.id} onClick={()=>del(a)}>Delete</Button>
               </div></td>
             </tr>))}</tbody></table>)}
       </div>
