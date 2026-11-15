@@ -17,14 +17,7 @@ interface Club {
   isFeatured: boolean;
 }
 
-const MOCK_CLUBS: Club[] = [
-  { id:'1', name:'Programming Club',   slug:'programming-club',  shortDescription:'Fostering competitive programming and problem-solving among CSE students.',       foundedYear:2013, memberCount:120, isActive:true, isFeatured:true,  advisorName:'Dr. Mohammad Rahman' },
-  { id:'2', name:'Robotics Club',      slug:'robotics-club',     shortDescription:'Exploring automation, robotics and embedded systems through hands-on projects.',  foundedYear:2015, memberCount:85,  isActive:true, isFeatured:true,  advisorName:'Mr. Arif Ahmed' },
-  { id:'3', name:'AI Research Club',   slug:'ai-research-club',  shortDescription:'Conducting research in artificial intelligence, machine learning and data science.',foundedYear:2018, memberCount:70,  isActive:true, isFeatured:false, advisorName:'Dr. Karim Hossain' },
-  { id:'4', name:'Cyber Security Club',slug:'cybersecurity-club',shortDescription:'Building expertise in ethical hacking, network security and digital privacy.',    foundedYear:2019, memberCount:60,  isActive:true, isFeatured:false, advisorName:'Dr. Fatima Khatun' },
-  { id:'5', name:'App Dev Club',       slug:'app-dev-club',      shortDescription:'Creating innovative mobile and web applications to solve real-world problems.',    foundedYear:2020, memberCount:95,  isActive:true, isFeatured:false, advisorName:'Ms. Nadia Islam' },
-  { id:'6', name:'Open Source Club',   slug:'open-source-club',  shortDescription:'Contributing to open source projects and promoting collaborative development.',   foundedYear:2021, memberCount:50,  isActive:true, isFeatured:false, advisorName:'Mr. Tanvir Hasan' },
-];
+const MOCK_CLUBS: Club[] = [];
 
 const CLUB_META = [
   { gradient:'from-blue-600 to-indigo-700',   icon:'💻' },

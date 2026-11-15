@@ -1,23 +1,26 @@
 import type { Metadata } from 'next';
 import SectionHero from '@/components/academics/SectionHero';
+import { fetchSettings, SETTINGS_FALLBACK } from '@/lib/api/settings';
 
-export const metadata: Metadata = { title: 'Administration — GSTU CSE' };
+export const metadata: Metadata = {
+  title: 'Administration — GSTU CSE',
+  description: 'Meet the administrative team managing the Department of CSE.',
+};
 
-const ADMIN_ROLES = [
-  { title: 'Chairman',               name: 'Prof. Dr. [Name]',  email: 'chairman@gstu-cse.edu', icon: '🏛️' },
-  { title: 'Graduate Coordinator',   name: 'Dr. [Name]',        email: 'grad@gstu-cse.edu',     icon: '🎓' },
-  { title: 'Undergraduate Advisor',  name: 'Dr. [Name]',        email: 'ugadv@gstu-cse.edu',    icon: '📚' },
-  { title: 'Research Coordinator',   name: 'Dr. [Name]',        email: 'research@gstu-cse.edu', icon: '🔬' },
-  { title: 'Examination Controller', name: '[Name]',             email: 'exam@gstu-cse.edu',     icon: '📝' },
-  { title: 'Lab Coordinator',        name: '[Name]',             email: 'lab@gstu-cse.edu',      icon: '💻' },
-];
+export default async function AdministrationPage() {
+  const s = await fetchSettings().catch(() => SETTINGS_FALLBACK);
 
-export default function AdministrationPage() {
+  const ADMIN_ROLES = [
+    { title: 'Chairman',         name: s.chairmanName || 'To be announced', email: s.chairmanEmail || s.email, icon: '🏛️' },
+    { title: 'Office Contact',    name: s.deptName || 'Department Office',   email: s.email,                    icon: '📞' },
+    { title: 'General Enquiry',   name: s.deptShortName || 'CSE Office',    email: s.email,                    icon: '✉️' },
+  ];
+
   return (
     <>
       <SectionHero tag="About" title="Administration"
         description="Meet the administrative team managing the department."
-        breadcrumbs={[{label:'Home',href:'/'},{label:'About',href:'/about'},{label:'Administration'}]}/>
+        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'About', href: '/about' }, { label: 'Administration' }]} />
       <div className="bg-white section-py"><div className="container-custom">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {ADMIN_ROLES.map(r => (
@@ -29,6 +32,9 @@ export default function AdministrationPage() {
             </div>
           ))}
         </div>
+        <p className="text-sm text-slate-400 text-center mt-8">
+          For specific coordinator roles (graduate, undergraduate, research, exam, lab), please contact the department office.
+        </p>
       </div></div>
     </>
   );

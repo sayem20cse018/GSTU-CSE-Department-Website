@@ -16,14 +16,7 @@ async function fetchFaculty(): Promise<FacultyMember[]> {
   } catch { return MOCK; }
 }
 
-const MOCK: FacultyMember[] = [
-  { id:'1', name:'Mrinal Kanti Baowaly', title:'Dr.', designation:'Professor', email:'baowaly@gstu.edu.bd', slug:'dr-mrinal-kanti-baowaly', researchInterests:['Machine Learning','Computer Vision'] },
-  { id:'2', name:'Mohammad Rahman',       title:'Dr.', designation:'Professor', email:'mrahman@gstu.edu.bd', slug:'dr-mohammad-rahman', researchInterests:['Deep Learning','NLP'] },
-  { id:'3', name:'Fatima Khatun',         title:'Dr.', designation:'Associate Professor', email:'fkhatun@gstu.edu.bd', researchInterests:['Cybersecurity','Networks'] },
-  { id:'4', name:'Karim Hossain',         title:'Dr.', designation:'Associate Professor', email:'khossain@gstu.edu.bd', researchInterests:['IoT','Embedded Systems'] },
-  { id:'5', name:'Nadia Islam',           title:'Ms.', designation:'Assistant Professor', email:'nislam@gstu.edu.bd', researchInterests:['Software Engineering'] },
-  { id:'6', name:'Arif Ahmed',            title:'Mr.', designation:'Assistant Professor', email:'aahmed@gstu.edu.bd', researchInterests:['Algorithms','Theory'] },
-];
+const MOCK: FacultyMember[] = [];
 
 const DESIG_STYLE: Record<string,{bg:string;text:string}> = {
   'Professor':           { bg:'rgba(22,101,52,0.12)',  text:'#166534' },
@@ -64,6 +57,9 @@ export default async function FacultyPreview() {
         </div>
 
         {/* Cards — max 4 preview cards */}
+        {faculty.length === 0 ? (
+          <p className="text-center text-slate-400 py-8">Faculty profiles will appear here once added.</p>
+        ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {faculty.slice(0, 4).map((member, i) => {
             const desig = DESIG_STYLE[member.designation] ?? { bg:'rgba(26,122,60,0.1)', text:'#166534' };
@@ -121,6 +117,7 @@ export default async function FacultyPreview() {
             );
           })}
         </div>
+        )}
 
         {/* View All Faculty — centered below cards */}
         <div className="mt-10 flex justify-center">

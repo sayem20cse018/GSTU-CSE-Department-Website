@@ -23,44 +23,7 @@ async function fetchPrograms(): Promise<Program[]> {
   } catch { return MOCK; }
 }
 
-const MOCK: Program[] = [
-  {
-    id: '1',
-    name: 'Bachelor of Science in Computer Science & Engineering',
-    degree: 'BSc',
-    duration: '4 Years',
-    totalCredits: 160,
-    description: 'A comprehensive undergraduate program covering core computer science fundamentals, software engineering, algorithms, and emerging technologies — preparing graduates for industry and research.',
-    highlights: ['Algorithm & Data Structures', 'Software Engineering', 'AI & Machine Learning', 'Database Systems', 'Computer Networks', 'Final Year Project'],
-    totalSeats: 60,
-    tuitionFee: '5,000 BDT/semester',
-    isActive: true,
-  },
-  {
-    id: '2',
-    name: 'Master of Science in Computer Science & Engineering',
-    degree: 'MSc',
-    duration: '2 Years',
-    totalCredits: 60,
-    description: 'An advanced graduate program focusing on research, specialization, and innovation in areas such as AI, cybersecurity, networks, and systems design.',
-    highlights: ['Advanced Algorithms', 'Research Methodology', 'Thesis / Dissertation', 'Specialization Tracks', 'Seminar & Publication'],
-    totalSeats: 30,
-    tuitionFee: '6,000 BDT/semester',
-    isActive: true,
-  },
-  {
-    id: '3',
-    name: 'Doctor of Philosophy in Computer Science & Engineering',
-    degree: 'PhD',
-    duration: '3–5 Years',
-    totalCredits: 42,
-    description: 'A doctoral research program for those who wish to contribute original knowledge to the field of computing through rigorous independent research and scholarly publication.',
-    highlights: ['Original Research', 'Dissertation Defense', 'International Publication', 'Research Funding', 'Faculty Mentorship'],
-    totalSeats: 10,
-    tuitionFee: 'Contact Department',
-    isActive: true,
-  },
-];
+const MOCK: Program[] = [];
 
 // Degree badge colours
 const DEGREE_STYLE: Record<string, { bg: string; text: string; border: string; accent: string }> = {
@@ -71,6 +34,7 @@ const DEGREE_STYLE: Record<string, { bg: string; text: string; border: string; a
 
 export default async function AcademicProgramsSection() {
   const programs = await fetchPrograms();
+  if (!programs.length) return null;
 
   return (
     <section className="py-10 bg-white">
