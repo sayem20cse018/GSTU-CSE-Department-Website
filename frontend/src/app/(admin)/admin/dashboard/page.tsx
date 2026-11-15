@@ -9,6 +9,7 @@ import SystemInfo                from '@/components/admin/dashboard/SystemInfo';
 import WelcomeBanner             from '@/components/admin/dashboard/WelcomeBanner';
 import PendingTasksWidget        from '@/components/admin/dashboard/PendingTasksWidget';
 import RecentPublicationsWidget  from '@/components/admin/dashboard/RecentPublicationsWidget';
+import AnalyticsWidget           from '@/components/admin/dashboard/AnalyticsWidget';
 import { RecentNotices, RecentNews, UpcomingEvents } from '@/components/admin/dashboard/ContentSummary';
 import RoleGate                  from '@/components/admin/dashboard/RoleGate';
 import Link from 'next/link';
@@ -30,7 +31,7 @@ const ITEM_ICON: Record<string, string> = {
   'Faculty & Staff':'👨‍🏫','Alumni':'🎓','Student Records':'🎒',
   'Clubs & Societies':'🤝','Undergraduate':'📋','Hero Slides':'🖼️',
   'Notices':'🔔','News':'📰','Events':'📅','Gallery':'📷','Forms':'📝',
-  'Statistics':'📊','Nav Manager':'🗂️','Settings':'⚙️',
+  'Statistics':'📊','Nav Manager':'🗂️','Settings':'⚙️','Admin Users':'👥',
 };
 
 /** Consistent section heading */
@@ -107,6 +108,14 @@ export default function DashboardPage() {
             <RecentPublicationsWidget />
           </div>
         </section>
+
+        {/* ── Analytics (shows setup prompt if Umami not configured) ──── */}
+        <RoleGate minRole="admin">
+          <section>
+            <Heading accent="bg-blue-600" title="Visitor Analytics" />
+            <AnalyticsWidget />
+          </section>
+        </RoleGate>
 
         {/* ── All modules grid ─────────────────────────────────────────── */}
         <section>

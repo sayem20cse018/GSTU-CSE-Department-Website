@@ -19,6 +19,7 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { HeroSlidesModule } from './modules/hero-slides/hero-slides.module';
 import { StudentsModule }   from './modules/students/students.module';
+import { AdminManagementModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { StudentsModule }   from './modules/students/students.module';
     SettingsModule,
     HeroSlidesModule,
     StudentsModule,
+    AdminManagementModule,
   ],
   controllers: [AppController],
   providers: [],

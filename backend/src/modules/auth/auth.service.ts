@@ -208,6 +208,7 @@ export class AuthService {
       upcomingEvents,
       incompleteFaculty,
       unregisteredStudents,
+      pendingAlumni,
     ] = await Promise.all([
       this.prisma.faculty.count({ where: { isActive: true } }),
       this.prisma.news.count(),
@@ -240,6 +241,8 @@ export class AuthService {
       }),
       // student records with no registered account
       this.prisma.studentRecord.count({ where: { user: null } }),
+      // alumni awaiting approval
+      this.prisma.alumni.count({ where: { approvalStatus: 'pending' } }),
     ]);
 
     return {
@@ -266,6 +269,7 @@ export class AuthService {
         upcomingEvents,
         incompleteFaculty,
         unregisteredStudents,
+        pendingAlumni,
       },
     };
   }

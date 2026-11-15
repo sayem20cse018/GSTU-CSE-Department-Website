@@ -10,6 +10,7 @@ interface PendingCounts {
   upcomingEvents: number;
   incompleteFaculty: number;
   unregisteredStudents: number;
+  pendingAlumni: number;
 }
 
 interface AggregateStats {
@@ -75,6 +76,14 @@ function buildTasks(p: PendingCounts): Task[] {
       color: 'border-teal-200 bg-teal-50 text-teal-700',
       icon: '🎒',
       priority: p.unregisteredStudents > 0 ? 1 : 0,
+    },
+    {
+      label: 'Pending Alumni Approvals',
+      count: p.pendingAlumni,
+      href: '/admin/alumni',
+      color: 'border-indigo-200 bg-indigo-50 text-indigo-700',
+      icon: '🎓',
+      priority: p.pendingAlumni > 0 ? 3 : 0,
     },
   ]
     .filter(t => t.count > 0)
