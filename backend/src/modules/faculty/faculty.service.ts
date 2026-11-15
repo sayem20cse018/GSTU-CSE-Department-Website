@@ -117,4 +117,26 @@ export class FacultyService {
     if (!f) throw new NotFoundException(`Faculty #${id} not found`);
     return this.prisma.faculty.delete({ where: { id } });
   }
+
+  // ─── Recent publications (dashboard widget) ──────────────────────────────
+  async getRecentPublications(limit = 5) {
+    const pubs = await this.prisma.facultyPublication.findMany({
+      orderBy: [{ year: 'desc' }],
+      take: limit,
+      include: {
+        faculty: { select: { name: true, designation: true, photo: true } },
+      },
+    });
+    return pubs.map(p => ({
+      id:          p.id,
+      title:       p.title,
+      authors:     p.authors,
+      venue:       p.venue,
+      year:        p.year,
+      type:        p.type,
+      doi:         p.doi,
+      url:         p.url,
+      facultyName: p.faculty.name,
+    }));
+  }
 }

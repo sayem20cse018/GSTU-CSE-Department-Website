@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
 import { AdminPageTitle } from '@/context/AdminPageContext';
 import { NAV_GROUPS } from '@/components/admin/layout/nav-items';
-import OverviewStats      from '@/components/admin/dashboard/OverviewStats';
-import QuickActions       from '@/components/admin/dashboard/QuickActions';
-import ActivityFeed       from '@/components/admin/dashboard/ActivityFeed';
-import StudentStatsWidget from '@/components/admin/dashboard/StudentStatsWidget';
-import SystemInfo         from '@/components/admin/dashboard/SystemInfo';
-import WelcomeBanner      from '@/components/admin/dashboard/WelcomeBanner';
+import OverviewStats             from '@/components/admin/dashboard/OverviewStats';
+import QuickActions              from '@/components/admin/dashboard/QuickActions';
+import ActivityFeed              from '@/components/admin/dashboard/ActivityFeed';
+import StudentStatsWidget        from '@/components/admin/dashboard/StudentStatsWidget';
+import SystemInfo                from '@/components/admin/dashboard/SystemInfo';
+import WelcomeBanner             from '@/components/admin/dashboard/WelcomeBanner';
+import PendingTasksWidget        from '@/components/admin/dashboard/PendingTasksWidget';
+import RecentPublicationsWidget  from '@/components/admin/dashboard/RecentPublicationsWidget';
 import { RecentNotices, RecentNews, UpcomingEvents } from '@/components/admin/dashboard/ContentSummary';
+import RoleGate                  from '@/components/admin/dashboard/RoleGate';
 import Link from 'next/link';
 
 export const metadata: Metadata = { title: 'Dashboard — GSTU CSE Admin' };
@@ -37,16 +40,7 @@ const ITEM_ICON: Record<string, string> = {
   'Statistics':'📊','Nav Manager':'🗂️','Settings':'⚙️',
 };
 
-// ─── Section header ───────────────────────────────────────────────────────────
-function SectionHeader({
-  color,
-  title,
-  badge,
-}: {
-  color: string;
-  title: string;
-  badge?: string;
-}) {
+function SectionHeader({ color, title, badge }: { color: string; title: string; badge?: string }) {
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2">
@@ -70,7 +64,7 @@ export default function DashboardPage() {
       <div className="p-6 max-w-7xl mx-auto space-y-8">
         <AdminPageTitle title="Dashboard" />
 
-        {/* ── Welcome banner (client, reads AuthContext) ───────────────── */}
+        {/* ── Welcome banner ───────────────────────────────────────────── */}
         <WelcomeBanner />
 
         {/* ── Live content counts ──────────────────────────────────────── */}
@@ -79,20 +73,29 @@ export default function DashboardPage() {
           <OverviewStats />
         </section>
 
-        {/* ── Quick actions ────────────────────────────────────────────── */}
+        {/* ── Pending tasks + Quick actions ────────────────────────────── */}
         <section>
-          <SectionHeader color="bg-blue-500" title="Quick Actions" />
-          <QuickActions />
-        </section>
-
-        {/* ── Activity + Student stats ─────────────────────────────────── */}
-        <section>
-          <SectionHeader color="bg-violet-500" title="Activity & Students" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <ActivityFeed />
-            <StudentStatsWidget />
+          <SectionHeader color="bg-orange-500" title="Pending Tasks & Quick Actions" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* Pending tasks spans 1 col */}
+            <PendingTasksWidget />
+            {/* Quick actions spans 2 cols */}
+            <div className="lg:col-span-2">
+              <QuickActions />
+            </div>
           </div>
         </section>
+
+        {/* ── Activity feed + Student stats (admin+ only) ──────────────── */}
+        <RoleGate minRole="admin">
+          <section>
+            <SectionHeader color="bg-violet-500" title="Activity & Students" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <ActivityFeed />
+              <StudentStatsWidget />
+            </div>
+          </section>
+        </RoleGate>
 
         {/* ── Content summary ──────────────────────────────────────────── */}
         <section>
@@ -101,6 +104,14 @@ export default function DashboardPage() {
             <RecentNotices />
             <RecentNews />
             <UpcomingEvents />
+          </div>
+        </section>
+
+        {/* ── Latest publications ───────────────────────────────────────── */}
+        <section>
+          <SectionHeader color="bg-blue-500" title="Latest Research Publications" />
+          <div className="max-w-2xl">
+            <RecentPublicationsWidget />
           </div>
         </section>
 
@@ -133,10 +144,8 @@ export default function DashboardPage() {
                     >
                       <span className="text-sm shrink-0" aria-hidden="true">{ITEM_ICON[item.label] ?? '📄'}</span>
                       <span className="text-xs font-semibold truncate">{item.label}</span>
-                      <svg
-                        className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-slate-400"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                      >
+                      <svg className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-slate-400"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
                       </svg>
                     </Link>
@@ -147,29 +156,25 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* ── System health ────────────────────────────────────────────── */}
-        <section>
-          <SectionHeader color="bg-green-500" title="System Health" />
-          <div className="max-w-sm">
-            <SystemInfo />
-          </div>
-        </section>
+        {/* ── System health (admin+ only) ──────────────────────────────── */}
+        <RoleGate minRole="admin">
+          <section>
+            <SectionHeader color="bg-green-500" title="System Health" />
+            <div className="max-w-sm">
+              <SystemInfo />
+            </div>
+          </section>
+        </RoleGate>
 
         {/* ── Footer note ──────────────────────────────────────────────── */}
         <div className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-2xl">
           <span className="text-2xl" aria-hidden="true">🌐</span>
           <div>
             <p className="text-sm font-semibold text-slate-800">All changes are live instantly</p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Every edit in this panel is reflected on the public website immediately.
-            </p>
+            <p className="text-xs text-slate-500 mt-0.5">Every edit is reflected on the public website immediately.</p>
           </div>
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto shrink-0 text-xs font-bold text-green-700 hover:text-green-800 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-50 transition-all"
-          >
+          <a href="/" target="_blank" rel="noopener noreferrer"
+            className="ml-auto shrink-0 text-xs font-bold text-green-700 hover:text-green-800 border border-green-200 px-3 py-1.5 rounded-lg hover:bg-green-50 transition-all">
             Preview ↗
           </a>
         </div>

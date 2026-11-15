@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, Req, UseGuards, HttpCode, HttpStatus,
+  Param, Query, Body, Req, UseGuards, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -27,6 +27,14 @@ export class FacultyController {
   @Get()
   @ApiOperation({ summary: 'Get all active faculty members' })
   findAll() { return this.facultyService.findAll(); }
+
+  @Public()
+  @Get('publications/recent')
+  @ApiOperation({ summary: 'Latest faculty publications — dashboard widget' })
+  recentPublications(@Query('limit') limit?: string) {
+    const n = limit ? parseInt(limit, 10) : 5;
+    return this.facultyService.getRecentPublications(isNaN(n) ? 5 : Math.min(n, 20));
+  }
 
   @Public()
   @Get(':id')

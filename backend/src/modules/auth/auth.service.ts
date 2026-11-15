@@ -183,6 +183,8 @@ export class AuthService {
 
   // ─── Aggregate stats (dashboard) ────────────────────────────────────────────
   async getAggregateStats() {
+    const now = new Date();
+
     const [
       faculty,
       news,
@@ -199,6 +201,13 @@ export class AuthService {
       courses,
       labs,
       resources,
+      // ── Pending-task counts ──────────────────────────────────────────────
+      draftNews,
+      draftNotices,
+      expiredNotices,
+      upcomingEvents,
+      incompleteFaculty,
+      unregisteredStudents,
     ] = await Promise.all([
       this.prisma.faculty.count({ where: { isActive: true } }),
       this.prisma.news.count(),
@@ -217,6 +226,20 @@ export class AuthService {
       this.prisma.course.count(),
       this.prisma.laboratory.count(),
       this.prisma.academicResource.count(),
+      // drafts / pending
+      this.prisma.news.count({ where: { isPublished: false } }),
+      this.prisma.notice.count({ where: { isPublished: false } }),
+      this.prisma.notice.count({ where: { expiresAt: { lt: now } } }),
+      this.prisma.event.count({ where: { startDate: { gte: now }, isPublished: true } }),
+      // faculty with no photo OR no shortBio
+      this.prisma.faculty.count({
+        where: {
+          isActive: true,
+          OR: [{ photo: null }, { shortBio: null }, { shortBio: '' }],
+        },
+      }),
+      // student records with no registered account
+      this.prisma.studentRecord.count({ where: { user: null } }),
     ]);
 
     return {
@@ -235,6 +258,15 @@ export class AuthService {
       courses,
       labs,
       resources,
+      // pending tasks
+      pending: {
+        draftNews,
+        draftNotices,
+        expiredNotices,
+        upcomingEvents,
+        incompleteFaculty,
+        unregisteredStudents,
+      },
     };
   }
 
