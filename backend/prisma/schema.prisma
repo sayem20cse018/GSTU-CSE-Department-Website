@@ -781,6 +781,12 @@ model Settings {
   aboutImage4          String   @default("")
   hiddenNavItems       String[] @default([])
   customNavItems       String   @default("[]")
+  // Theme / appearance (admin-controlled)
+  headerAccentColor    String?  @default("#1a7a3c")
+  headerRightBg        String?  @default("#1a7a3c")
+  showDeptPrefix       Boolean  @default(true)
+  headerFont           String?  @default("montserrat")
+  adminAccentColor     String?  @default("#16a34a")
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 

@@ -39,6 +39,12 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() @MaxLength(5_000_000) aboutImage4?: string;
   @IsOptional() @IsArray() @IsString({ each: true }) hiddenNavItems?: string[];
   @IsOptional() @IsString() @MaxLength(20_000) customNavItems?: string;
+  // ── Theme / appearance ────────────────────────────────────────────────────
+  @IsOptional() @IsString() @MaxLength(20)  headerAccentColor?: string;
+  @IsOptional() @IsString() @MaxLength(50)  headerRightBg?: string;
+  @IsOptional()                              showDeptPrefix?: boolean;
+  @IsOptional() @IsString() @MaxLength(30)  headerFont?: string;
+  @IsOptional() @IsString() @MaxLength(20)  adminAccentColor?: string;
 }
 
 const SINGLETON_KEY = 'site_settings';

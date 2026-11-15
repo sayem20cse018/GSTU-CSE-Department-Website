@@ -3,11 +3,11 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useAdminPage } from '@/context/AdminPageContext';
+import { useTheme } from '@/context/ThemeContext';
 import { NAV_GROUPS } from './nav-items';
 
 interface TopbarProps { onMenuClick: () => void; }
 
-/** Breadcrumb from current pathname */
 function useBreadcrumb() {
   const pathname = usePathname();
   for (const group of NAV_GROUPS) {
@@ -32,6 +32,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
   const { pageTitle }     = useAdminPage();
   const router            = useRouter();
   const breadcrumb        = useBreadcrumb();
+  const { theme, toggleTheme } = useTheme();
 
   async function handleLogout() {
     await logout();
@@ -44,12 +45,18 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
   const roleStyle = ROLE_STYLE[admin?.role ?? ''] ?? ROLE_STYLE.editor;
 
   return (
-    <header className="h-14 flex items-center gap-3 px-4 lg:px-6 shrink-0 bg-white border-b border-slate-200">
-
+    <header
+      className="h-14 flex items-center gap-3 px-4 lg:px-6 shrink-0 border-b transition-colors duration-300"
+      style={{
+        background: 'var(--admin-topbar-bg, #ffffff)',
+        borderColor: 'var(--admin-topbar-border, #e2e8f0)',
+      }}
+    >
       {/* Hamburger — mobile only */}
       <button
         onClick={onMenuClick}
-        className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition"
+        className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition"
+        style={{ color: 'var(--admin-topbar-fg)' }}
         aria-label="Open menu"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,30 +66,54 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 flex-1 min-w-0 text-sm">
-        <span className="text-slate-400 text-xs hidden sm:inline">Admin</span>
+        <span className="text-xs hidden sm:inline font-medium" style={{ color: 'var(--admin-topbar-fg)', opacity: 0.5 }}>Admin</span>
         {breadcrumb && (
           <>
-            <svg className="w-3 h-3 text-slate-300 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 hidden sm:block shrink-0" style={{ color: 'var(--admin-topbar-fg)', opacity: 0.3 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
             </svg>
-            <span className="text-slate-400 text-xs hidden sm:inline truncate">{breadcrumb.group}</span>
-            <svg className="w-3 h-3 text-slate-300 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span className="text-xs hidden sm:inline truncate" style={{ color: 'var(--admin-topbar-fg)', opacity: 0.5 }}>{breadcrumb.group}</span>
+            <svg className="w-3 h-3 hidden sm:block shrink-0" style={{ color: 'var(--admin-topbar-fg)', opacity: 0.3 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
             </svg>
           </>
         )}
-        <h1 className="text-sm font-semibold text-slate-800 truncate">{pageTitle}</h1>
+        <h1 className="text-sm font-semibold truncate" style={{ color: 'var(--admin-topbar-fg)' }}>{pageTitle}</h1>
       </div>
 
       {/* Right actions */}
       <div className="flex items-center gap-2 shrink-0">
+        {/* Dark / Light toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-1.5 rounded-lg border transition-colors"
+          style={{
+            color: 'var(--admin-topbar-fg)',
+            borderColor: 'var(--admin-topbar-border)',
+          }}
+          title={theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          )}
+        </button>
 
         {/* View public site */}
         <Link
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-green-700 hover:bg-green-50 border border-slate-200 hover:border-green-200 px-3 py-1.5 rounded-lg transition"
+          className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition"
+          style={{ color: 'var(--admin-topbar-fg)', borderColor: 'var(--admin-topbar-border)' }}
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -91,19 +122,19 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
           View Site
         </Link>
 
-        <div className="h-5 w-px bg-slate-200 hidden sm:block" />
+        <div className="h-5 w-px hidden sm:block" style={{ background: 'var(--admin-topbar-border)' }} />
 
         {/* Admin info */}
         {admin && (
           <div className="hidden md:flex items-center gap-2.5">
             <div
               className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-              style={{ background: 'linear-gradient(135deg,#166534,#15803d)' }}
+              style={{ background: `linear-gradient(135deg, var(--admin-accent, #16a34a), var(--admin-accent, #16a34a)cc)` }}
             >
               {initial}
             </div>
             <div className="text-left leading-none">
-              <p className="text-xs font-semibold text-slate-800">{admin.name}</p>
+              <p className="text-xs font-semibold" style={{ color: 'var(--admin-topbar-fg)' }}>{admin.name}</p>
               <span className={`text-[10px] font-semibold px-1.5 py-px rounded border capitalize inline-block mt-0.5 ${roleStyle}`}>
                 {roleLabel}
               </span>
@@ -114,7 +145,8 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 hover:border-red-200 px-3 py-1.5 rounded-lg transition"
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition"
+          style={{ color: 'var(--admin-topbar-fg)', borderColor: 'var(--admin-topbar-border)' }}
           title="Logout"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

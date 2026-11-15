@@ -39,6 +39,20 @@
   --text-base:       #0f172a;
   --surface:         #f8fafc;
   --border:          #e2e8f0;
+
+  /* ── Admin panel variables (driven by ThemeContext) ─────────────────────── */
+  --admin-bg:          #f1f5f9;
+  --admin-content-bg:  #f1f5f9;
+  --admin-sidebar-bg:  #111827;
+  --admin-sidebar-fg:  #e5e7eb;
+  --admin-sidebar-active-bg: rgba(74, 222, 128, 0.15);
+  --admin-sidebar-active-fg: #4ade80;
+  --admin-sidebar-border: #1f2937;
+  --admin-topbar-bg:    #ffffff;
+  --admin-topbar-fg:    #1e293b;
+  --admin-topbar-border: #e2e8f0;
+  --admin-card-bg:     #ffffff;
+  --admin-input-bg:    #ffffff;
 }
 
 /* Dark mode — activated by .dark on <html> */
@@ -47,6 +61,20 @@ html.dark {
   --text-base: #f1f5f9;
   --surface:   #1e293b;
   --border:    #334155;
+
+  /* Admin panel dark mode */
+  --admin-bg:          #0f172a;
+  --admin-content-bg:  #0f172a;
+  --admin-sidebar-bg:  #0c0f1a;
+  --admin-sidebar-fg:  #94a3b8;
+  --admin-sidebar-active-bg: rgba(74, 222, 128, 0.12);
+  --admin-sidebar-active-fg: #4ade80;
+  --admin-sidebar-border: #1e293b;
+  --admin-topbar-bg:    #1e293b;
+  --admin-topbar-fg:    #e2e8f0;
+  --admin-topbar-border: #334155;
+  --admin-card-bg:     #1e293b;
+  --admin-input-bg:    #0f172a;
 }
 
 html.dark body {

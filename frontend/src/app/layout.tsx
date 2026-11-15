@@ -56,21 +56,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const umamiId  = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
-  const umamiUrl = process.env.NEXT_PUBLIC_UMAMI_URL ?? 'https://analytics.umami.is';
-
   return (
     <html lang="bn" className={`${inter.variable} ${jetbrainsMono.variable} ${oswald.variable} ${montserrat.variable} ${notoSansBengali.variable} scroll-smooth`}>
-      <head>
-        {/* Umami analytics — only loads when NEXT_PUBLIC_UMAMI_WEBSITE_ID is set */}
-        {umamiId && (
-          <script
-            defer
-            src={`${umamiUrl}/script.js`}
-            data-website-id={umamiId}
-          />
-        )}
-      </head>
       <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased"
         style={{ fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif' }}>
         <AuthProvider>

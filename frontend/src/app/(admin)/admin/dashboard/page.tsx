@@ -9,7 +9,6 @@ import SystemInfo                from '@/components/admin/dashboard/SystemInfo';
 import WelcomeBanner             from '@/components/admin/dashboard/WelcomeBanner';
 import PendingTasksWidget        from '@/components/admin/dashboard/PendingTasksWidget';
 import RecentPublicationsWidget  from '@/components/admin/dashboard/RecentPublicationsWidget';
-import AnalyticsWidget           from '@/components/admin/dashboard/AnalyticsWidget';
 import { RecentNotices, RecentNews, UpcomingEvents } from '@/components/admin/dashboard/ContentSummary';
 import RoleGate                  from '@/components/admin/dashboard/RoleGate';
 import Link from 'next/link';
@@ -108,14 +107,6 @@ export default function DashboardPage() {
             <RecentPublicationsWidget />
           </div>
         </section>
-
-        {/* ── Analytics (shows setup prompt if Umami not configured) ──── */}
-        <RoleGate minRole="admin">
-          <section>
-            <Heading accent="bg-blue-600" title="Visitor Analytics" />
-            <AnalyticsWidget />
-          </section>
-        </RoleGate>
 
         {/* ── All modules grid ─────────────────────────────────────────── */}
         <section>

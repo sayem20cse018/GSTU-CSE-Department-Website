@@ -7,7 +7,11 @@ import { useAuth } from '@/context/AuthContext';
 import { NAV_GROUPS } from './nav-items';
 import { cn } from '@/lib/utils/cn';
 
-interface SidebarProps { isOpen: boolean; onClose: () => void; }
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  accent?: string;
+}
 
 /** Fetch dept name + logo from settings (cached in module scope) */
 let _cachedBrand: { name: string; logo: string } | null = null;
@@ -23,9 +27,7 @@ async function fetchBrand() {
   } catch { return null; }
 }
 
-interface SidebarProps { isOpen: boolean; onClose: () => void; }
-
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, accent = '#16a34a' }: SidebarProps) {
   const pathname       = usePathname();
   const searchParams   = useSearchParams();
   const { admin, hasPermission } = useAuth();
@@ -44,11 +46,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     });
   }
 
-  /** Determine if a nav item is active */
   function isItemActive(href: string): boolean {
     const [hrefPath, hrefQuery] = href.split('?');
-
-    // Items with query params — exact path + exact query match only
     if (hrefQuery) {
       if (pathname !== hrefPath) return false;
       const hrefParams = new URLSearchParams(hrefQuery);
@@ -57,26 +56,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       }
       return true;
     }
-
-    // Dashboard — always exact
     if (href === '/admin/dashboard') return pathname === href;
-
-    // Exact match first
     if (pathname === hrefPath) return true;
-
-    // Check if this path has sibling items in the same group
-    // If any sibling starts with the same base, use exact matching only
     const group = NAV_GROUPS.find(g => g.items.some(i => i.href.split('?')[0] === hrefPath));
     if (group) {
       const hasSiblingWithLongerPath = group.items.some(item => {
         const sibPath = item.href.split('?')[0];
         return sibPath !== hrefPath && sibPath.startsWith(hrefPath + '/');
       });
-      // If siblings exist that are sub-paths, only use exact match to avoid double-active
       if (hasSiblingWithLongerPath) return pathname === hrefPath;
     }
-
-    // No siblings with sub-paths — allow startsWith
     return pathname.startsWith(hrefPath + '/');
   }
 
@@ -93,13 +82,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           'lg:translate-x-0 lg:static lg:z-auto',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
-        style={{ width: '256px', background: '#111827', borderRight: '1px solid #1f2937' }}
+        style={{
+          width: '256px',
+          background: 'var(--admin-sidebar-bg, #111827)',
+          borderRight: '1px solid var(--admin-sidebar-border, #1f2937)',
+        }}
       >
-        {/* Brand */}
-        <div className="shrink-0 border-b border-gray-800/80" style={{ background: 'linear-gradient(135deg,#0d1f0d,#1a2e1a)' }}>
+        {/* Brand — uses accent color gradient */}
+        <div className="shrink-0 border-b" style={{ borderColor: 'var(--admin-sidebar-border, #1f2937)', background: `linear-gradient(135deg, ${accent}22, transparent)` }}>
           <div className="flex items-center gap-3 px-4 py-3.5">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ring-1 ring-green-700/50"
-              style={{ background: 'linear-gradient(135deg,#166534,#15803d)' }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ring-1"
+              style={{ background: `linear-gradient(135deg, ${accent}, ${accent}cc)`, borderColor: accent }}>
               {brand?.logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={brand.logo} alt="" className="w-full h-full object-contain p-0.5"/>
@@ -111,13 +104,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white leading-none truncate">
+              <p className="text-sm font-bold leading-none truncate" style={{ color: 'var(--admin-sidebar-fg)' }}>
                 {brand?.name ?? 'GSTU CSE'}
               </p>
-              <p className="text-[10px] text-green-600/80 mt-0.5 font-medium">Admin Panel</p>
+              <p className="text-[10px] mt-0.5 font-medium" style={{ color: accent }}>Admin Panel</p>
             </div>
             <button onClick={onClose}
-              className="lg:hidden text-gray-600 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition"
+              className="lg:hidden p-1.5 rounded-lg hover:bg-white/10 transition"
+              style={{ color: 'var(--admin-sidebar-fg)' }}
               aria-label="Close menu">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
@@ -133,20 +127,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               item.permission ? hasPermission(item.permission) : true
             );
             if (!visible.length) return null;
-
             const isCollapsed = collapsed.has(group.group);
             const hasActive   = visible.some(item => isItemActive(item.href));
 
             return (
               <div key={group.group} className="mb-1">
-                {/* Group header — click to collapse */}
                 <button
                   onClick={() => toggle(group.group)}
                   className={cn(
                     'w-full flex items-center justify-between px-3 py-1.5 text-left rounded transition',
                     'text-[10px] font-bold uppercase tracking-widest',
-                    hasActive ? 'text-green-400' : 'text-gray-500 hover:text-gray-300',
-                  )}>
+                  )}
+                  style={{ color: hasActive ? accent : 'var(--admin-sidebar-fg)' }}
+                >
                   {group.group}
                   <svg className={cn('w-3 h-3 transition-transform', isCollapsed ? '-rotate-90' : '')}
                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +147,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   </svg>
                 </button>
 
-                {/* Items */}
                 {!isCollapsed && (
                   <ul className="mt-0.5 space-y-0.5">
                     {visible.map(item => {
@@ -162,15 +154,32 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                       return (
                         <li key={item.href}>
                           <Link href={item.href} onClick={onClose}
-                            className={cn(
-                              'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all',
-                              active
-                                ? 'bg-green-900/40 text-green-300 font-semibold border-l-2 border-green-500 pl-2.5'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5',
-                            )}>
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all"
+                            style={active ? {
+                              background: `color-mix(in srgb, ${accent} 15%, transparent)`,
+                              color: accent,
+                              fontWeight: 600,
+                              borderLeft: `2px solid ${accent}`,
+                              paddingLeft: '0.625rem',
+                            } : {
+                              color: 'var(--admin-sidebar-fg)',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!active) {
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                e.currentTarget.style.color = '#fff';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!active) {
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = 'var(--admin-sidebar-fg)';
+                              }
+                            }}
+                          >
                             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor"
                               viewBox="0 0 24 24" strokeWidth={active ? 2.2 : 1.75}
-                              style={{ color: active ? '#4ade80' : 'currentColor' }}
+                              style={{ color: active ? accent : 'currentColor' }}
                               aria-hidden="true">
                               {item.icon.split(' M').map((part, i) => (
                                 <path key={i} strokeLinecap="round" strokeLinejoin="round"
@@ -195,23 +204,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer */}
-        <div className="shrink-0 px-3 py-3 border-t border-gray-800/80" style={{ background: '#0d1a0d' }}>
+        <div className="shrink-0 px-3 py-3 border-t"
+          style={{ borderColor: 'var(--admin-sidebar-border, #1f2937)', background: 'color-mix(in srgb, var(--admin-sidebar-bg, #111827) 80%, #000)' }}>
           <div className="flex items-center gap-2.5 px-1">
             <div
-              className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white ring-2 ring-green-800"
-              style={{ background: 'linear-gradient(135deg,#166534,#15803d)' }}
+              className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold text-white ring-2"
+              style={{ background: `linear-gradient(135deg, ${accent}, ${accent}cc)`, borderColor: accent }}
             >
               {admin?.name?.charAt(0).toUpperCase() ?? 'A'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{admin?.name ?? 'Admin'}</p>
-              <p className="text-[10px] text-gray-500 capitalize truncate">
+              <p className="text-xs font-semibold truncate" style={{ color: 'var(--admin-sidebar-fg)' }}>
+                {admin?.name ?? 'Admin'}
+              </p>
+              <p className="text-[10px] capitalize truncate" style={{ color: 'var(--admin-sidebar-fg)', opacity: 0.6 }}>
                 {admin?.role?.replace('_', ' ') ?? 'administrator'}
               </p>
             </div>
             <Link href="/admin/settings"
               title="Settings"
-              className="text-gray-600 hover:text-green-400 transition p-1.5 rounded-lg hover:bg-white/5">
+              className="transition p-1.5 rounded-lg hover:bg-white/10"
+              style={{ color: 'var(--admin-sidebar-fg)' }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
