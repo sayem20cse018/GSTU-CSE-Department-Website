@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import Link from 'next/link';
 import SectionHero from '@/components/academics/SectionHero';
 import CurriculumTable from '@/components/academics/CurriculumTable';
@@ -67,7 +67,7 @@ export default async function BScPage() {
                 <ul className="space-y-2">
                   {program.highlights.map((h, i) => (
                     <li key={i} className="flex items-start gap-3 text-slate-600 text-sm">
-                      <svg className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <svg className="w-4 h-4 text-green-600 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       {h}
@@ -80,7 +80,7 @@ export default async function BScPage() {
               <section aria-labelledby="curriculum-heading">
                 <div className="flex items-center justify-between mb-4">
                   <h2 id="curriculum-heading" className="text-xl font-bold text-slate-900">Curriculum</h2>
-                  <Link href="/academics/courses?degree=BSc" className="text-sm font-semibold text-blue-700 hover:text-blue-900">
+                  <Link href="/academics/courses?degree=BSc" className="text-sm font-semibold text-green-700 hover:text-green-900">
                     View All Courses →
                   </Link>
                 </div>
@@ -104,7 +104,7 @@ export default async function BScPage() {
             {/* ── Sidebar ───────────────────────────────────────────────── */}
             <aside className="space-y-6">
               {/* Quick facts */}
-              <div className="bg-[#0d1b2e] text-white rounded-2xl p-6">
+              <div className="bg-[#0b3d1f] text-white rounded-2xl p-6">
                 <h3 className="font-bold mb-4 text-sm uppercase tracking-wider text-slate-400">Quick Facts</h3>
                 {[
                   ['Degree', program.name.split(' ').slice(0, 2).join(' ')],
@@ -135,7 +135,7 @@ export default async function BScPage() {
                 </ul>
                 <Link
                   href="/admissions"
-                  className="mt-5 flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold py-2.5 rounded-xl transition"
+                  className="mt-5 flex items-center justify-center gap-2 w-full bg-green-700 hover:bg-green-800 text-white text-sm font-semibold py-2.5 rounded-xl transition"
                 >
                   Apply Now
                 </Link>
@@ -147,7 +147,7 @@ export default async function BScPage() {
                   href={program.brochureUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-blue-300 text-blue-700 hover:bg-blue-50 text-sm font-semibold py-3 rounded-xl transition"
+                  className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-green-300 text-green-700 hover:bg-green-50 text-sm font-semibold py-3 rounded-xl transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />

@@ -5,18 +5,14 @@ export const metadata: Metadata = { title: 'Chairman List — GSTU CSE' };
 
 interface Person { id:string; name:string; title?:string; designation:string; email:string; photo?:string; shortBio?:string; staffType:string; isActive:boolean; sortOrder:number; joinedAt?:string; }
 
-const MOCK: Person[] = [
-  { id:'1', name:'Dr. Mrinal Kanti Baowaly', title:'Dr.', designation:'Professor & Chairman', email:'baowaly@gstu.edu.bd', staffType:'chairman', isActive:true, sortOrder:1, shortBio:'Current Chairman of the Department of CSE, GSTU. PhD in Computer Science.' },
-];
-
 async function fetchChairmen(): Promise<Person[]> {
   try {
     const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
     const r = await fetch(`${api}/faculty?staffType=chairman`, { next: { revalidate: 3600 } });
-    if (!r.ok) return MOCK;
+    if (!r.ok) return [];
     const d = await r.json() as { data: Person[] };
-    return d.data?.length ? d.data : MOCK;
-  } catch { return MOCK; }
+    return d.data ?? [];
+  } catch { return []; }
 }
 
 export default async function ChairmenPage() {
@@ -30,6 +26,13 @@ export default async function ChairmenPage() {
 
       <div className="bg-white section-py">
         <div className="container-custom max-w-4xl">
+          {list.length === 0 ? (
+            <div className="text-center py-16">
+              <span className="text-5xl block mb-3" aria-hidden="true">🎓</span>
+              <p className="text-slate-500 font-medium">Chairman information not yet added.</p>
+              <p className="text-sm text-slate-400 mt-1">This information is managed by the admin.</p>
+            </div>
+          ) : (
           <div className="space-y-6">
             {list.map((c, i) => (
               <div key={c.id} className="flex flex-col sm:flex-row gap-6 p-6 border border-slate-200 rounded-2xl hover:border-green-300 hover:shadow-md transition">
@@ -65,6 +68,7 @@ export default async function ChairmenPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
     </>

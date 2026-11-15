@@ -9,13 +9,6 @@ interface Achievement {
   type: string; achievedAt: string; achieverName?: string; awardedBy?: string; isFeatured: boolean;
 }
 
-const MOCK: Record<string, Achievement> = {
-  '1':{ id:'1', title:'1st Place — ACM ICPC Regional 2024', description:'A team of three undergraduate students from the Department of CSE — Rafi, Sadia, and Tanvir — secured first place at the ACM ICPC Regional Programming Contest held in Dhaka. The team solved 9 out of 12 problems within the 5-hour contest window, outperforming teams from top universities across Bangladesh. This achievement marks the first time GSTU CSE has won the regional title and qualifies the team for the ACM ICPC Asia Pacific Finals.', type:'competition', achievedAt:new Date().toISOString(), achieverName:'Team Epsilon — Rafi, Sadia, Tanvir', awardedBy:'ACM Bangladesh Chapter', isFeatured:true },
-  '2':{ id:'2', title:'Best Research Paper — IEEE International Conference 2024', description:'Dr. Mohammad Rahman received the Best Research Paper Award at the IEEE International Conference on Computer Science and Engineering held in Singapore. His paper titled "Federated Learning for Privacy-Preserving Medical Image Analysis" was selected from over 800 submissions and recognized for its novel contribution to the field of privacy-preserving machine learning.', type:'research', achievedAt:new Date(Date.now()-30*86400000).toISOString(), achieverName:'Dr. Mohammad Rahman', awardedBy:'IEEE Computer Society', isFeatured:true },
-  '3':{ id:'3', title:'National Innovation Award 2024', description:'The Department of Computer Science and Engineering at GSTU received the National Innovation Award for outstanding contributions to technology research and development in Bangladesh. The award was presented by the Ministry of Science and Technology at a ceremony in Dhaka.', type:'department', achievedAt:new Date(Date.now()-60*86400000).toISOString(), awardedBy:'Ministry of Science and Technology, Bangladesh', isFeatured:false },
-  '4':{ id:'4', title:'Google CodeJam Global Top 100', description:'CSE student Nasrin Akter ranked in the global top 100 of Google CodeJam, a prestigious worldwide programming competition. She was the only participant from Bangladesh in the top 100, representing GSTU CSE on an international platform.', type:'student', achievedAt:new Date(Date.now()-90*86400000).toISOString(), achieverName:'Nasrin Akter (4th Year, BSc)', awardedBy:'Google', isFeatured:false },
-};
-
 const TYPE_COLORS: Record<string,string> = {
   competition:'bg-amber-100 text-amber-700', research:'bg-blue-100 text-blue-700',
   department:'bg-violet-100 text-violet-700', student:'bg-emerald-100 text-emerald-700',
@@ -26,10 +19,10 @@ async function fetchById(id: string): Promise<Achievement | null> {
   try {
     const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
     const r = await fetch(`${api}/achievements/${id}`, { next: { revalidate: 1800 } });
-    if (!r.ok) return MOCK[id] ?? null;
+    if (!r.ok) return null;
     const d = await r.json() as { data: Achievement };
-    return d.data ?? MOCK[id] ?? null;
-  } catch { return MOCK[id] ?? null; }
+    return d.data ?? null;
+  } catch { return null; }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {

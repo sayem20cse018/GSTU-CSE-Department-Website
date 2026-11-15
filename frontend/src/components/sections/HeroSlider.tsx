@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
@@ -55,7 +55,7 @@ function SlideBackground({ slide, active }: { slide: Slide; active: boolean }) {
         />
       ) : (
         /* Gradient fallback */
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0d1b2e] via-[#1e3a5f] to-[#0d1b2e]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0b3d1f] via-[#1e3a5f] to-[#0b3d1f]" />
       )}
       {/* Dark overlay */}
       <div
@@ -188,7 +188,7 @@ export default function HeroSlider({ initialSlides = [] }: { initialSlides?: Api
 
   return (
     <section
-      className={cn('relative overflow-hidden z-0', slides.length === 0 ? 'bg-white' : 'bg-[#0d1b2e]')}
+      className={cn('relative overflow-hidden z-0', slides.length === 0 ? 'bg-white' : 'bg-[#0b3d1f]')}
       style={{ height: '100vh', minHeight: '580px', maxHeight: '960px' }}
       aria-label="Hero slider"
       aria-roledescription="carousel"

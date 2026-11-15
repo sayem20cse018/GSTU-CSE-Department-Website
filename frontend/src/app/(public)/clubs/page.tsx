@@ -8,14 +8,7 @@ interface Club {
   id:string; name:string; slug:string; shortDescription:string; logo?:string;
   advisorName?:string; foundedYear:number; memberCount:number; isFeatured:boolean;
 }
-const MOCK: Club[] = [
-  { id:'1', name:'Programming Club',   slug:'programming-club',  shortDescription:'Competitive programming and problem-solving.',             foundedYear:2013, memberCount:120, isFeatured:true,  advisorName:'Dr. Mohammad Rahman' },
-  { id:'2', name:'Robotics Club',      slug:'robotics-club',     shortDescription:'Automation, robotics and embedded systems projects.',       foundedYear:2015, memberCount:85,  isFeatured:true,  advisorName:'Mr. Arif Ahmed' },
-  { id:'3', name:'AI Research Club',   slug:'ai-research-club',  shortDescription:'Research in AI, ML and data science.',                     foundedYear:2018, memberCount:70,  isFeatured:false, advisorName:'Dr. Karim Hossain' },
-  { id:'4', name:'Cyber Security Club',slug:'cybersecurity-club',shortDescription:'Ethical hacking and network security.',                    foundedYear:2019, memberCount:60,  isFeatured:false, advisorName:'Dr. Fatima Khatun' },
-  { id:'5', name:'App Dev Club',       slug:'app-dev-club',      shortDescription:'Mobile and web application development.',                  foundedYear:2020, memberCount:95,  isFeatured:false, advisorName:'Ms. Nadia Islam' },
-  { id:'6', name:'Open Source Club',   slug:'open-source-club',  shortDescription:'Contributing to open source and collaborative development.',foundedYear:2021, memberCount:50,  isFeatured:false, advisorName:'Mr. Tanvir Hasan' },
-];
+const MOCK: Club[] = [];
 const ICONS = ['💻','🤖','🧠','🔐','📱','🌐'];
 const GRADS = ['from-blue-600 to-indigo-700','from-violet-600 to-purple-700','from-emerald-600 to-teal-700','from-rose-600 to-pink-700','from-amber-600 to-orange-700','from-cyan-600 to-blue-700'];
 
@@ -23,10 +16,10 @@ async function fetchClubs(): Promise<Club[]> {
   try {
     const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
     const r = await fetch(`${api}/clubs`, { next:{revalidate:3600} });
-    if (!r.ok) return MOCK;
+    if (!r.ok) return [];
     const d = await r.json() as { data: Club[] };
-    return d.data?.length ? d.data : MOCK;
-  } catch { return MOCK; }
+    return d.data ?? [];
+  } catch { return []; }
 }
 
 export default async function ClubsPage() {
@@ -37,6 +30,13 @@ export default async function ClubsPage() {
         description="Explore our vibrant student clubs and develop skills beyond the classroom."
         breadcrumbs={[{label:'Home',href:'/'},{label:'Clubs'}]}/>
       <div className="bg-white section-py"><div className="container-custom">
+        {clubs.length === 0 ? (
+          <div className="text-center py-16">
+            <span className="text-5xl block mb-3" aria-hidden="true">🤝</span>
+            <p className="text-slate-500 font-medium">No clubs listed yet.</p>
+            <p className="text-sm text-slate-400 mt-1">Clubs are managed by the admin.</p>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {clubs.map((club,i)=>(
             <article key={club.id} className="border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all group">
@@ -60,6 +60,7 @@ export default async function ClubsPage() {
             </article>
           ))}
         </div>
+        )}
       </div></div>
     </>
   );

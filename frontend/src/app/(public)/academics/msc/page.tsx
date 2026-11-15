@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import Link from 'next/link';
 import SectionHero from '@/components/academics/SectionHero';
 import CurriculumTable from '@/components/academics/CurriculumTable';
@@ -71,7 +71,7 @@ export default async function MScPage() {
             </div>
 
             <aside className="space-y-6">
-              <div className="bg-[#0d1b2e] text-white rounded-2xl p-6">
+              <div className="bg-[#0b3d1f] text-white rounded-2xl p-6">
                 <h3 className="font-bold mb-4 text-sm uppercase tracking-wider text-slate-400">Quick Facts</h3>
                 {[['Duration',program.duration],['Credits',String(program.totalCredits)],['Seats',program.totalSeats?String(program.totalSeats):'—'],['Fee',program.tuitionFee??'Contact office']].map(([l,v])=>(
                   <div key={l} className="flex justify-between py-2 border-b border-white/10 last:border-0 text-sm">

@@ -44,7 +44,7 @@ export default async function NewsDetailPage({params}:{params:Promise<{slug:stri
     <>
       <main className="bg-slate-50 min-h-screen">
         {/* Hero */}
-        <div className="bg-[#0d1b2e] pt-24 pb-12">
+        <div className="bg-[#0b3d1f] pt-24 pb-12">
           <div className="container-custom max-w-4xl">
             <Link href="/news" className="inline-flex items-center gap-1.5 text-blue-400 hover:text-blue-300 text-sm mb-6 transition">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
