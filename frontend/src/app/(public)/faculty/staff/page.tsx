@@ -5,11 +5,7 @@ export const metadata: Metadata = { title: 'Officers & Staff — GSTU CSE' };
 
 interface Person { id:string; name:string; title?:string; designation:string; email:string; photo?:string; shortBio?:string; officeRoom?:string; staffType:string; phone?:string; isActive:boolean; }
 
-const MOCK: Person[] = [
-  { id:'1', name:'Md. Rafiqul Islam', title:'Mr.', designation:'Section Officer', email:'rafiq@gstu.edu.bd', staffType:'staff', isActive:true, officeRoom:'Room 101, Admin Block' },
-  { id:'2', name:'Nasrin Akter', title:'Ms.', designation:'Administrative Officer', email:'nasrin@gstu.edu.bd', staffType:'officer', isActive:true, officeRoom:'Room 102, Admin Block' },
-  { id:'3', name:'Md. Jahangir Alam', title:'Mr.', designation:'System Analyst', email:'jahangir@gstu.edu.bd', staffType:'officer', isActive:true, officeRoom:'Computer Lab, 2nd Floor' },
-];
+const MOCK: Person[] = [];
 
 async function fetchStaff(): Promise<Person[]> {
   try {
@@ -24,8 +20,8 @@ async function fetchStaff(): Promise<Person[]> {
       r2.ok ? (r2.json() as Promise<{ data: Person[] }>) : Promise.resolve({ data: [] as Person[] }),
     ]);
     const combined = [...(d1.data ?? []), ...(d2.data ?? [])];
-    return combined.length ? combined : MOCK;
-  } catch { return MOCK; }
+    return combined;
+  } catch { return []; }
 }
 
 export default async function StaffPage() {

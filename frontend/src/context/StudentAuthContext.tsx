@@ -84,7 +84,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
     });
     const d = await r.json() as { student?: StudentProfile; message?: string };
     if (!r.ok) throw new Error(d.message ?? 'Registration failed');
-    setStudent(d.student ?? null);
+    // Do NOT set student state — user must login separately after registration
   }, []);
 
   const logout = useCallback(async () => {

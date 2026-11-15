@@ -9,12 +9,14 @@ import { useToast } from '@/components/admin/ui/Toast';
 import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import SearchInput from '@/components/admin/ui/SearchInput';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
+import FileUpload from '@/components/admin/ui/FileUpload';
 import type { AcademicResource } from '@/lib/api/academics';
 import { formatDate } from '@/lib/utils/format';
 
 const TYPE_LABELS: Record<string,string> = {
   routine:'Class Routine', calendar:'Academic Calendar', exam_schedule:'Exam Schedule',
-  result:'Results', guideline:'Syllabus/Guidelines', other:'Other' };
+  result:'Results', guideline:'Syllabus/Guidelines', course_material:'Course Materials',
+  regulation:'Academic Regulations', lab_manual:'Lab Manuals', other:'Other' };
 
 const EMPTY = { title:'', type:'routine' as AcademicResource['type'], description:'',
   targetDegree:'all', academicYear:'2024-25', term:'Spring' as 'Spring'|'Summer'|'Fall'|'Annual',
@@ -116,10 +118,9 @@ export default function AdminResourcesPage() {
                     <option>Spring</option><option>Summer</option><option>Fall</option><option>Annual</option>
                   </select></div>
               </div>
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">File URL</label>
-                <input type="url" value={form.fileUrl} onChange={e=>F('fileUrl',e.target.value)} placeholder="https://…" className={iCls}/></div>
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Display File Name</label>
-                <input value={form.fileName} onChange={e=>F('fileName',e.target.value)} placeholder="routine-spring-2024.pdf" className={iCls}/></div>
+              <FileUpload label="File (PDF or Image)" value={form.fileUrl}
+                onChange={(url, name) => { F('fileUrl', url); if (name) F('fileName', name); }}
+                accept="image/*,application/pdf" hint="Upload PDF or image, or paste a URL" />
               <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Description</label>
                 <textarea rows={2} value={form.description} onChange={e=>F('description',e.target.value)} className={`${iCls} resize-none`}/></div>
               <div className="flex gap-4">

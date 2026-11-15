@@ -3,7 +3,7 @@ import Link from 'next/link';
 import SectionHero from '@/components/academics/SectionHero';
 import { cn } from '@/lib/utils/cn';
 
-export const metadata: Metadata = { title: 'Faculty Members — GSTU CSE' };
+export const metadata: Metadata = { title: 'Faculty Members Ã¢â‚¬â€ GSTU CSE' };
 
 interface Faculty {
   id: string; name: string; title?: string; designation: string;
@@ -26,25 +26,18 @@ const BADGE: Record<string, string> = {
   'Adjunct Faculty':     'bg-slate-100 text-slate-600',
 };
 const AVATAR_COLORS = ['bg-blue-600','bg-violet-600','bg-emerald-600','bg-rose-600','bg-amber-600','bg-teal-600'];
-const MOCK: Faculty[] = [
-  {id:'1',name:'Mohammad Rahman',title:'Dr.',designation:'Professor',email:'mrahman@gstu.edu.bd',researchInterests:['Machine Learning','Computer Vision'],isActive:true,slug:'dr-mohammad-rahman'},
-  {id:'2',name:'Fatima Khatun',title:'Dr.',designation:'Associate Professor',email:'fkhatun@gstu.edu.bd',researchInterests:['Cybersecurity','Networking'],isActive:true,slug:'dr-fatima-khatun'},
-  {id:'3',name:'Karim Hossain',title:'Dr.',designation:'Associate Professor',email:'khossain@gstu.edu.bd',researchInterests:['NLP','Deep Learning'],isActive:true,slug:'dr-karim-hossain'},
-  {id:'4',name:'Arif Ahmed',title:'Mr.',designation:'Assistant Professor',email:'aahmed@gstu.edu.bd',researchInterests:['IoT','Embedded Systems'],isActive:true,slug:'mr-arif-ahmed'},
-  {id:'5',name:'Nadia Islam',title:'Ms.',designation:'Assistant Professor',email:'nislam@gstu.edu.bd',researchInterests:['Software Engineering'],isActive:true,slug:'ms-nadia-islam'},
-  {id:'6',name:'Tanvir Hasan',title:'Mr.',designation:'Lecturer',email:'thasan@gstu.edu.bd',researchInterests:['Algorithms'],isActive:true,slug:'mr-tanvir-hasan'},
-];
+const MOCK: Faculty[] = [];
 
 async function fetchFaculty(): Promise<Faculty[]> {
   try {
     const api = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
     const r = await fetch(`${api}/faculty`, { cache: 'no-store' });
-    if (!r.ok) return MOCK;
+    if (!r.ok) return [];
     const d = await r.json() as { data?: Faculty[] };
     const all = Array.isArray(d.data) ? d.data : [];
     const filtered = all.filter(f => !f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman');
-    return filtered.length ? filtered : MOCK;
-  } catch { return MOCK; }
+    return filtered;
+  } catch { return []; }
 }
 
 export default async function FacultyPage() {
@@ -63,7 +56,13 @@ export default async function FacultyPage() {
         breadcrumbs={[{label:'Home',href:'/'},{label:'Faculty'}]}/>
       <main className="bg-white section-py">
         <div className="container-custom">
-          {Object.entries(groups).map(([desig, members]) => (
+          {all.length === 0 ? (
+            <div className="text-center py-16">
+              <span className="text-5xl block mb-3" aria-hidden="true">ðŸ‘¨â€ðŸ«</span>
+              <p className="text-slate-500 font-medium">No faculty profiles available yet.</p>
+            </div>
+          ) : (
+          Object.entries(groups).map(([desig, members]) => (
             <div key={desig} className="mb-12 last:mb-0">
               <div className="flex items-center gap-3 mb-6">
                 <h2 className="text-xl font-bold text-slate-900">{desig}</h2>
@@ -106,7 +105,8 @@ export default async function FacultyPage() {
                 ))}
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </main>
     </>

@@ -9,6 +9,7 @@ export default function StudentRegisterPage() {
   const [err,     setErr]     = useState('');
   const [loading, setLoading] = useState(false);
   const [showPw,  setShowPw]  = useState(false);
+  const [done,     setDone]     = useState(false);
 
   const { register, isAuthenticated, isLoading } = useStudentAuth();
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function StudentRegisterPage() {
     setLoading(true); setErr('');
     try {
       await register(studentId.trim().toUpperCase(), email, password, phone || undefined);
-      router.replace('/students');
+      setDone(true);
     } catch (error) {
       setErr(error instanceof Error ? error.message : 'Registration failed. Please try again.');
     } finally { setLoading(false); }
@@ -50,6 +51,17 @@ export default function StudentRegisterPage() {
           <p className="text-green-300 text-sm mt-1">GSTU — Dept. of CSE Student Portal</p>
         </div>
 
+        {done ? (
+          <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+            <span className="text-5xl block mb-4">✅</span>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Registration Successful!</h2>
+            <p className="text-slate-500 mb-5">Your account has been created. Please login to access the student portal.</p>
+            <Link href="/student/login" className="inline-block px-6 py-3 text-sm font-bold text-white rounded-xl transition"
+              style={{background:"linear-gradient(135deg,#166534,#15803d)"}}>
+              Go to Login
+            </Link>
+          </div>
+        ) : (
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <h2 className="text-lg font-bold text-slate-900 mb-1">Student Registration</h2>
           <p className="text-sm text-slate-500 mb-5">Only students in the CSE database can register. Your ID will be verified.</p>
@@ -120,6 +132,7 @@ export default function StudentRegisterPage() {
             <Link href="/" className="text-xs text-slate-400 hover:text-slate-600">← Back to main website</Link>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

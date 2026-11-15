@@ -38,8 +38,7 @@ export const NAV_LINKS = [
       { label: "Graduate Studies",      href: "/academics/msc" },
       { label: "MPhil",                 href: "/academics/mphil" },
       { label: "PhD",                   href: "/academics/phd" },
-      { label: "Academic Calendar",     href: "/academics/resources?type=calendar" },
-      { label: "Syllabus",              href: "/academics/resources?type=guideline" },
+      { label: "Academic Resources",    href: "/academics/resources" },
     ],
   },
   {
@@ -57,10 +56,6 @@ export const NAV_LINKS = [
     href: "/students",
     children: [
       { label: "Student Portal",    href: "/student/login" },
-      { label: "Class Routine",     href: "/academics/resources?type=routine" },
-      { label: "Exam Routine",      href: "/academics/resources?type=exam_schedule" },
-      { label: "Results",           href: "/academics/resources?type=result" },
-      { label: "Academic Calendar", href: "/academics/resources?type=calendar" },
       { label: "Scholarships",      href: "/students/scholarships" },
       { label: "Clubs & Societies", href: "/students/clubs" },
       { label: "Internship",        href: "/students/internship" },

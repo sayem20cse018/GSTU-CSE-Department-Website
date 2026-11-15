@@ -79,7 +79,7 @@ async function handler(
   if (!backendRes.ok) return res;
 
   // For login/register — extract token from backend response and set our own cookie
-  if (action === 'login' || action === 'register') {
+  if (action === 'login') {
     // Backend returns { student: {...}, token: "..." } via ResponseInterceptor → { data: { student, token } }
     // But students controller returns directly without going through ResponseInterceptor for these
     // Check both wrapped and unwrapped formats
