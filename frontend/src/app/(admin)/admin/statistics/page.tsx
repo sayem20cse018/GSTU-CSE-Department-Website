@@ -6,6 +6,7 @@ import Button      from '@/components/admin/ui/Button';
 import { useToast }   from '@/components/admin/ui/Toast';
 import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import { cn } from '@/lib/utils/cn';
+import SearchInput from '@/components/admin/ui/SearchInput';
 import { adminGet, adminPatch, adminPost, adminDelete } from '@/lib/api/admin-fetch';
 
 interface Stat {
@@ -17,6 +18,7 @@ const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-s
 
 export default function StatisticsAdminPage() {
   const [list,      setList]      = useState<Stat[]>([]);
+  const [query, setQuery] = useState('');
   const [loading,   setLoading]   = useState(true);
   const [edits,     setEdits]     = useState<Record<string, Partial<Stat>>>({});
   const [saving,    setSaving]    = useState<string | null>(null);

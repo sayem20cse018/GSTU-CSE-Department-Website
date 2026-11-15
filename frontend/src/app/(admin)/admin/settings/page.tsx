@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import { adminGet, adminPatch, adminPost } from '@/lib/api/admin-fetch';
 import { useAuth } from '@/context/AuthContext';
 import type { SiteSettings } from '@/lib/api/settings';
@@ -22,6 +24,7 @@ const lCls = 'block text-xs font-semibold text-slate-700 mb-1.5';
 
 export default function SettingsPage() {
   const [form,    setForm]    = useState<SiteSettings>(SETTINGS_FALLBACK);
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
   const [saved,   setSaved]   = useState(false);

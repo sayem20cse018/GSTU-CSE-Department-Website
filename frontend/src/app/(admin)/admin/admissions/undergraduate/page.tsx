@@ -6,6 +6,8 @@ import EmptyState from '@/components/admin/ui/EmptyState';
 import Badge     from '@/components/admin/ui/Badge';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { cn }    from '@/lib/utils/cn';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 
 interface Program {
@@ -23,6 +25,7 @@ const lCls = 'block text-xs font-semibold text-slate-700 mb-1.5';
 
 export default function AdmissionsUGPage() {
   const [list,    setList]    = useState<Program[]>([]);
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [form,    setForm]    = useState(EMPTY);
   const [editing, setEditing] = useState<Program|null>(null);
@@ -55,7 +58,7 @@ export default function AdmissionsUGPage() {
       const payload = { ...form, highlights: form.highlights.split('\n').map(s=>s.trim()).filter(Boolean) };
       if (editing) await adminPatch(`/academics/programs/${editing.id}`, payload);
       else await adminPost('/academics/programs', payload);
-      setOpen(false); load();
+      setOpen(false); load(); toast.success('Saved!');
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
     finally { setSaving(false); }
   }

@@ -7,6 +7,7 @@ import PageHeader from '@/components/admin/ui/PageHeader';
 import EmptyState from '@/components/admin/ui/EmptyState';
 import { useToast } from '@/components/admin/ui/Toast';
 import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import SearchInput from '@/components/admin/ui/SearchInput';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import type { AcademicResource } from '@/lib/api/academics';
 import { formatDate } from '@/lib/utils/format';
@@ -21,6 +22,7 @@ const EMPTY = { title:'', type:'routine' as AcademicResource['type'], descriptio
 
 export default function AdminResourcesPage() {
   const [resources, setResources] = useState<AcademicResource[]>([]);
+  const [query, setQuery] = useState('');
   const [loading,   setLoading]   = useState(true);
   const [open,      setOpen]      = useState(false);
   const [editing,   setEditing]   = useState<AcademicResource|null>(null);

@@ -7,6 +7,7 @@ import PageHeader from '@/components/admin/ui/PageHeader';
 import EmptyState from '@/components/admin/ui/EmptyState';
 import { useToast } from '@/components/admin/ui/Toast';
 import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import SearchInput from '@/components/admin/ui/SearchInput';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { cn } from '@/lib/utils/cn';
 import type { Course } from '@/lib/api/academics';
@@ -27,6 +28,7 @@ const EMPTY: {
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [degree,  setDegree]  = useState<typeof DEGREES[number]>('BSc');
+  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [open,    setOpen]    = useState(false);
   const [editing, setEditing] = useState<Course|null>(null);

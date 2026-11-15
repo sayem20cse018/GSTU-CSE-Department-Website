@@ -7,6 +7,7 @@ import PageHeader from '@/components/admin/ui/PageHeader';
 import EmptyState from '@/components/admin/ui/EmptyState';
 import { useToast } from '@/components/admin/ui/Toast';
 import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
+import SearchInput from '@/components/admin/ui/SearchInput';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import type { Program } from '@/lib/api/academics';
 
@@ -15,6 +16,7 @@ const EMPTY = { name:'', degree:'BSc' as typeof DEGREES[number], duration:'', to
 
 export default function AdminProgramsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [query, setQuery] = useState('');
   const [loading,  setLoading]  = useState(true);
   const [open,     setOpen]     = useState(false);
   const [editing,  setEditing]  = useState<Program|null>(null);

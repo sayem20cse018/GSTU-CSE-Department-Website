@@ -5,6 +5,8 @@ import Button    from '@/components/admin/ui/Button';
 import Badge     from '@/components/admin/ui/Badge';
 import EmptyState from '@/components/admin/ui/EmptyState';
 import { cn }    from '@/lib/utils/cn';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import { adminGet, adminPost, adminPatch, adminDelete } from '@/lib/api/admin-fetch';
 import { formatDate } from '@/lib/utils/format';
 
@@ -35,6 +37,7 @@ const lCls = 'block text-xs font-semibold text-slate-700 mb-1.5';
 
 export default function PublicationsPage() {
   const [list,      setList]      = useState<Publication[]>([]);
+  const toast = useToast();
   const [loading,   setLoading]   = useState(true);
   const [activeTab, setActiveTab] = useState<PubType>('journal');
   const [form,      setForm]      = useState<typeof EMPTY>(EMPTY);

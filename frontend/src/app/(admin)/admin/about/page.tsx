@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { AdminPageTitle } from '@/context/AdminPageContext';
+import { useToast }   from '@/components/admin/ui/Toast';
+import { useConfirm } from '@/components/admin/ui/ConfirmDialog';
 import { adminGet, adminPatch } from '@/lib/api/admin-fetch';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import type { SiteSettings } from '@/lib/api/settings';
@@ -25,6 +27,7 @@ const sec   = 'text-[10px] font-bold uppercase tracking-widest text-slate-400 pb
 export default function AboutAdminPage() {
   const [tab,    setTab]    = useState<Tab>('department');
   const [form,   setForm]   = useState<SiteSettings>(SETTINGS_FALLBACK);
+  const toast = useToast();
   const [loading, setLoad]  = useState(true);
   const [saving,  setSave]  = useState(false);
   const [saved,   setSaved] = useState(false);
