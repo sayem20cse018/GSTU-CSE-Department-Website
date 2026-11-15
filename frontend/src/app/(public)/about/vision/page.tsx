@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import SectionHero from '@/components/academics/SectionHero';
+import { fetchSettings, SETTINGS_FALLBACK } from '@/lib/api/settings';
 
-export const metadata: Metadata = { title: 'Vision & Mission — GSTU CSE' };
+export const metadata: Metadata = {
+  title: 'Vision & Mission — GSTU CSE',
+  description: 'The guiding principles and aspirations that shape the direction of our department.',
+};
 
 const VALUES = [
   { icon: '🎓', title: 'Academic Excellence', desc: 'Upholding the highest standards of teaching and learning to produce graduates who lead in their fields.' },
@@ -22,7 +26,14 @@ const OBJECTIVES = [
   'Foster a vibrant community of lifelong learners committed to continuous improvement.',
 ];
 
-export default function VisionPage() {
+const DEFAULT_VISION = 'To be a leading center of excellence in Computer Science and Engineering education and research in Bangladesh — recognized for producing graduates who make significant contributions to technology, society, and the global knowledge economy.';
+const DEFAULT_MISSION = 'Our mission is to provide rigorous, high-quality education in Computer Science and Engineering that prepares students for lifelong learning and professional success. We are committed to conducting impactful research, fostering ethical and innovative thinking, and creating an inclusive environment where every student can thrive and contribute to the advancement of technology and society.';
+
+export default async function VisionPage() {
+  const s = await fetchSettings().catch(() => SETTINGS_FALLBACK);
+  const visionText = s.aboutVision || DEFAULT_VISION;
+  const missionText = s.aboutMission || DEFAULT_MISSION;
+
   return (
     <>
       <SectionHero
@@ -35,24 +46,19 @@ export default function VisionPage() {
       <div className="bg-white section-py">
         <div className="container-custom max-w-4xl">
 
-          {/* Vision & Mission cards */}
+          {/* Vision & Mission cards — from settings */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
             {/* Vision */}
             <div className="relative overflow-hidden rounded-2xl p-8 text-white"
               style={{ background: 'linear-gradient(160deg,#0b3d1f 0%,#134e2a 60%,#0a2e1a 100%)' }}>
               <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10 blur-2xl"
-                style={{ background: '#4ade80' }} aria-hidden="true"/>
+                style={{ background: '#4ade80' }} aria-hidden="true" />
               <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl mb-4">
                 🔭
               </div>
               <h2 className="text-xl font-black mb-3 uppercase tracking-wide"
                 style={{ fontFamily: 'var(--font-oswald)' }}>Our Vision</h2>
-              <p className="text-green-100/90 leading-relaxed text-sm">
-                To be a leading center of excellence in Computer Science and Engineering education and research in Bangladesh — recognized for producing graduates who make significant contributions to technology, society, and the global knowledge economy.
-              </p>
-              <p className="text-green-100/90 leading-relaxed text-sm mt-3">
-                We aspire to foster an inclusive, innovative, and intellectually vibrant environment where students, faculty, and researchers collaborate to solve real-world problems and advance the frontiers of computing.
-              </p>
+              <p className="text-green-100/90 leading-relaxed text-sm">{visionText}</p>
             </div>
 
             {/* Mission */}
@@ -62,12 +68,7 @@ export default function VisionPage() {
               </div>
               <h2 className="text-xl font-black mb-3 uppercase tracking-wide text-slate-900"
                 style={{ fontFamily: 'var(--font-oswald)' }}>Our Mission</h2>
-              <p className="text-slate-600 leading-relaxed text-sm">
-                Our mission is to provide rigorous, high-quality education in Computer Science and Engineering that prepares students for lifelong learning and professional success.
-              </p>
-              <p className="text-slate-600 leading-relaxed text-sm mt-3">
-                We are committed to conducting impactful research, fostering ethical and innovative thinking, and creating an inclusive environment where every student can thrive and contribute to the advancement of technology and society.
-              </p>
+              <p className="text-slate-600 leading-relaxed text-sm">{missionText}</p>
             </div>
           </div>
 

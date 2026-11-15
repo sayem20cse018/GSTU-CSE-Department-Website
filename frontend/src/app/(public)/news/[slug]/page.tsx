@@ -68,9 +68,9 @@ export default async function NewsDetailPage({params}:{params:Promise<{slug:stri
         {/* Content */}
         <div className="container-custom max-w-4xl py-10">
           <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
-            <div className="prose prose-slate max-w-none prose-headings:font-bold prose-a:text-blue-700">
+            <div className="prose prose-slate max-w-none prose-headings:font-bold prose-a:text-green-700">
               {n.content ? (
-                <div dangerouslySetInnerHTML={{__html: n.content.replace(/\n/g,'<br/>')}}/>
+                <p className="text-slate-700 leading-relaxed whitespace-pre-line">{n.content}</p>
               ) : (
                 <p className="text-slate-500 italic">Content not available.</p>
               )}
@@ -82,7 +82,7 @@ export default async function NewsDetailPage({params}:{params:Promise<{slug:stri
               </div>) : null}
           </div>
           <div className="mt-6 flex justify-between items-center">
-            <Link href="/news" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-700 transition">
+            <Link href="/news" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-green-700 transition">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
               Back to News
             </Link>
