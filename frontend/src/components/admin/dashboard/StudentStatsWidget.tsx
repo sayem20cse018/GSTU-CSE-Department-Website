@@ -3,13 +3,19 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { adminGet } from '@/lib/api/admin-fetch';
 
+interface LastActivity {
+  name: string;
+  studentId: string;
+  at: string;
+}
+
 interface StudentStats {
   totalRecords: number;
   totalRegistered: number;
   onlineNow: number;
   todayLogins: number;
   totalLoginCount: number;
-  lastActivity: string | null;
+  lastActivity: LastActivity | null;
 }
 
 /** Simple SVG horizontal bar — no external library */
@@ -122,7 +128,9 @@ export default function StudentStatsWidget() {
 
             {stats.lastActivity && (
               <p className="text-[10px] text-slate-400 mt-4 pt-3 border-t border-slate-100">
-                Last student activity: {new Date(stats.lastActivity).toLocaleString()}
+                Last login: <span className="font-semibold">{stats.lastActivity.name}</span>
+                {' '}({stats.lastActivity.studentId})
+                {' — '}{new Date(stats.lastActivity.at).toLocaleString()}
               </p>
             )}
           </>

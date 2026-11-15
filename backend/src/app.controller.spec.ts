@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { PrismaService } from './database/prisma.service';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -8,16 +8,24 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [
+        {
+          provide: PrismaService,
+          useValue: {
+            $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]),
+          },
+        },
+      ],
     }).compile();
 
     appController = app.get<AppController>(AppController);
   });
 
   describe('healthCheck', () => {
-    it('should return status ok', () => {
-      const result = appController.healthCheck();
+    it('should return status ok when DB is reachable', async () => {
+      const result = await appController.healthCheck();
       expect(result.status).toBe('ok');
+      expect(result.db).toBe('ok');
     });
   });
 });

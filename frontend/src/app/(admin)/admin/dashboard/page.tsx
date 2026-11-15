@@ -7,6 +7,7 @@ import ActivityFeed       from '@/components/admin/dashboard/ActivityFeed';
 import StudentStatsWidget from '@/components/admin/dashboard/StudentStatsWidget';
 import SystemInfo         from '@/components/admin/dashboard/SystemInfo';
 import WelcomeBanner      from '@/components/admin/dashboard/WelcomeBanner';
+import { RecentNotices, RecentNews, UpcomingEvents } from '@/components/admin/dashboard/ContentSummary';
 import Link from 'next/link';
 
 export const metadata: Metadata = { title: 'Dashboard — GSTU CSE Admin' };
@@ -90,6 +91,16 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <ActivityFeed />
             <StudentStatsWidget />
+          </div>
+        </section>
+
+        {/* ── Content summary ──────────────────────────────────────────── */}
+        <section>
+          <SectionHeader color="bg-amber-500" title="Content Summary" />
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <RecentNotices />
+            <RecentNews />
+            <UpcomingEvents />
           </div>
         </section>
 

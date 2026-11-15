@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-interface Health { status: string; timestamp: string; version: string }
+interface Health { status: string; db: string; timestamp: string; version: string }
 
 type RowStatus = 'ok' | 'error' | 'neutral';
 interface Row { label: string; value: string; status: RowStatus }
@@ -47,8 +47,8 @@ export default function SystemInfo() {
     },
     {
       label: 'Database',
-      value: checking ? '…' : isOnline ? 'Connected' : 'Unknown',
-      status: checking ? 'neutral' : isOnline ? 'ok' : 'neutral',
+      value: checking ? '…' : (health?.db === 'ok') ? 'Connected' : isOnline ? 'Error' : 'Unknown',
+      status: checking ? 'neutral' : (health?.db === 'ok') ? 'ok' : isOnline ? 'error' : 'neutral',
     },
     {
       label: 'Response',

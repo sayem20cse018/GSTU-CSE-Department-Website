@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
+import { ActivityLoggerModule } from './common/services/activity-logger.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { FacultyModule } from './modules/faculty/faculty.module';
 import { NewsModule } from './modules/news/news.module';
@@ -31,13 +31,11 @@ import { StudentsModule }   from './modules/students/students.module';
     // ── PostgreSQL via Prisma ─────────────────────────────────────────────
     DatabaseModule,
 
+    // ── Activity logger (global — available in all controllers) ───────────
+    ActivityLoggerModule,
+
     // ── Rate limiting ─────────────────────────────────────────────────────
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60_000,
-        limit: 100,
-      },
-    ]),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
 
     // ── Feature modules ───────────────────────────────────────────────────
     AuthModule,
@@ -57,6 +55,6 @@ import { StudentsModule }   from './modules/students/students.module';
     StudentsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
