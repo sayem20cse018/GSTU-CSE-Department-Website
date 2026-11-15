@@ -15,19 +15,12 @@ import Link from 'next/link';
 
 export const metadata: Metadata = { title: 'Dashboard — GSTU CSE Admin' };
 
-// ─── Module grid config ───────────────────────────────────────────────────────
 const MODULES = NAV_GROUPS.filter(g => g.group !== 'Overview');
 
 const GROUP_ICON: Record<string, string> = {
-  'About':                   '🏛️',
-  'Academics':               '📚',
-  'Research & Publications': '🔬',
-  'Achievements':            '🏆',
-  'People':                  '👥',
-  'Students':                '🎓',
-  'Admissions':              '📋',
-  'Content':                 '📝',
-  'Configuration':           '⚙️',
+  'About': '🏛️', 'Academics': '📚', 'Research & Publications': '🔬',
+  'Achievements': '🏆', 'People': '👥', 'Students': '🎓',
+  'Admissions': '📋', 'Content': '📝', 'Configuration': '⚙️',
 };
 
 const ITEM_ICON: Record<string, string> = {
@@ -40,15 +33,16 @@ const ITEM_ICON: Record<string, string> = {
   'Statistics':'📊','Nav Manager':'🗂️','Settings':'⚙️',
 };
 
-function SectionHeader({ color, title, badge }: { color: string; title: string; badge?: string }) {
+/** Consistent section heading */
+function Heading({ accent, title, badge }: { accent: string; title: string; badge?: string }) {
   return (
     <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center gap-2">
-        <div className={`w-1 h-5 rounded-full ${color}`} aria-hidden="true" />
+      <div className="flex items-center gap-2.5">
+        <div className={`w-1 h-5 rounded-full ${accent}`} aria-hidden="true" />
         <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">{title}</h2>
       </div>
       {badge && (
-        <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium">
+        <span className="text-[11px] text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-full font-medium">
           {badge}
         </span>
       )}
@@ -60,36 +54,35 @@ export default function DashboardPage() {
   const totalModules = NAV_GROUPS.reduce((acc, g) => acc + g.items.length, 0);
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen" style={{ background: '#f1f5f9' }}>
+      <div className="p-6 max-w-7xl mx-auto space-y-7">
         <AdminPageTitle title="Dashboard" />
 
         {/* ── Welcome banner ───────────────────────────────────────────── */}
         <WelcomeBanner />
 
-        {/* ── Live content counts ──────────────────────────────────────── */}
+        {/* ── Live stats ───────────────────────────────────────────────── */}
         <section>
-          <SectionHeader color="bg-green-600" title="Live Content Stats" />
+          <Heading accent="bg-green-600" title="Live Content Stats" />
           <OverviewStats />
         </section>
 
-        {/* ── Pending tasks + Quick actions ────────────────────────────── */}
+        {/* ── Pending tasks row ────────────────────────────────────────── */}
         <section>
-          <SectionHeader color="bg-orange-500" title="Pending Tasks & Quick Actions" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* Pending tasks spans 1 col */}
-            <PendingTasksWidget />
-            {/* Quick actions spans 2 cols */}
-            <div className="lg:col-span-2">
-              <QuickActions />
-            </div>
-          </div>
+          <Heading accent="bg-orange-500" title="Pending Tasks" />
+          <PendingTasksWidget />
+        </section>
+
+        {/* ── Quick actions ────────────────────────────────────────────── */}
+        <section>
+          <Heading accent="bg-blue-500" title="Quick Actions" />
+          <QuickActions />
         </section>
 
         {/* ── Activity feed + Student stats (admin+ only) ──────────────── */}
         <RoleGate minRole="admin">
           <section>
-            <SectionHeader color="bg-violet-500" title="Activity & Students" />
+            <Heading accent="bg-violet-500" title="Activity & Students" />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <ActivityFeed />
               <StudentStatsWidget />
@@ -99,17 +92,17 @@ export default function DashboardPage() {
 
         {/* ── Content summary ──────────────────────────────────────────── */}
         <section>
-          <SectionHeader color="bg-amber-500" title="Content Summary" />
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <Heading accent="bg-amber-500" title="Content Summary" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <RecentNotices />
             <RecentNews />
             <UpcomingEvents />
           </div>
         </section>
 
-        {/* ── Latest publications ───────────────────────────────────────── */}
+        {/* ── Latest publications ──────────────────────────────────────── */}
         <section>
-          <SectionHeader color="bg-blue-500" title="Latest Research Publications" />
+          <Heading accent="bg-blue-500" title="Latest Research Publications" />
           <div className="max-w-2xl">
             <RecentPublicationsWidget />
           </div>
@@ -117,34 +110,25 @@ export default function DashboardPage() {
 
         {/* ── All modules grid ─────────────────────────────────────────── */}
         <section>
-          <SectionHeader
-            color="bg-indigo-500"
-            title="All CMS Modules"
-            badge={`${totalModules} modules`}
-          />
+          <Heading accent="bg-indigo-500" title="All CMS Modules" badge={`${totalModules} modules`} />
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {MODULES.map(group => (
-              <div
-                key={group.group}
-                className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-slate-300 hover:shadow-sm transition-all"
-              >
-                <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+              <div key={group.group}
+                className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-sm transition-shadow">
+                <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100 bg-slate-50/80">
                   <span className="text-base" aria-hidden="true">{GROUP_ICON[group.group] ?? '📁'}</span>
                   <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">{group.group}</span>
                   <span className="ml-auto text-[10px] text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-full">
                     {group.items.length}
                   </span>
                 </div>
-                <div className="p-3 grid grid-cols-2 gap-1.5">
+                <div className="p-3 grid grid-cols-2 gap-1">
                   {group.items.map(item => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all group"
-                    >
+                    <Link key={item.href} href={item.href}
+                      className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors group">
                       <span className="text-sm shrink-0" aria-hidden="true">{ITEM_ICON[item.label] ?? '📄'}</span>
                       <span className="text-xs font-semibold truncate">{item.label}</span>
-                      <svg className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-slate-400"
+                      <svg className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-60 transition-opacity shrink-0 text-slate-400"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
                       </svg>
@@ -159,7 +143,7 @@ export default function DashboardPage() {
         {/* ── System health (admin+ only) ──────────────────────────────── */}
         <RoleGate minRole="admin">
           <section>
-            <SectionHeader color="bg-green-500" title="System Health" />
+            <Heading accent="bg-green-500" title="System Health" />
             <div className="max-w-sm">
               <SystemInfo />
             </div>

@@ -1,5 +1,4 @@
 'use client';
-
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
@@ -8,10 +7,9 @@ import { NAV_GROUPS } from './nav-items';
 
 interface TopbarProps { onMenuClick: () => void; }
 
-/** Build breadcrumb from current pathname */
+/** Breadcrumb from current pathname */
 function useBreadcrumb() {
   const pathname = usePathname();
-  // Find matching nav item
   for (const group of NAV_GROUPS) {
     for (const item of group.items) {
       const itemPath = item.href.split('?')[0];
@@ -22,6 +20,12 @@ function useBreadcrumb() {
   }
   return null;
 }
+
+const ROLE_STYLE: Record<string, string> = {
+  super_admin: 'bg-rose-100 text-rose-700 border-rose-200',
+  admin:       'bg-blue-100 text-blue-700 border-blue-200',
+  editor:      'bg-slate-100 text-slate-500 border-slate-200',
+};
 
 export default function Topbar({ onMenuClick }: TopbarProps) {
   const { admin, logout } = useAuth();
@@ -35,18 +39,17 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
     router.refresh();
   }
 
-  const roleLabel = admin?.role?.replace(/_/g, ' ') ?? 'administrator';
   const initial   = admin?.name?.charAt(0).toUpperCase() ?? 'A';
+  const roleLabel = admin?.role?.replace(/_/g, ' ') ?? '';
+  const roleStyle = ROLE_STYLE[admin?.role ?? ''] ?? ROLE_STYLE.editor;
 
   return (
-    <header
-      className="h-14 flex items-center gap-3 px-4 lg:px-6 shrink-0 border-b"
-      style={{ background: '#0f1f0f', borderColor: '#1a2e1a' }}
-    >
-      {/* Hamburger */}
+    <header className="h-14 flex items-center gap-3 px-4 lg:px-6 shrink-0 bg-white border-b border-slate-200">
+
+      {/* Hamburger — mobile only */}
       <button
         onClick={onMenuClick}
-        className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition"
+        className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition"
         aria-label="Open menu"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,30 +59,30 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 flex-1 min-w-0 text-sm">
-        <span className="text-gray-600 text-xs hidden sm:inline font-medium">Admin</span>
+        <span className="text-slate-400 text-xs hidden sm:inline">Admin</span>
         {breadcrumb && (
           <>
-            <svg className="w-3 h-3 text-gray-700 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 text-slate-300 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
             </svg>
-            <span className="text-gray-600 text-xs hidden sm:inline truncate">{breadcrumb.group}</span>
-            <svg className="w-3 h-3 text-gray-700 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span className="text-slate-400 text-xs hidden sm:inline truncate">{breadcrumb.group}</span>
+            <svg className="w-3 h-3 text-slate-300 hidden sm:block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
             </svg>
           </>
         )}
-        <h1 className="text-sm font-semibold text-white truncate">{pageTitle}</h1>
+        <h1 className="text-sm font-semibold text-slate-800 truncate">{pageTitle}</h1>
       </div>
 
-      {/* Actions */}
+      {/* Right actions */}
       <div className="flex items-center gap-2 shrink-0">
 
-        {/* View site */}
+        {/* View public site */}
         <Link
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-3 py-1.5 rounded-lg transition"
+          className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-green-700 hover:bg-green-50 border border-slate-200 hover:border-green-200 px-3 py-1.5 rounded-lg transition"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -88,23 +91,30 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
           View Site
         </Link>
 
-        <div className="h-4 w-px bg-gray-700 hidden sm:block"/>
+        <div className="h-5 w-px bg-slate-200 hidden sm:block" />
 
-        {/* Admin avatar + name */}
-        <div className="hidden md:flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white bg-green-700 ring-2 ring-green-900">
-            {initial}
+        {/* Admin info */}
+        {admin && (
+          <div className="hidden md:flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+              style={{ background: 'linear-gradient(135deg,#166534,#15803d)' }}
+            >
+              {initial}
+            </div>
+            <div className="text-left leading-none">
+              <p className="text-xs font-semibold text-slate-800">{admin.name}</p>
+              <span className={`text-[10px] font-semibold px-1.5 py-px rounded border capitalize inline-block mt-0.5 ${roleStyle}`}>
+                {roleLabel}
+              </span>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-semibold text-white leading-none">{admin?.name}</p>
-            <p className="text-[10px] text-gray-500 capitalize mt-0.5">{roleLabel}</p>
-          </div>
-        </div>
+        )}
 
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-700/40 px-3 py-1.5 rounded-lg transition"
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 hover:border-red-200 px-3 py-1.5 rounded-lg transition"
           title="Logout"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
