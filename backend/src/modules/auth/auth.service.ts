@@ -181,6 +181,81 @@ export class AuthService {
     return { message: 'Logged out successfully' };
   }
 
+  // ─── Aggregate stats (dashboard) ────────────────────────────────────────────
+  async getAggregateStats() {
+    const [
+      faculty,
+      news,
+      events,
+      notices,
+      achievements,
+      clubs,
+      alumni,
+      galleryAlbums,
+      studentRecords,
+      studentRegistered,
+      onlineNow,
+      programs,
+      courses,
+      labs,
+      resources,
+    ] = await Promise.all([
+      this.prisma.faculty.count({ where: { isActive: true } }),
+      this.prisma.news.count(),
+      this.prisma.event.count(),
+      this.prisma.notice.count(),
+      this.prisma.achievement.count(),
+      this.prisma.club.count(),
+      this.prisma.alumni.count(),
+      this.prisma.gallery.count(),
+      this.prisma.studentRecord.count(),
+      this.prisma.studentUser.count(),
+      this.prisma.studentSession.count({
+        where: { lastSeenAt: { gte: new Date(Date.now() - 5 * 60 * 1000) } },
+      }),
+      this.prisma.program.count(),
+      this.prisma.course.count(),
+      this.prisma.laboratory.count(),
+      this.prisma.academicResource.count(),
+    ]);
+
+    return {
+      faculty,
+      news,
+      events,
+      notices,
+      achievements,
+      clubs,
+      alumni,
+      galleryAlbums,
+      studentRecords,
+      studentRegistered,
+      onlineNow,
+      programs,
+      courses,
+      labs,
+      resources,
+    };
+  }
+
+  // ─── Recent activity log (dashboard) ────────────────────────────────────────
+  async getRecentActivity(limit = 20) {
+    const logs = await this.prisma.adminActivityLog.findMany({
+      orderBy: { performedAt: 'desc' },
+      take: limit,
+      include: {
+        admin: { select: { name: true, email: true, role: true } },
+      },
+    });
+    return logs.map(l => ({
+      id: l.id,
+      action: l.action,
+      performedAt: l.performedAt,
+      ipAddress: l.ipAddress,
+      admin: l.admin,
+    }));
+  }
+
   // ─── Create super admin (seed) ──────────────────────────────────────────────
   async createSuperAdmin(name: string, email: string, password: string): Promise<AdminProfile> {
     const existing = await this.prisma.admin.findUnique({

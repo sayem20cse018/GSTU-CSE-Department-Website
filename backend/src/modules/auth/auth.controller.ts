@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Patch,
+  Query,
   Body,
   Req,
   HttpCode,
@@ -104,5 +105,24 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout — records activity. Client must discard tokens.' })
   async logout(@CurrentUser() admin: Admin) {
     return this.authService.logout(admin.id);
+  }
+
+  // ─── GET /api/auth/aggregate-stats ──────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get('aggregate-stats')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Single-call aggregate counts for the dashboard' })
+  async aggregateStats() {
+    return this.authService.getAggregateStats();
+  }
+
+  // ─── GET /api/auth/activity ──────────────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get('activity')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Recent admin activity log' })
+  async recentActivity(@Query('limit') limit?: string) {
+    const n = limit ? parseInt(limit, 10) : 20;
+    return this.authService.getRecentActivity(isNaN(n) ? 20 : Math.min(n, 100));
   }
 }
