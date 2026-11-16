@@ -94,21 +94,25 @@ export default function PeoplePage() {
   }
 
   async function save() {
-    if (!form.name.trim() || !form.email.trim()) { setErr('Name and email are required.'); return; }
+    if (!form.name.trim()) { setErr('Name is required.'); return; }
     setSaving(true); setErr('');
     try {
-      // Build payload — strip empty strings and UI-only fields
+      // Build payload — always include name and email, strip empty optional fields
       const { chairmanFrom, chairmanTo, ...rest } = form;
       const payload: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(rest)) {
-        if (v === '' || v === null) continue; // Skip empty strings
+        if (k === 'name') { payload.name = String(v).trim(); continue; }
+        if (k === 'email') { payload.email = String(v).trim(); continue; }
+        if (v === '' || v === null) continue; // Skip empty strings for optional fields
         if (k === 'researchInterests') {
           payload[k] = String(v).split(',').map(s => s.trim()).filter(Boolean);
         } else {
           payload[k] = v;
         }
       }
-      // Always send isActive and sortOrder even if defaults
+      // Ensure required fields are always present
+      if (!payload.name) payload.name = form.name.trim();
+      if (!payload.email) payload.email = form.email.trim();
       if (payload.isActive === undefined) payload.isActive = true;
       if (payload.sortOrder === undefined) payload.sortOrder = 0;
 

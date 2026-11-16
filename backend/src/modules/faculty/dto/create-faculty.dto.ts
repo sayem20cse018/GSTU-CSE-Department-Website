@@ -1,13 +1,11 @@
 import {
   IsString,
-  IsEmail,
   IsOptional,
   IsBoolean,
   IsArray,
   IsNumber,
   IsEnum,
   ValidateNested,
-  MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -19,44 +17,45 @@ class EducationDto {
 }
 
 export class CreateFacultyDto {
-  @ApiProperty() @IsString() @MinLength(2) name: string;
+  @ApiProperty() @IsString() name: string;
 
   @ApiPropertyOptional()
   @IsOptional() @IsString()
-  title?: string;   // e.g. "Dr.", "Prof." — optional
+  title?: string;
 
-  @ApiProperty({ description: 'Designation e.g. Professor, Lecturer, Administrative Officer' })
   @IsOptional() @IsString()
   designation?: string;
 
-  @ApiProperty() @IsEmail() email: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() phone?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() photo?: string;
+  @IsOptional() @IsString()
+  email?: string;
 
-  @ApiPropertyOptional({ type: [String] })
+  @IsOptional() @IsString()
+  phone?: string;
+
+  @IsOptional() @IsString()
+  photo?: string;
+
   @IsOptional() @IsArray() @IsString({ each: true })
   researchInterests?: string[];
 
-  @ApiPropertyOptional({ type: [EducationDto] })
   @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => EducationDto)
   education?: EducationDto[];
 
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() isActive?: boolean;
-  @ApiPropertyOptional() @IsOptional() @IsNumber() sortOrder?: number;
+  @IsOptional() @IsBoolean() isActive?: boolean;
+  @IsOptional() @IsNumber() sortOrder?: number;
 
-  @ApiPropertyOptional({ enum: ['faculty', 'staff', 'officer', 'chairman'] })
   @IsOptional()
   @IsEnum(['faculty', 'staff', 'officer', 'chairman'])
   staffType?: string;
 
-  @ApiPropertyOptional() @IsOptional() @IsString() shortBio?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() fullBio?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() officeRoom?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() googleScholarUrl?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() linkedinUrl?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() researchGateUrl?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() orcidId?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() websiteUrl?: string;
-  @ApiPropertyOptional() @IsOptional() @IsString() joinedAt?: string;
-  @ApiPropertyOptional() @IsOptional() @IsEnum(['full_time','part_time','on_leave','retired']) employmentStatus?: string;
+  @IsOptional() @IsString() shortBio?: string;
+  @IsOptional() @IsString() fullBio?: string;
+  @IsOptional() @IsString() officeRoom?: string;
+  @IsOptional() @IsString() googleScholarUrl?: string;
+  @IsOptional() @IsString() linkedinUrl?: string;
+  @IsOptional() @IsString() researchGateUrl?: string;
+  @IsOptional() @IsString() orcidId?: string;
+  @IsOptional() @IsString() websiteUrl?: string;
+  @IsOptional() @IsString() joinedAt?: string;
+  @IsOptional() @IsEnum(['full_time','part_time','on_leave','retired']) employmentStatus?: string;
 }
