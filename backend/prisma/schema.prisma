@@ -794,6 +794,103 @@ model Settings {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ADMISSION SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Admission window configuration (singleton per session)
+model AdmissionSetting {
+  id                 String   @id @default(cuid())
+  session            String   @unique   // "2024-25"
+  isOpen             Boolean  @default(false)
+  appStartDate       DateTime?
+  appDeadline        DateTime?
+  admissionFee       Int      @default(500)   // BDT
+  feeInstructions    String?  // bKash/bank instructions
+  instructions       String?  // general admission instructions
+  requiredDocuments  String[] @default([])    // list of required doc labels
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  applications AdmissionApplication[]
+  @@map("admission_settings")
+}
+
+// New student admission application
+model AdmissionApplication {
+  id              String   @id @default(cuid())
+  applicationId   String   @unique   // e.g. "APP-2024-00001"
+  settingId       String?
+  setting         AdmissionSetting? @relation(fields: [settingId], references: [id])
+  session         String
+  program         String   @default("BSc")   // BSc | MSc | PhD
+
+  // Personal info
+  fullName        String
+  dateOfBirth     String?
+  gender          String?
+  email           String
+  phone           String
+  presentAddress  String?
+  permanentAddress String?
+
+  // Guardian info
+  fatherName      String?
+  motherName      String?
+  guardianPhone   String?
+
+  // SSC
+  sscBoard        String?
+  sscRoll         String?
+  sscRegNo        String?
+  sscYear         String?
+  sscGpa          String?
+
+  // HSC
+  hscBoard        String?
+  hscRoll         String?
+  hscRegNo        String?
+  hscYear         String?
+  hscGpa          String?
+
+  // Documents (Cloudinary URLs)
+  photoUrl        String?
+  sscDocUrl       String?
+  hscDocUrl       String?
+  otherDocUrl     String?
+
+  // Status
+  status          String   @default("submitted")
+  // submitted | under_review | payment_pending | payment_verified | approved | rejected
+
+  // Payment
+  paymentStatus   String   @default("pending")   // pending | paid | verified | refunded
+  paymentAmount   Int?
+  paymentMethod   String?  // bKash | bank | cash
+  transactionId   String?
+  paymentDate     DateTime?
+  paymentVerifiedAt DateTime?
+  paymentVerifiedBy String?  // admin id
+
+  // Admin review
+  adminRemarks    String?
+  reviewedBy      String?
+  reviewedAt      DateTime?
+
+  // After approval: generated Student ID
+  assignedStudentId String?
+  assignedBatch   String?
+
+  // Tracking account (for applicant to log in and check status)
+  trackingPassword String?  // bcrypt hashed — for /admission/status login
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([session, status])
+  @@map("admission_applications")
+}
+// ─────────────────────────────────────────────────────────────────────────────
 // STUDENT SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -803,6 +900,10 @@ model StudentRecord {
   studentId  String   @unique   // e.g. "20CSE018"
   name       String
   session    String             // e.g. "2020-21"
+  batch            String?            // e.g. "14th"
+  email            String?            // optional pre-set email
+  phone            String?
+  enrollmentStatus String   @default("active")   // active | inactive | graduated | suspended
   isVerified Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

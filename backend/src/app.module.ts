@@ -20,6 +20,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { HeroSlidesModule } from './modules/hero-slides/hero-slides.module';
 import { StudentsModule }   from './modules/students/students.module';
 import { AdminManagementModule } from './modules/admin/admin.module';
+import { AdmissionModule }        from './modules/admission/admission.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { AdminManagementModule } from './modules/admin/admin.module';
     HeroSlidesModule,
     StudentsModule,
     AdminManagementModule,
+    AdmissionModule,
   ],
   controllers: [AppController],
   providers: [],

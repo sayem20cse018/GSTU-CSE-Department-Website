@@ -147,6 +147,34 @@ export class StudentsController {
     return this.svc.deleteRecord(id);
   }
 
+  // ─── Admin: activate / suspend student account ──────────────────────────
+  @Patch("accounts/:userId/status")
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "[Admin] Activate or suspend a student account" })
+  async setAccountStatus(
+    @Param("userId") userId: string,
+    @Body() body: { isActive: boolean },
+  ) {
+    return this.svc.setAccountStatus(userId, body.isActive);
+  }
+
+  // ─── Admin: update record (extended) ─────────────────────────────────────
+  @Patch("records/:id/extended")
+  @UseGuards(RolesGuard)
+  @Roles("admin")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "[Admin] Update student record including batch + enrollmentStatus" })
+  async updateRecordExtended(
+    @Param("id") id: string,
+    @Body() body: {
+      name?: string; session?: string; batch?: string;
+      email?: string; phone?: string; enrollmentStatus?: string;
+    },
+  ) {
+    return this.svc.updateRecordExtended(id, body);
+  }
   // ─── Admin: stats ─────────────────────────────────────────────────────────
   @Get('stats')
   @UseGuards(RolesGuard)

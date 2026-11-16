@@ -194,7 +194,10 @@ export class StudentsService {
     return this.prisma.studentRecord.delete({ where: { id } });
   }
 
-  async addRecord(data: { studentId: string; name: string; session: string }) {
+  async addRecord(data: {
+    studentId: string; name: string; session: string;
+    batch?: string; email?: string; phone?: string; enrollmentStatus?: string;
+  }) {
     const existing = await this.prisma.studentRecord.findUnique({
       where: { studentId: data.studentId.toUpperCase() },
     });
@@ -203,9 +206,13 @@ export class StudentsService {
     }
     return this.prisma.studentRecord.create({
       data: {
-        studentId: data.studentId.toUpperCase(),
-        name: data.name.trim(),
-        session: data.session.trim(),
+        studentId:        data.studentId.toUpperCase(),
+        name:             data.name.trim(),
+        session:          data.session.trim(),
+        batch:            data.batch?.trim() || null,
+        email:            data.email?.toLowerCase().trim() || null,
+        phone:            data.phone?.trim() || null,
+        enrollmentStatus: data.enrollmentStatus ?? "active",
       },
     });
   }
@@ -223,6 +230,36 @@ export class StudentsService {
     });
   }
 
+  // ─── ADMIN: activate / suspend account ────────────────────────────────────────
+  async setAccountStatus(userId: string, isActive: boolean) {
+    const user = await this.prisma.studentUser.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException("Student account not found");
+    return this.prisma.studentUser.update({
+      where: { id: userId },
+      data: { isActive },
+    }).then(u => this.safe(u));
+  }
+
+  // ─── ADMIN: update record (extended with batch + enrollmentStatus) ─────────────
+  async updateRecordExtended(id: string, data: {
+    name?: string; session?: string; batch?: string; email?: string;
+    phone?: string; enrollmentStatus?: string;
+  }) {
+    const r = await this.prisma.studentRecord.findUnique({ where: { id } });
+    if (!r) throw new NotFoundException("Record not found");
+    return this.prisma.studentRecord.update({
+      where: { id },
+      data: {
+        ...(data.name             !== undefined ? { name:             data.name.trim()             } : {}),
+        ...(data.session          !== undefined ? { session:          data.session.trim()          } : {}),
+        ...(data.batch            !== undefined ? { batch:            data.batch.trim()            } : {}),
+        ...(data.email            !== undefined ? { email:            data.email.trim()            } : {}),
+        ...(data.phone            !== undefined ? { phone:            data.phone.trim()            } : {}),
+        ...(data.enrollmentStatus !== undefined ? { enrollmentStatus: data.enrollmentStatus        } : {}),
+      },
+      include: { user: { select: { id: true, email: true, isActive: true, lastLoginAt: true } } },
+    });
+  }
   // ─── ADMIN: stats ──────────────────────────────────────────────────────────────
   async getStats() {
     const now = new Date();
