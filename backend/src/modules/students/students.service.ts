@@ -52,14 +52,12 @@ export class StudentsService {
         passwordHash,
         session:      record.session,
         phone:        dto.phone,
-        lastLoginAt:  new Date(),
-        lastLoginIp:  ip,
-        totalLoginCount: 1,
+        // Do NOT set lastLoginAt or totalLoginCount here — not a login
       },
     });
 
-    const token = await this.createSession(user.id, ip);
-    return { token, student: this.safe(user) };
+    // Do NOT create a session at registration — user must log in separately
+    return { student: this.safe(user) };
   }
 
   // ─── LOGIN ───────────────────────────────────────────────────────────────────

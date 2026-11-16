@@ -65,13 +65,13 @@ export default async function SiteHeader() {
 
           {/* Text */}
           <div>
-            <p className="leading-none mb-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:800, fontSize:'0.62rem', letterSpacing:'0.22em', textTransform:'uppercase', color:'#111827' }}>
+            <p className="leading-none mb-0.5" style={{ fontFamily:'var(--font-montserrat)', fontWeight:700, fontSize:'0.6rem', letterSpacing:'0.2em', textTransform:'uppercase', color:'#4b5563' }}>
               {s.showDeptPrefix !== false ? 'Department of' : ''}
             </p>
-            <p className="leading-tight group-hover:opacity-80 transition-opacity" style={{ fontFamily, fontWeight:900, fontSize:'1.55rem', letterSpacing:'-0.01em', color: accentColor, textTransform:'uppercase' }}>
+            <p className="leading-tight group-hover:opacity-80 transition-opacity" style={{ fontFamily, fontWeight:900, fontSize:'1.65rem', letterSpacing:'-0.01em', color: accentColor, textTransform:'uppercase' }}>
               {deptCore}
             </p>
-            <p className="mt-1" style={{ fontFamily:'var(--font-montserrat)', fontWeight:700, fontSize:'0.6rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'#111827' }}>
+            <p className="mt-1.5" style={{ fontFamily:'var(--font-montserrat)', fontWeight:800, fontSize:'0.68rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'#111827' }}>
               {s.universityName}
             </p>
           </div>
@@ -139,7 +139,7 @@ export default async function SiteHeader() {
               </svg>
               Student Login
             </Link>
-            <Link href="/admissions"
+            <Link href="/student/register"
               className="flex items-center gap-1.5 text-[11px] font-extrabold ml-1.5 px-4 py-1.5 rounded-lg text-green-900 transition hover:opacity-90"
               style={{ background: '#ffffff', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +179,7 @@ export default async function SiteHeader() {
           <a href={s.moodleUrl || 'https://moodle.gstu.edu.bd'} target="_blank" rel="noopener noreferrer" className="text-xs text-white/75 hover:text-white transition">Moodle</a>
           <span className="text-white/30">|</span>
           <Link href="/student/login" className="text-xs font-semibold px-2.5 py-1 rounded text-white transition hover:bg-white/10" style={{ border: '1px solid rgba(255,255,255,0.35)' }}>Login</Link>
-          <Link href="/admissions" className="text-xs font-extrabold px-2.5 py-1 rounded text-green-900 hover:opacity-90 transition" style={{ background: 'white' }}>Register</Link>
+          <Link href="/student/register" className="text-xs font-extrabold px-2.5 py-1 rounded text-green-900 hover:opacity-90 transition" style={{ background: 'white' }}>Register</Link>
         </div>
       </header>
 
@@ -215,7 +215,7 @@ export default async function SiteHeader() {
         {/* Login/Register row below */}
         <div className="flex items-center gap-2 mt-2">
           <Link href="/student/login" className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border" style={{ borderColor: accentColor, color: accentColor }}>Student Login</Link>
-          <Link href="/admissions" className="text-[11px] font-extrabold px-3 py-1.5 rounded-lg text-white" style={{ background: accentColor }}>Register</Link>
+          <Link href="/student/register" className="text-[11px] font-extrabold px-3 py-1.5 rounded-lg text-white" style={{ background: accentColor }}>Register</Link>
         </div>
       </header>
     </>

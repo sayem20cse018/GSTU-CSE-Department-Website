@@ -9,12 +9,13 @@ import type { SiteSettings } from '@/lib/api/settings';
 import { SETTINGS_FALLBACK } from '@/lib/api/settings';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
-type Tab = 'identity' | 'contact' | 'social' | 'account';
+type Tab = 'identity' | 'contact' | 'social' | 'theme' | 'account';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'identity', label: 'Identity', icon: '🏛️' },
   { id: 'contact',  label: 'Contact',  icon: '📞' },
   { id: 'social',   label: 'Social',   icon: '🔗' },
+  { id: 'theme',    label: 'Theme',    icon: '🎨' },
   { id: 'account',  label: 'Account',  icon: '🔐' },
 ];
 
@@ -329,6 +330,156 @@ export default function SettingsPage() {
                     placeholder={f.ph} className={iCls}/>
                 </div>
               ))}
+            </>
+          )}
+
+          {/* ── THEME ── */}
+          {tab === 'theme' && (
+            <>
+              <p className={sectionLabel}>Header Appearance</p>
+
+              {/* Header accent color */}
+              <div>
+                <label className={lCls}>Header Accent Color</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={(form as unknown as Record<string,string>).headerAccentColor ?? '#1a7a3c'}
+                    onChange={e => F('headerAccentColor' as keyof SiteSettings, e.target.value)}
+                    className="w-12 h-9 rounded cursor-pointer border border-slate-300 p-0.5 bg-white"
+                  />
+                  <input
+                    type="text"
+                    value={(form as unknown as Record<string,string>).headerAccentColor ?? '#1a7a3c'}
+                    onChange={e => F('headerAccentColor' as keyof SiteSettings, e.target.value)}
+                    placeholder="#1a7a3c"
+                    className={`${iCls} flex-1 font-mono`}
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Applied to: department name text, navbar stripe, borders</p>
+              </div>
+
+              {/* Header right background */}
+              <div>
+                <label className={lCls}>Header Right Panel Color</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={(form as unknown as Record<string,string>).headerRightBg ?? '#1a7a3c'}
+                    onChange={e => F('headerRightBg' as keyof SiteSettings, e.target.value)}
+                    className="w-12 h-9 rounded cursor-pointer border border-slate-300 p-0.5 bg-white"
+                  />
+                  <input
+                    type="text"
+                    value={(form as unknown as Record<string,string>).headerRightBg ?? '#1a7a3c'}
+                    onChange={e => F('headerRightBg' as keyof SiteSettings, e.target.value)}
+                    placeholder="#1a7a3c"
+                    className={`${iCls} flex-1 font-mono`}
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Background of the right section of the desktop header</p>
+              </div>
+
+              {/* Header font */}
+              <div>
+                <label className={lCls}>Header Department Name Font</label>
+                <select
+                  value={(form as unknown as Record<string,string>).headerFont ?? 'montserrat'}
+                  onChange={e => F('headerFont' as keyof SiteSettings, e.target.value)}
+                  className={iCls}
+                >
+                  <option value="montserrat">Montserrat (Modern Sans)</option>
+                  <option value="oswald">Oswald (Condensed Bold)</option>
+                  <option value="inter">Inter (Clean)</option>
+                  <option value="serif">Serif (Traditional)</option>
+                  <option value="bengali">Noto Sans Bengali</option>
+                </select>
+              </div>
+
+              {/* Show dept prefix */}
+              <div className="flex items-center gap-3 py-2">
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={(form as unknown as Record<string,boolean>).showDeptPrefix !== false}
+                    onChange={e => F('showDeptPrefix' as keyof SiteSettings, e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-10 h-5 bg-slate-200 peer-checked:bg-green-600 rounded-full transition-colors"/>
+                  <div className="absolute left-0.5 top-0.5 bg-white w-4 h-4 rounded-full shadow transition-all peer-checked:translate-x-5"/>
+                </label>
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">Show &quot;Department of&quot; prefix</p>
+                  <p className="text-xs text-slate-400">Toggles the small label above the department name in the header</p>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100 pt-4">
+                <p className={sectionLabel}>Admin Panel Theme</p>
+                <div>
+                  <label className={lCls}>Admin Panel Accent Color</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={(form as unknown as Record<string,string>).adminAccentColor ?? '#16a34a'}
+                      onChange={e => F('adminAccentColor' as keyof SiteSettings, e.target.value)}
+                      className="w-12 h-9 rounded cursor-pointer border border-slate-300 p-0.5 bg-white"
+                    />
+                    <input
+                      type="text"
+                      value={(form as unknown as Record<string,string>).adminAccentColor ?? '#16a34a'}
+                      onChange={e => F('adminAccentColor' as keyof SiteSettings, e.target.value)}
+                      placeholder="#16a34a"
+                      className={`${iCls} flex-1 font-mono`}
+                    />
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">Applied to: sidebar active state, buttons, focus rings in the admin panel</p>
+                </div>
+
+                {/* Preset themes */}
+                <div className="mt-4">
+                  <p className="text-xs font-semibold text-slate-600 mb-2">Quick Presets</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { label: 'Green (Default)', accent: '#1a7a3c', admin: '#16a34a', right: '#1a7a3c' },
+                      { label: 'Forest',          accent: '#14532d', admin: '#15803d', right: '#14532d' },
+                      { label: 'Navy Blue',       accent: '#1e3a5f', admin: '#1d4ed8', right: '#1e3a5f' },
+                      { label: 'Royal Purple',    accent: '#581c87', admin: '#7c3aed', right: '#581c87' },
+                      { label: 'Teal',            accent: '#134e4a', admin: '#0f766e', right: '#134e4a' },
+                      { label: 'Crimson',         accent: '#7f1d1d', admin: '#dc2626', right: '#7f1d1d' },
+                    ].map(preset => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => {
+                          F('headerAccentColor' as keyof SiteSettings, preset.accent);
+                          F('headerRightBg' as keyof SiteSettings, preset.right);
+                          F('adminAccentColor' as keyof SiteSettings, preset.admin);
+                        }}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:border-slate-400 transition"
+                      >
+                        <span className="w-4 h-4 rounded-full shrink-0" style={{ background: preset.accent }} />
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Reset to defaults */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    F('headerAccentColor' as keyof SiteSettings, '#1a7a3c');
+                    F('headerRightBg' as keyof SiteSettings, '#1a7a3c');
+                    F('adminAccentColor' as keyof SiteSettings, '#16a34a');
+                    F('headerFont' as keyof SiteSettings, 'montserrat');
+                    F('showDeptPrefix' as keyof SiteSettings, true);
+                  }}
+                  className="mt-3 text-xs text-slate-500 hover:text-slate-700 underline transition"
+                >
+                  Reset to Default Theme
+                </button>
+              </div>
             </>
           )}
 

@@ -34,13 +34,12 @@ export class StudentsController {
   @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() dto: StudentRegisterDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async register(@Body() dto: StudentRegisterDto, @Req() req: Request) {
     const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
     const result = await this.svc.register(dto, ip);
-    // Set cookie for direct browser access (development / same-origin)
-    res.cookie(SESSION_COOKIE, result.token, getCookieOpts(req));
-    // Also return token in body so Next.js proxy can set its own httpOnly cookie in production
-    return { student: result.student, token: result.token };
+    // Registration successful — no session created, no cookie set.
+    // Student must log in separately.
+    return { student: result.student, message: 'Registration successful. Please log in.' };
   }
 
   // ─── Public: login ────────────────────────────────────────────────────────
