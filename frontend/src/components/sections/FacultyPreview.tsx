@@ -11,7 +11,7 @@ async function fetchFaculty(): Promise<FacultyMember[]> {
     const res = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
     if (!res.ok) return MOCK;
     const json = await res.json() as { data?: FacultyMember[] };
-    const arr = Array.isArray(json.data) ? json.data.slice(0, 5) : [];
+    const arr = Array.isArray(json.data) ? json.data.filter(f => f.name && f.name.trim() !== '').slice(0, 5) : [];
     return arr.length ? arr : MOCK;
   } catch { return MOCK; }
 }

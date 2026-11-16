@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
@@ -16,7 +16,9 @@ export class FacultyService {
 
   findAll(isAdmin = false) {
     return this.prisma.faculty.findMany({
-      where: isAdmin ? {} : { isActive: true },
+      where: isAdmin
+        ? {}
+        : { isActive: true, NOT: { name: '' } },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       include: FACULTY_INCLUDE,
     });
@@ -29,18 +31,26 @@ export class FacultyService {
   }
 
   async create(dto: CreateFacultyDto) {
-    // Extract values explicitly to avoid class-transformer type-constructor references
-    // When transform:true + enableImplicitConversion is used, string fields can become String()
-    const safeStr = (v: unknown) => (v != null && typeof v !== 'function' ? String(v) : undefined);
+    const safeStr = (v: unknown) => (v != null && typeof v !== 'function' ? String(v).trim() : undefined);
     const safeBool = (v: unknown, def: boolean) => (typeof v === 'boolean' ? v : def);
     const safeNum = (v: unknown, def: number) => (typeof v === 'number' ? v : def);
     const safeArr = (v: unknown): object[] => (Array.isArray(v) ? v : []);
 
     const d = dto as unknown as Record<string, unknown>;
 
+    // Reject empty name — never create an "anonymous" record
+    const name = safeStr(d.name);
+    if (!name) {
+      throw new BadRequestException('Name is required and cannot be empty.');
+    }
+    const email = safeStr(d.email);
+    if (!email) {
+      throw new BadRequestException('Email is required and cannot be empty.');
+    }
+
     const data: Record<string, unknown> = {
-      name:             safeStr(d.name) ?? '',
-      email:            safeStr(d.email) ?? '',
+      name:             name,
+      email:            email,
       designation:      safeStr(d.designation) ?? 'Lecturer',
       staffType:        safeStr(d.staffType) ?? 'faculty',
       employmentStatus: safeStr(d.employmentStatus) ?? 'full_time',

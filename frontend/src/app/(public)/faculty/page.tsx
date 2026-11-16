@@ -35,7 +35,7 @@ async function fetchFaculty(): Promise<Faculty[]> {
     if (!r.ok) return [];
     const d = await r.json() as { data?: Faculty[] };
     const all = Array.isArray(d.data) ? d.data : [];
-    const filtered = all.filter(f => !f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman');
+    const filtered = all.filter(f => f.name && f.name.trim() !== '' && (!f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman'));
     return filtered;
   } catch { return []; }
 }
