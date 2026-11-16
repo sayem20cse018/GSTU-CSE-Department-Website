@@ -14,9 +14,9 @@ const FACULTY_INCLUDE = {
 export class FacultyService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
+  findAll(isAdmin = false) {
     return this.prisma.faculty.findMany({
-      where: { isActive: true },
+      where: isAdmin ? {} : { isActive: true },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       include: FACULTY_INCLUDE,
     });
@@ -52,8 +52,7 @@ export class FacultyService {
 
     // Optional string fields
     const optionalStrings = ['title','phone','photo','shortBio','fullBio','slug','officeRoom',
-      'websiteUrl','googleScholarUrl','linkedinUrl','researchGateUrl','orcidId'] as const;
-    for (const key of optionalStrings) {
+      'websiteUrl','googleScholarUrl','linkedinUrl','researchGateUrl','orcidId'] as const;    for (const key of optionalStrings) {
       const v = safeStr(d[key]);
       if (v !== undefined && v !== '') data[key] = v;
     }

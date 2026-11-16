@@ -50,10 +50,13 @@ export class CreateFacultyDto {
   staffType?: string;
 
   @ApiPropertyOptional() @IsOptional() @IsString() shortBio?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() fullBio?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() officeRoom?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() googleScholarUrl?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() linkedinUrl?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() researchGateUrl?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() orcidId?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() websiteUrl?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() joinedAt?: string;
   @ApiPropertyOptional() @IsOptional() @IsEnum(['full_time','part_time','on_leave','retired']) employmentStatus?: string;
 }

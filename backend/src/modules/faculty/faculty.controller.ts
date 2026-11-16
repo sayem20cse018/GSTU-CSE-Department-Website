@@ -25,8 +25,10 @@ export class FacultyController {
   // ── Public read routes ────────────────────────────────────────────────────
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Get all active faculty members' })
-  findAll() { return this.facultyService.findAll(); }
+  @ApiOperation({ summary: 'Get all faculty members (active only for public, all for admin)' })
+  findAll(@Query('admin') admin?: string) {
+    return this.facultyService.findAll(admin === 'true');
+  }
 
   @Public()
   @Get('publications/recent')

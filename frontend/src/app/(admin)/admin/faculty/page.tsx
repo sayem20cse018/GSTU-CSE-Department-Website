@@ -26,19 +26,21 @@ type StaffType = typeof STAFF_TYPES[number]['key'];
 
 const EMPTY = {
   name:'', title:'Dr.', designation:'Lecturer', email:'', phone:'', photo:'',
-  shortBio:'', officeRoom:'', researchInterests:'', googleScholarUrl:'', linkedinUrl:'',
+  shortBio:'', fullBio:'', officeRoom:'', researchInterests:'',
+  googleScholarUrl:'', linkedinUrl:'', researchGateUrl:'',
   orcidId:'', websiteUrl:'', isActive:true, sortOrder:0, staffType:'faculty' as StaffType,
-  employmentStatus:'full_time',
-  chairmanFrom:'', chairmanTo:'',  // Chairman List specific
+  employmentStatus:'full_time', joinedAt:'',
+  chairmanFrom:'', chairmanTo:'',
 };
 
 interface FacultyMember {
   id:string; name:string; title?:string; designation:string; email:string;
-  phone?:string; photo?:string; shortBio?:string; officeRoom?:string;
+  phone?:string; photo?:string; shortBio?:string; fullBio?:string; officeRoom?:string;
   researchInterests:string[]; googleScholarUrl?:string; linkedinUrl?:string;
-  orcidId?:string; isActive:boolean; sortOrder:number;
+  researchGateUrl?:string; orcidId?:string; websiteUrl?:string;
+  isActive:boolean; sortOrder:number;
   staffType:string; employmentStatus:string;
-  chairmanFrom?:string; chairmanTo?:string;
+  joinedAt?:string; chairmanFrom?:string; chairmanTo?:string;
 }
 
 export default function PeoplePage() {
@@ -58,7 +60,7 @@ export default function PeoplePage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { setList(await adminGet<FacultyMember[]>('/faculty')); }
+    try { setList(await adminGet<FacultyMember[]>('/faculty?admin=true')); }
     catch { toast.error('Failed to load people'); setList([]); } finally { setLoading(false); }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [load]);
@@ -77,15 +79,16 @@ export default function PeoplePage() {
     setForm({
       name: m.name, title: m.title ?? 'Dr.', designation: m.designation,
       email: m.email, phone: m.phone ?? '', photo: m.photo ?? '',
-      shortBio: m.shortBio ?? '', officeRoom: m.officeRoom ?? '',
+      shortBio: m.shortBio ?? '', fullBio: m.fullBio ?? '', officeRoom: m.officeRoom ?? '',
       researchInterests: (m.researchInterests ?? []).join(', '),
       googleScholarUrl: m.googleScholarUrl ?? '', linkedinUrl: m.linkedinUrl ?? '',
-      orcidId: m.orcidId ?? '', websiteUrl: '',
-      isActive: m.isActive, sortOrder: m.sortOrder,
+      researchGateUrl: m.researchGateUrl ?? '', orcidId: m.orcidId ?? '',
+      websiteUrl: m.websiteUrl ?? '', isActive: m.isActive, sortOrder: m.sortOrder,
       staffType: (m.staffType || 'faculty') as StaffType,
       employmentStatus: m.employmentStatus || 'full_time',
+      joinedAt: m.joinedAt ? m.joinedAt.slice(0,10) : '',
       chairmanFrom: m.chairmanFrom ? m.chairmanFrom.slice(0,10) : '',
-      chairmanTo:   m.chairmanTo   ? m.chairmanTo.slice(0,10)   : '',
+      chairmanTo: m.chairmanTo ? m.chairmanTo.slice(0,10) : '',
     });
     setErr(''); setOpen(true);
   }
@@ -94,10 +97,21 @@ export default function PeoplePage() {
     if (!form.name.trim() || !form.email.trim()) { setErr('Name and email are required.'); return; }
     setSaving(true); setErr('');
     try {
-      // Strip UI-only fields not in backend DTO
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // Build payload — strip empty strings and UI-only fields
       const { chairmanFrom, chairmanTo, ...rest } = form;
-      const payload = { ...rest, researchInterests: form.researchInterests.split(',').map(s=>s.trim()).filter(Boolean) };
+      const payload: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(rest)) {
+        if (v === '' || v === null) continue; // Skip empty strings
+        if (k === 'researchInterests') {
+          payload[k] = String(v).split(',').map(s => s.trim()).filter(Boolean);
+        } else {
+          payload[k] = v;
+        }
+      }
+      // Always send isActive and sortOrder even if defaults
+      if (payload.isActive === undefined) payload.isActive = true;
+      if (payload.sortOrder === undefined) payload.sortOrder = 0;
+
       if (editing) { await adminPatch(`/faculty/${editing.id}`, payload); toast.success('Record updated!'); }
       else          { await adminPost('/faculty', payload);                toast.success('Record created!'); }
       setOpen(false); load();
@@ -228,9 +242,14 @@ export default function PeoplePage() {
                 <textarea rows={2} value={form.shortBio} onChange={e=>F('shortBio',e.target.value)}
                   className={`${iCls} resize-none`}/>
               </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Biography</label>
+                <textarea rows={4} value={form.fullBio} onChange={e=>F('fullBio',e.target.value)}
+                  placeholder="Detailed biography — education, career, research..." className={`${iCls} resize-none`}/>
+              </div>
 
               {/* Research interests — faculty/chairman only */}
-              {(activeType === 'faculty') && (
+              {(activeType === 'faculty' || activeType === 'chairman') && (
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Research Interests (comma-separated)</label>
                   <input value={form.researchInterests} onChange={e=>F('researchInterests',e.target.value)}
@@ -239,14 +258,20 @@ export default function PeoplePage() {
               )}
 
               {/* Online links — faculty/chairman only */}
-              {(activeType === 'faculty') && (
+              {(activeType === 'faculty' || activeType === 'chairman') && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Google Scholar URL</label>
                     <input type="url" value={form.googleScholarUrl} onChange={e=>F('googleScholarUrl',e.target.value)} placeholder="https://scholar.google.com/…" className={iCls}/></div>
                   <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">LinkedIn URL</label>
                     <input type="url" value={form.linkedinUrl} onChange={e=>F('linkedinUrl',e.target.value)} placeholder="https://linkedin.com/in/…" className={iCls}/></div>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">ResearchGate URL</label>
+                    <input type="url" value={form.researchGateUrl} onChange={e=>F('researchGateUrl',e.target.value)} placeholder="https://researchgate.net/…" className={iCls}/></div>
                   <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">ORCID ID</label>
                     <input value={form.orcidId} onChange={e=>F('orcidId',e.target.value)} placeholder="0000-0000-0000-0000" className={iCls}/></div>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Personal Website</label>
+                    <input type="url" value={form.websiteUrl} onChange={e=>F('websiteUrl',e.target.value)} placeholder="https://…" className={iCls}/></div>
+                  <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Joining Date</label>
+                    <input type="date" value={form.joinedAt} onChange={e=>F('joinedAt',e.target.value)} className={iCls}/></div>
                 </div>
               )}
 
