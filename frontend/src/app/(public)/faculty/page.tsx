@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SectionHero from '@/components/academics/SectionHero';
 import FacultyDirectory from './faculty-directory';
+import FacultyLoadError from '@/components/faculty/FacultyLoadError';
 import { fetchFacultyList } from '@/lib/faculty/data';
 import {
   isValidFacultyRecord,
@@ -15,15 +16,18 @@ export const metadata: Metadata = {
 };
 
 export default async function FacultyPage() {
-  const raw = await fetchFacultyList(false);
-  const members = sortBySeniority(
-    raw.filter(
-      (f) =>
-        isValidFacultyRecord(f) &&
-        isDirectoryFaculty(f) &&
-        f.isActive !== false,
-    ),
-  );
+  const result = await fetchFacultyList(false);
+
+  const members = result.ok
+    ? sortBySeniority(
+        result.members.filter(
+          (f) =>
+            isValidFacultyRecord(f) &&
+            isDirectoryFaculty(f) &&
+            f.isActive !== false,
+        ),
+      )
+    : [];
 
   return (
     <>
@@ -35,7 +39,9 @@ export default async function FacultyPage() {
       />
       <main className="bg-white section-py">
         <div className="container-custom">
-          {members.length === 0 ? (
+          {!result.ok ? (
+            <FacultyLoadError title="Couldn't load faculty" />
+          ) : members.length === 0 ? (
             <div className="text-center py-16">
               <span className="text-5xl block mb-3" aria-hidden="true">
                 👨‍🏫

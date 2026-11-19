@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { fetchFacultyBySlug } from '@/lib/faculty/data';
+import FacultyLoadError from '@/components/faculty/FacultyLoadError';
 import {
   getBadgeStyle,
   getInitials,
@@ -17,8 +18,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const f = await fetchFacultyBySlug(slug);
-  if (!f) return { title: 'Faculty — GSTU CSE' };
+  const result = await fetchFacultyBySlug(slug);
+  // Fetch failure OR genuinely-not-found both fall back to a generic title.
+  if (!result.ok || !result.member) return { title: 'Faculty — GSTU CSE' };
+  const f = result.member;
   return {
     title: `${f.title ? f.title + ' ' : ''}${f.name} — GSTU CSE Faculty`,
     description: f.shortBio ?? `${f.designation}, Department of CSE, GSTU.`,
@@ -47,7 +50,11 @@ export default async function FacultyDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const f = await fetchFacultyBySlug(slug);
+  const result = await fetchFacultyBySlug(slug);
+  // Backend unreachable / timed out → graceful retry state (NOT a 404).
+  if (!result.ok) return <ProfileLoadError />;
+  const f = result.member;
+  // Genuinely not found → 404.
   if (!f) notFound();
 
   const badge = getBadgeStyle(f.designation);
@@ -365,6 +372,30 @@ export default async function FacultyDetailPage({
 }
 
 // ─── Small presentational helpers ─────────────────────────────────────────────
+
+function ProfileLoadError() {
+  return (
+    <main className="bg-slate-50 min-h-screen pt-28 pb-16">
+      <div className="container-custom">
+        <Link
+          href="/faculty"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 hover:text-green-900 transition mb-8"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          All Faculty
+        </Link>
+        <div className="max-w-md mx-auto">
+          <FacultyLoadError
+            title="Couldn't load this profile"
+            message="We had trouble reaching the server. Please try again in a moment."
+          />
+        </div>
+      </div>
+    </main>
+  );
+}
 
 function Panel({
   title,
