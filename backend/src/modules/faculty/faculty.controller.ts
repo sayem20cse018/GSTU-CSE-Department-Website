@@ -6,8 +6,6 @@ import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import type { Admin } from '@prisma/client';
 import { FacultyService } from './faculty.service';
-import type { CreateFacultyDto } from './dto/create-faculty.dto';
-import type { UpdateFacultyDto } from './dto/update-faculty.dto';
 import { Public }                from '../../common/decorators/public.decorator';
 import { Roles }                 from '../../common/decorators/roles.decorator';
 import { RolesGuard }            from '../../common/guards/roles.guard';
@@ -50,11 +48,11 @@ export class FacultyController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '[Admin] Create a faculty member' })
   async create(
-    @Body() dto: CreateFacultyDto,
+    @Body() body: Record<string, unknown>,
     @CurrentUser() admin: Admin,
     @Req() req: Request,
   ) {
-    const result = await this.facultyService.create(dto);
+    const result = await this.facultyService.create(body as any);
     const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
     void this.logger.log(admin.id, 'CREATE_FACULTY', ip);
     return result;
@@ -67,11 +65,11 @@ export class FacultyController {
   @ApiOperation({ summary: '[Admin] Update a faculty member' })
   async update(
     @Param('id') id: string,
-    @Body() dto: UpdateFacultyDto,
+    @Body() body: Record<string, unknown>,
     @CurrentUser() admin: Admin,
     @Req() req: Request,
   ) {
-    const result = await this.facultyService.update(id, dto);
+    const result = await this.facultyService.update(id, body as any);
     const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
     void this.logger.log(admin.id, 'UPDATE_FACULTY', ip);
     return result;

@@ -36,10 +36,8 @@ export class FacultyService {
     return f;
   }
 
-  async create(dto: CreateFacultyDto) {
-    // Accept EVERYTHING — no server-side rejection
-    // If name is empty/missing, store as-is; frontend should validate
-    const d = dto as unknown as Record<string, unknown>;
+  async create(dto: Record<string, unknown>) {
+    const d = dto;
 
     const str = (v: unknown) => (v != null ? String(v).trim() : '');
     const optStr = (v: unknown) => { const s = str(v); return s !== '' ? s : null; };
@@ -47,7 +45,7 @@ export class FacultyService {
     const num  = (v: unknown, def: number)  => (typeof v === 'number'  ? v : def);
     const arr  = (v: unknown) => (Array.isArray(v) ? v : []);
 
-    const name = str(d.name ?? dto.name);
+    const name = str(d.name);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.create({
@@ -61,28 +59,28 @@ export class FacultyService {
         sortOrder:         num(d.sortOrder, 0),
         researchInterests: arr(d.researchInterests) as string[],
         courses:           arr(d.courses)           as string[],
-        title:             optStr(d.title ?? dto.title),
-        phone:             optStr(d.phone ?? dto.phone),
-        photo:             optStr(d.photo ?? dto.photo),
-        shortBio:          optStr(d.shortBio ?? dto.shortBio),
-        fullBio:           optStr(d.fullBio  ?? dto.fullBio),
-        officeRoom:        optStr(d.officeRoom ?? dto.officeRoom),
-        websiteUrl:        optStr(d.websiteUrl ?? dto.websiteUrl),
-        googleScholarUrl:  optStr(d.googleScholarUrl ?? dto.googleScholarUrl),
-        linkedinUrl:       optStr(d.linkedinUrl ?? dto.linkedinUrl),
-        researchGateUrl:   optStr(d.researchGateUrl ?? dto.researchGateUrl),
-        orcidId:           optStr(d.orcidId ?? dto.orcidId),
+        title:             optStr(d.title),
+        phone:             optStr(d.phone),
+        photo:             optStr(d.photo),
+        shortBio:          optStr(d.shortBio),
+        fullBio:           optStr(d.fullBio),
+        officeRoom:        optStr(d.officeRoom),
+        websiteUrl:        optStr(d.websiteUrl),
+        googleScholarUrl:  optStr(d.googleScholarUrl),
+        linkedinUrl:       optStr(d.linkedinUrl),
+        researchGateUrl:   optStr(d.researchGateUrl),
+        orcidId:           optStr(d.orcidId),
         ...(d.joinedAt ? { joinedAt: new Date(str(d.joinedAt)) } : {}),
       } as any,
       include: FACULTY_INCLUDE,
     });
   }
 
-  async update(id: string, dto: UpdateFacultyDto) {
+  async update(id: string, dto: Record<string, unknown>) {
     const f = await this.prisma.faculty.findUnique({ where: { id } });
     if (!f) throw new NotFoundException(`Faculty #${id} not found`);
 
-    const d = dto as unknown as Record<string, unknown>;
+    const d = dto;
     const safeStr = (v: unknown) => (v != null && typeof v !== 'function' ? String(v) : undefined);
     const safeArr = (v: unknown): object[] => (Array.isArray(v) ? v : []);
 
