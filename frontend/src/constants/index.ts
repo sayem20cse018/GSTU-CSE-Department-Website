@@ -46,9 +46,9 @@ export const NAV_LINKS = [
     href: "/faculty",
     children: [
       { label: "Active Faculty",   href: "/faculty" },
-      { label: "Faculty on Leave", href: "/faculty?status=on_leave" },
-      { label: "Chairman List",    href: "/faculty/chairmen" },
-      { label: "Officers & Staff", href: "/faculty/staff" },
+      { label: "Faculty on Leave", href: "/faculty/on_leave" },
+      { label: "Ex Chairman",      href: "/faculty/ex_chairman" },
+      { label: "Officers & Staff", href: "/officer_staff" },
     ],
   },
   {
