@@ -279,11 +279,11 @@ export default async function FacultyDetailPage({
 
             {publications.length > 0 && (
               <ContentSection title="Publications">
-                <ul className="space-y-4">
-                  {publications.map((p) => (
-                    <PublicationRow key={p.id} pub={p} />
+                <ol className="space-y-5">
+                  {publications.map((p, idx) => (
+                    <PublicationRow key={p.id} pub={p} index={idx + 1} />
                   ))}
-                </ul>
+                </ol>
               </ContentSection>
             )}
 
@@ -366,31 +366,59 @@ function ContentSection({ title, children }: { title: string; children: ReactNod
   );
 }
 
-function PublicationRow({ pub }: { pub: FacultyPublication }) {
+function PublicationRow({ pub, index }: { pub: FacultyPublication; index: number }) {
   const type = PUB_TYPE[(pub.type ?? 'other').toLowerCase()] ?? PUB_TYPE.other;
   const link = pub.url ?? (pub.doi ? `https://doi.org/${pub.doi}` : null);
   return (
-    <li>
-      {link ? (
-        <a href={link} target="_blank" rel="noopener noreferrer"
-          className="text-sm font-semibold text-green-700 hover:underline leading-snug">
-          {pub.title}
-        </a>
-      ) : (
-        <p className="text-sm font-semibold text-slate-900 leading-snug">{pub.title}</p>
-      )}
-      {pub.authors && <p className="text-xs text-slate-600 mt-0.5">{pub.authors}</p>}
-      <p className="text-xs text-slate-500">
-        <span className="font-medium" style={{ color: type.color }}>{type.label}</span>
-        {pub.venue ? ` · ${pub.venue}` : ''}
-        {pub.year ? `, ${pub.year}` : ''}
-      </p>
-      {pub.doi && (
-        <a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener noreferrer"
-          className="text-[10px] text-green-700 hover:underline">
-          DOI: {pub.doi}
-        </a>
-      )}
+    <li className="flex gap-3">
+      {/* Numbering */}
+      <span className="shrink-0 text-sm font-bold text-slate-400 w-5 text-right mt-0.5">
+        {index}.
+      </span>
+      <div className="min-w-0">
+        {/* Authors + bold title inline — matching JUST CSE style */}
+        <p className="text-sm text-slate-700 leading-snug">
+          {pub.authors && <span>{pub.authors}. </span>}
+          {link ? (
+            <a href={link} target="_blank" rel="noopener noreferrer"
+              className="font-bold text-slate-900 hover:text-green-700 transition">
+              {pub.title}
+            </a>
+          ) : (
+            <strong className="font-bold text-slate-900">{pub.title}</strong>
+          )}
+          {pub.venue && <span className="text-slate-600">{', '}<em>{pub.venue}</em></span>}
+          {pub.year && <span className="text-slate-600">{', '}{pub.year}.</span>}
+        </p>
+        {/* Type chip + DOI chip */}
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span
+            className="inline-block text-[10px] font-bold px-2 py-0.5 rounded"
+            style={{ background: `${type.color}18`, color: type.color }}>
+            {type.label}
+          </span>
+          {pub.doi && (
+            <a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200 text-slate-500 hover:border-green-400 hover:text-green-700 transition">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+              DOI
+            </a>
+          )}
+          {pub.url && !pub.doi && (
+            <a href={pub.url} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200 text-slate-500 hover:border-green-400 hover:text-green-700 transition">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+              Link
+            </a>
+          )}
+        </div>
+      </div>
     </li>
   );
 }
