@@ -392,20 +392,28 @@ export default function PeoplePage() {
             </thead>
             <tbody>
               {filtered.map((m, i) => (
-                <tr key={m.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'bg-slate-50/30')}>
+                <tr key={m.id} className={cn('border-b border-slate-100 last:border-0 hover:bg-slate-50', i%2?'bg-white':'bg-slate-50/30',
+                  (!m.name || m.name.trim() === '' || m.name.toLowerCase() === 'anonymous') ? 'bg-red-50' : '')}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {m.photo ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={m.photo} alt={m.name} className="w-9 h-9 rounded-full object-cover shrink-0"/>
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-green-100 border border-green-200 flex items-center justify-center shrink-0 text-xs font-bold text-green-700">
-                          {m.name.charAt(0)}
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+                          (!m.name || m.name.toLowerCase() === 'anonymous') ? 'bg-red-200 text-red-700' : 'bg-green-100 border border-green-200 text-green-700'
+                        }`}>
+                          {m.name ? m.name.charAt(0).toUpperCase() : '?'}
                         </div>
                       )}
                       <div>
-                        <p className="font-semibold text-slate-900">{m.title} {m.name}</p>
-                        {m.email && m.email.includes('@') && <p className="text-xs text-slate-500">{m.email}</p>}
+                        {(!m.name || m.name.toLowerCase() === 'anonymous') ? (
+                          <p className="font-semibold text-red-500 text-xs">⚠ No name — please Edit or Delete</p>
+                        ) : (
+                          <p className="font-semibold text-slate-900">{m.title} {m.name}</p>
+                        )}
+                        {m.email && !m.email.match(/^faculty-\d+@/) && <p className="text-xs text-slate-500">{m.email}</p>}
+                        {m.email && m.email.match(/^faculty-\d+@/) && <p className="text-xs text-red-400 italic">⚠ Invalid email</p>}
                       </div>
                     </div>
                   </td>

@@ -19,7 +19,11 @@ async function fetchStaff(): Promise<Person[]> {
       r2.ok ? (r2.json() as Promise<{ data: Person[] }>) : Promise.resolve({ data: [] as Person[] }),
     ]);
     const combined = [...(d1.data ?? []), ...(d2.data ?? [])]
-      .filter(m => m.name && m.name.trim() !== '' && (!m.email || !m.email.match(/^faculty-\d+@/)));
+      .filter(m =>
+        m.name && m.name.trim() !== '' &&
+        m.name.trim().toLowerCase() !== 'anonymous' &&
+        (!m.email || !m.email.match(/^faculty-\d+@/))
+      );
     return combined;
   } catch { return []; }
 }

@@ -18,7 +18,13 @@ export class FacultyService {
     return this.prisma.faculty.findMany({
       where: isAdmin
         ? {}
-        : { isActive: true, NOT: { name: '' } },
+        : {
+            isActive: true,
+            NOT: [
+              { name: '' },
+              { name: 'anonymous' },
+            ],
+          },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       include: FACULTY_INCLUDE,
     });
@@ -38,10 +44,10 @@ export class FacultyService {
 
     const d = dto as unknown as Record<string, unknown>;
 
-    // Name is the only hard requirement
+    // Name is the only hard requirement — reject empty or 'anonymous'
     const name = safeStr(d.name);
-    if (!name) {
-      throw new BadRequestException('Name is required.');
+    if (!name || name.toLowerCase() === 'anonymous') {
+      throw new BadRequestException('Please enter a valid name.');
     }
 
     const email = safeStr(d.email);
@@ -128,10 +134,12 @@ export class FacultyService {
 
   // ─── Clean up bad records (empty names, auto-generated emails) ─────────────
   async cleanupBadRecords() {
-    const all = await this.prisma.faculty.findMany();
+    const all = await this.prisma.faculty.findMany({ select: { id: true, name: true, email: true } });
     const bad = all.filter(f =>
-      !f.name || f.name.trim() === '' ||
-      (f.email && f.email.match(/^faculty-\d+@/))
+      !f.name ||
+      f.name.trim() === '' ||
+      f.name.trim().toLowerCase() === 'anonymous' ||
+      (f.email != null && f.email.match(/^faculty-\d+@/))
     );
     if (bad.length === 0) return { deleted: 0, message: 'No bad records found.' };
     const ids = bad.map(f => f.id);

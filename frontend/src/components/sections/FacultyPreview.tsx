@@ -12,7 +12,11 @@ async function fetchFaculty(): Promise<FacultyMember[]> {
     if (!res.ok) return MOCK;
     const json = await res.json() as { data?: FacultyMember[] };
     const arr = Array.isArray(json.data)
-      ? json.data.filter(f => f.name && f.name.trim() !== '' && (!f.email || !f.email.match(/^faculty-\d+@/)))
+      ? json.data.filter(f =>
+          f.name && f.name.trim() !== '' &&
+          f.name.trim().toLowerCase() !== 'anonymous' &&
+          (!f.email || !f.email.match(/^faculty-\d+@/))
+        )
       : [];
     return arr.slice(0, 5);
   } catch { return MOCK; }

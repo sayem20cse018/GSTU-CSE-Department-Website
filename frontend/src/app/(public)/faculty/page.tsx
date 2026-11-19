@@ -37,8 +37,8 @@ async function fetchFaculty(): Promise<Faculty[]> {
     const all = Array.isArray(d.data) ? d.data : [];
     const filtered = all.filter(f =>
       f.name && f.name.trim() !== '' &&
+      f.name.trim().toLowerCase() !== 'anonymous' &&
       (!f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman') &&
-      // Exclude auto-generated fake emails
       (!f.email || !f.email.match(/^faculty-\d+@/))
     );
     return filtered;
