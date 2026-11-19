@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 interface FacultyMember {
   id: string; name: string; designation: string; title?: string;
-  photo?: string; email: string; slug?: string; researchInterests?: string[];
+  photo?: string; email?: string | null; slug?: string; researchInterests?: string[];
 }
 
 async function fetchFaculty(): Promise<FacultyMember[]> {
@@ -11,8 +11,10 @@ async function fetchFaculty(): Promise<FacultyMember[]> {
     const res = await fetch(`${api}/faculty`, { next: { revalidate: 3600 } });
     if (!res.ok) return MOCK;
     const json = await res.json() as { data?: FacultyMember[] };
-    const arr = Array.isArray(json.data) ? json.data.filter(f => f.name && f.name.trim() !== '').slice(0, 5) : [];
-    return arr.length ? arr : MOCK;
+    const arr = Array.isArray(json.data)
+      ? json.data.filter(f => f.name && f.name.trim() !== '' && (!f.email || !f.email.match(/^faculty-\d+@/)))
+      : [];
+    return arr.slice(0, 5);
   } catch { return MOCK; }
 }
 

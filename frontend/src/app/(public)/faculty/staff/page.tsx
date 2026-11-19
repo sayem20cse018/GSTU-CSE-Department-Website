@@ -3,14 +3,13 @@ import SectionHero from '@/components/academics/SectionHero';
 
 export const metadata: Metadata = { title: 'Officers & Staff — GSTU CSE' };
 
-interface Person { id:string; name:string; title?:string; designation:string; email:string; photo?:string; shortBio?:string; officeRoom?:string; staffType:string; phone?:string; isActive:boolean; }
+interface Person { id:string; name:string; title?:string; designation:string; email?:string|null; photo?:string; shortBio?:string; officeRoom?:string; staffType:string; phone?:string; isActive:boolean; employmentStatus?:string; }
 
 const MOCK: Person[] = [];
 
 async function fetchStaff(): Promise<Person[]> {
   try {
     const api = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
-    // Fetch both staff and officers
     const [r1, r2] = await Promise.all([
       fetch(`${api}/faculty?staffType=staff`, { next: { revalidate: 3600 } }),
       fetch(`${api}/faculty?staffType=officer`, { next: { revalidate: 3600 } }),
@@ -19,7 +18,8 @@ async function fetchStaff(): Promise<Person[]> {
       r1.ok ? (r1.json() as Promise<{ data: Person[] }>) : Promise.resolve({ data: [] as Person[] }),
       r2.ok ? (r2.json() as Promise<{ data: Person[] }>) : Promise.resolve({ data: [] as Person[] }),
     ]);
-    const combined = [...(d1.data ?? []), ...(d2.data ?? [])];
+    const combined = [...(d1.data ?? []), ...(d2.data ?? [])]
+      .filter(m => m.name && m.name.trim() !== '' && (!m.email || !m.email.match(/^faculty-\d+@/)));
     return combined;
   } catch { return []; }
 }
@@ -53,7 +53,9 @@ export default async function StaffPage() {
                   <p className="font-bold text-slate-900 text-sm">{m.title} {m.name}</p>
                   <p className="text-xs text-green-700 font-semibold mt-1">{m.designation}</p>
                   {m.officeRoom && <p className="text-xs text-slate-400 mt-1">{m.officeRoom}</p>}
-                  <a href={`mailto:${m.email}`} className="text-xs text-slate-500 hover:text-green-700 transition mt-2 truncate max-w-full">{m.email}</a>
+                  {m.email && m.email.includes('@') && !m.email.match(/^faculty-\d+@/) && (
+                    <a href={`mailto:${m.email}`} className="text-xs text-slate-500 hover:text-green-700 transition mt-2 truncate max-w-full">{m.email}</a>
+                  )}
                 </div>
               ))}
             </div>

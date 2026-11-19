@@ -7,10 +7,10 @@ export const metadata: Metadata = { title: 'Faculty Members Ã¢â‚¬â€ G
 
 interface Faculty {
   id: string; name: string; title?: string; designation: string;
-  email: string; phone?: string; photo?: string; shortBio?: string;
+  email?: string | null; phone?: string; photo?: string; shortBio?: string;
   researchInterests: string[]; officeRoom?: string; slug?: string;
   googleScholarUrl?: string; linkedinUrl?: string; isActive: boolean;
-  staffType?: string;
+  staffType?: string; employmentStatus?: string;
 }
 
 const DESIGNATION_ORDER = [
@@ -35,7 +35,12 @@ async function fetchFaculty(): Promise<Faculty[]> {
     if (!r.ok) return [];
     const d = await r.json() as { data?: Faculty[] };
     const all = Array.isArray(d.data) ? d.data : [];
-    const filtered = all.filter(f => f.name && f.name.trim() !== '' && (!f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman'));
+    const filtered = all.filter(f =>
+      f.name && f.name.trim() !== '' &&
+      (!f.staffType || f.staffType === 'faculty' || f.staffType === 'chairman') &&
+      // Exclude auto-generated fake emails
+      (!f.email || !f.email.match(/^faculty-\d+@/))
+    );
     return filtered;
   } catch { return []; }
 }
@@ -96,10 +101,12 @@ export default async function FacultyPage() {
                           ))}
                         </div>
                       )}
-                      <a href={`mailto:${f.email}`} className="mt-3 flex items-center gap-1.5 text-xs text-slate-400 hover:text-blue-600 transition truncate">
-                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        <span className="truncate">{f.email}</span>
-                      </a>
+                      {f.email && f.email.includes('@') && !f.email.match(/^faculty-\d+@/) && (
+                        <a href={`mailto:${f.email}`} className="mt-3 flex items-center gap-1.5 text-xs text-slate-400 hover:text-blue-600 transition truncate">
+                          <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                          <span className="truncate">{f.email}</span>
+                        </a>
+                      )}
                     </div>
                   </article>
                 ))}

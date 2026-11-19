@@ -54,7 +54,7 @@ model AdminActivityLog {
 model Faculty {
   id                 String              @id @default(cuid())
   name               String
-  email              String              @unique
+  email              String?
   phone              String?
   photo              String?
   designation        String

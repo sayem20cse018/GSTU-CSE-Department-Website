@@ -195,7 +195,7 @@ export default function PeoplePage() {
                   <input value={form.name} onChange={e=>F('name',e.target.value)} placeholder="Dr. Mohammad Rahman" className={iCls}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email *</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email <span className="text-slate-400 font-normal">(optional)</span></label>
                   <input type="email" value={form.email} onChange={e=>F('email',e.target.value)} placeholder="name@gstu.edu.bd" className={iCls}/>
                 </div>
                 <div>
@@ -346,7 +346,7 @@ export default function PeoplePage() {
                       )}
                       <div>
                         <p className="font-semibold text-slate-900">{m.title} {m.name}</p>
-                        <p className="text-xs text-slate-500">{m.email}</p>
+                        {m.email && m.email.includes('@') && <p className="text-xs text-slate-500">{m.email}</p>}
                       </div>
                     </div>
                   </td>
@@ -361,9 +361,17 @@ export default function PeoplePage() {
                     </td>
                   )}
                   <td className="px-4 py-3 text-center hidden sm:table-cell">
-                    <Badge variant={m.isActive ? 'success' : 'neutral'}>
-                      {m.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
+                    <div className="flex flex-col gap-1 items-center">
+                      <Badge variant={m.isActive ? 'success' : 'neutral'}>
+                        {m.isActive ? 'Active' : 'Inactive'}
+                      </Badge>
+                      {m.employmentStatus === 'on_leave' && (
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">On Leave</span>
+                      )}
+                      {m.employmentStatus === 'retired' && (
+                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">Retired</span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-2">

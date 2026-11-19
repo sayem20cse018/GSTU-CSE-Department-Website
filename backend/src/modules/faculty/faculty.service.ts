@@ -38,20 +38,18 @@ export class FacultyService {
 
     const d = dto as unknown as Record<string, unknown>;
 
-    // Name is the only hard requirement — never create an "anonymous" record
+    // Name is the only hard requirement
     const name = safeStr(d.name);
     if (!name) {
       throw new BadRequestException('Name is required.');
     }
 
-    const email = safeStr(d.email) ?? '';
-    // Email is optional at DB level but recommended — use empty string if not provided
-    // Prisma requires unique email, so use a generated one if empty to avoid conflicts
-    const finalEmail = email || `faculty-${Date.now()}@gstu.edu.bd`;
+    const email = safeStr(d.email);
+    // Email is optional — only set if provided and non-empty
 
     const data: Record<string, unknown> = {
       name:             name,
-      email:            finalEmail,
+      email:            email || null,
       designation:      safeStr(d.designation) ?? 'Lecturer',
       staffType:        safeStr(d.staffType) ?? 'faculty',
       employmentStatus: safeStr(d.employmentStatus) ?? 'full_time',
