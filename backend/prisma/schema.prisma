@@ -73,6 +73,10 @@ model Faculty {
   isActive           Boolean             @default(true)
   employmentStatus   String              @default("full_time")
   staffType          String              @default("faculty")
+  leadershipRole     String?             // running_chairman | former_chairman | former_head
+  isCurrentChairman  Boolean             @default(false)
+  chairmanFrom       DateTime?
+  chairmanTo         DateTime?
   sortOrder          Int                 @default(0)
   joinedAt           DateTime?
   createdAt          DateTime            @default(now())

@@ -70,7 +70,11 @@ export class FacultyService {
         linkedinUrl:       optStr(d.linkedinUrl),
         researchGateUrl:   optStr(d.researchGateUrl),
         orcidId:           optStr(d.orcidId),
-        ...(d.joinedAt ? { joinedAt: new Date(str(d.joinedAt)) } : {}),
+        ...(d.joinedAt      ? { joinedAt:     new Date(str(d.joinedAt))      } : {}),
+        leadershipRole:    optStr(d.leadershipRole),
+        isCurrentChairman: bool(d.isCurrentChairman, false),
+        ...(d.chairmanFrom  ? { chairmanFrom: new Date(str(d.chairmanFrom))  } : {}),
+        ...(d.chairmanTo    ? { chairmanTo:   new Date(str(d.chairmanTo))    } : {}),
       } as any,
       include: FACULTY_INCLUDE,
     });

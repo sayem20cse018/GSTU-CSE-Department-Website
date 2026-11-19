@@ -67,6 +67,10 @@ export interface FacultyMember {
   isActive: boolean;
   employmentStatus: string; // full_time | on_leave | contract | ...
   staffType: string;         // faculty | chairman | dean | staff | officer
+  leadershipRole?: string | null; // running_chairman | former_chairman | former_head
+  isCurrentChairman: boolean;
+  chairmanFrom?: string | null;
+  chairmanTo?: string | null;
   sortOrder: number;
   joinedAt?: string | null;
   createdAt: string;
@@ -214,4 +218,14 @@ export function groupByDesignation(
 export function profileHref(f: Pick<FacultyMember, 'slug' | 'id'>): string {
   const slug = (f.slug ?? '').trim();
   return slug ? `/faculty/${slug}` : `/faculty/${f.id}`;
+}
+
+/** Format a service period from two optional date strings, e.g. "2019 – 2023" or "2021 – Present" */
+export function formatServicePeriod(from?: string | null, to?: string | null): string {
+  const startYear = from ? new Date(from).getFullYear() : null;
+  const endYear   = to   ? new Date(to).getFullYear()   : null;
+  if (!startYear && !endYear) return '';
+  if (!startYear) return endYear ? `– ${endYear}` : '';
+  if (!endYear) return `${startYear} – Present`;
+  return `${startYear} – ${endYear}`;
 }

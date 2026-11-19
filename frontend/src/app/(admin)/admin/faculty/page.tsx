@@ -52,6 +52,7 @@ const EMPTY = {
   orcidId:'', websiteUrl:'', isActive:true, sortOrder:0, staffType:'faculty' as StaffType,
   employmentStatus:'full_time', joinedAt:'',
   chairmanFrom:'', chairmanTo:'',
+  leadershipRole:'' as string, isCurrentChairman:false,
 };
 
 interface FacultyMember {
@@ -62,6 +63,7 @@ interface FacultyMember {
   isActive:boolean; sortOrder:number;
   staffType:string; employmentStatus:string;
   joinedAt?:string; chairmanFrom?:string; chairmanTo?:string;
+  leadershipRole?:string; isCurrentChairman?:boolean;
   education?: EduRow[];
   publications?: PubRow[];
   awards?: AwardRow[];
@@ -142,6 +144,8 @@ export default function PeoplePage() {
       joinedAt: m.joinedAt ? m.joinedAt.slice(0,10) : '',
       chairmanFrom: m.chairmanFrom ? m.chairmanFrom.slice(0,10) : '',
       chairmanTo: m.chairmanTo ? m.chairmanTo.slice(0,10) : '',
+      leadershipRole: m.leadershipRole ?? '',
+      isCurrentChairman: m.isCurrentChairman ?? false,
     });
     setEduRows((m.education ?? []).map(e => ({ ...e, year: e.year ?? new Date().getFullYear() })));
     setPubRows((m.publications ?? []).map(p => ({
@@ -163,11 +167,11 @@ export default function PeoplePage() {
     if (!form.name.trim()) { setErr('Name is required.'); return; }
     setSaving(true); setErr('');
     try {
-      const { chairmanFrom, chairmanTo, ...rest } = form;
       const payload: Record<string, unknown> = {};
-      for (const [k, v] of Object.entries(rest)) {
+      for (const [k, v] of Object.entries(form)) {
         if (k === 'name') { payload.name = String(v).trim(); continue; }
         if (k === 'email') { payload.email = String(v).trim(); continue; }
+        if (['leadershipRole','isCurrentChairman','chairmanFrom','chairmanTo'].includes(k)) continue;
         if (v === '' || v === null) continue;
         if (k === 'researchInterests') {
           payload[k] = String(v).split(',').map(s => s.trim()).filter(Boolean);
@@ -183,6 +187,11 @@ export default function PeoplePage() {
       payload.publications = pubRows.filter(p => p.title.trim()).map(p => ({ title: p.title.trim(), authors: p.authors.trim(), venue: p.venue.trim(), year: Number(p.year), type: p.type, ...(p.doi.trim() ? { doi: p.doi.trim() } : {}), ...(p.url.trim() ? { url: p.url.trim() } : {}) }));
       payload.awards       = awardRows.filter(a => a.title.trim()).map(a => ({ title: a.title.trim(), awardedBy: a.awardedBy.trim(), year: Number(a.year), ...(a.description.trim() ? { description: a.description.trim() } : {}) }));
       payload.officeHours  = ohRows.filter(h => h.day).map(h => ({ day: h.day, startTime: h.startTime, endTime: h.endTime }));
+      // Leadership fields
+      if (form.leadershipRole) payload.leadershipRole = form.leadershipRole; else payload.leadershipRole = null;
+      payload.isCurrentChairman = form.isCurrentChairman;
+      if (form.chairmanFrom) payload.chairmanFrom = form.chairmanFrom;
+      if (form.chairmanTo)   payload.chairmanTo   = form.chairmanTo;
 
       if (editing) { await adminPatch(`/faculty/${editing.id}`, payload); toast.success('Record updated!'); }
       else          { await adminPost('/faculty', payload);                toast.success('Record created!'); }
@@ -410,11 +419,35 @@ export default function PeoplePage() {
 
               {activeType === 'chairman' && (
                 <div className="border-t border-slate-100 pt-4 space-y-3">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Service Period</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Leadership Role & Service Period</p>
+
+                  {/* Leadership role selector */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Leadership Role</label>
+                    <select value={form.leadershipRole} onChange={e=>F('leadershipRole',e.target.value)} className={iCls}>
+                      <option value="">— Select Role —</option>
+                      <option value="running_chairman">Running Chairman</option>
+                      <option value="former_chairman">Former Chairman</option>
+                      <option value="former_head">Former Head of the Department</option>
+                    </select>
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      &quot;Former Head&quot; appears on the Honorable Heads page. These are independent roles — do not confuse them.
+                    </p>
+                  </div>
+
+                  {/* Running chairman toggle */}
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={form.isCurrentChairman}
+                      onChange={e=>{F('isCurrentChairman',e.target.checked); if(e.target.checked) F('leadershipRole','running_chairman');}}
+                      className="accent-green-500"/>
+                    <span className="text-sm font-medium text-slate-700">Currently Serving Chairman</span>
+                  </label>
+
+                  {/* Service period */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">From</label>
+                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Service Start Date</label>
                       <input type="date" value={form.chairmanFrom} onChange={e=>F('chairmanFrom',e.target.value)} className={iCls}/></div>
-                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">To <span className="text-slate-400 font-normal">(blank = current)</span></label>
+                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Service End Date <span className="text-slate-400 font-normal">(blank = Present)</span></label>
                       <input type="date" value={form.chairmanTo} onChange={e=>F('chairmanTo',e.target.value)} className={iCls}/></div>
                   </div>
                 </div>
