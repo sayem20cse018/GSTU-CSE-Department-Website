@@ -37,25 +37,27 @@ export class FacultyService {
   }
 
   async create(dto: CreateFacultyDto) {
-    const safeStr = (v: unknown) => (v != null && typeof v !== 'function' ? String(v).trim() : undefined);
+    const safeStr = (v: unknown) => (v != null ? String(v).trim() : undefined);
     const safeBool = (v: unknown, def: boolean) => (typeof v === 'boolean' ? v : def);
     const safeNum = (v: unknown, def: number) => (typeof v === 'number' ? v : def);
     const safeArr = (v: unknown): object[] => (Array.isArray(v) ? v : []);
 
+    // Use dto properties directly — more reliable than casting to Record
     const d = dto as unknown as Record<string, unknown>;
 
-    // Name is the only hard requirement — reject empty or 'anonymous'
-    const name = safeStr(d.name);
+    // Name — read from both dto.name and d.name for safety
+    const rawName = dto.name ?? d.name;
+    const name = rawName != null ? String(rawName).trim() : undefined;
     if (!name || name.toLowerCase() === 'anonymous') {
-      throw new BadRequestException('Please enter a valid name.');
+      throw new BadRequestException('Name is required. Please enter the full name.');
     }
 
-    const email = safeStr(d.email);
-    // Email is optional — only set if provided and non-empty
+    const rawEmail = dto.email ?? d.email;
+    const email = rawEmail != null ? String(rawEmail).trim() : undefined;
 
     const data: Record<string, unknown> = {
       name:             name,
-      email:            email || null,
+      email:            (email && email !== '') ? email : null,
       designation:      safeStr(d.designation) ?? 'Lecturer',
       staffType:        safeStr(d.staffType) ?? 'faculty',
       employmentStatus: safeStr(d.employmentStatus) ?? 'full_time',

@@ -17,7 +17,7 @@ class EducationDto {
 }
 
 export class CreateFacultyDto {
-  @ApiProperty() @IsString() name: string;
+  @IsOptional() @IsString() name?: string;
 
   @ApiPropertyOptional()
   @IsOptional() @IsString()
