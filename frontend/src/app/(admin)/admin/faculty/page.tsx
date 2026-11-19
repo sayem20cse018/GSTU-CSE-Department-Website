@@ -18,11 +18,11 @@ const PUB_TYPES  = ['journal','conference','book','book_chapter','thesis','other
 const DAYS       = ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'];
 
 const STAFF_TYPES = [
-  { key: 'faculty',   label: 'Faculty Members', icon: 'ðŸ‘¨â€ðŸ«' },
-  { key: 'dean',      label: 'Dean',            icon: 'ðŸ›ï¸' },
-  { key: 'chairman',  label: 'Chairman / Head', icon: 'ðŸŽ“' },
-  { key: 'staff',     label: 'Staff',           icon: 'ðŸ¢' },
-  { key: 'officer',   label: 'Officers',        icon: 'ðŸ“‹' },
+  { key: 'faculty',   label: 'Faculty Members' },
+  { key: 'dean',      label: 'Dean'            },
+  { key: 'chairman',  label: 'Chairman / Head' },
+  { key: 'staff',     label: 'Staff'           },
+  { key: 'officer',   label: 'Officers'        },
 ] as const;
 
 type StaffType = typeof STAFF_TYPES[number]['key'];
@@ -34,7 +34,7 @@ const FACULTY_FILTERS = [
 ];
 type FacultyFilter = typeof FACULTY_FILTERS[number]['key'];
 
-// â”€â”€â”€ Nested-row shapes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  Nested-row shapes 
 interface EduRow   { degree: string; institution: string; year: number | string }
 interface PubRow   { title: string; authors: string; venue: string; year: number | string; type: string; doi: string; url: string }
 interface AwardRow { title: string; awardedBy: string; year: number | string; description: string }
@@ -70,7 +70,7 @@ interface FacultyMember {
   officeHours?: OHRow[];
 }
 
-// â”€â”€â”€ Modal section tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  Modal section tabs 
 const MODAL_TABS = [
   { key: 'basic',       label: 'Basic Info' },
   { key: 'education',   label: 'Education' },
@@ -182,7 +182,7 @@ export default function PeoplePage() {
       if (payload.isActive === undefined) payload.isActive = true;
       if (payload.sortOrder === undefined) payload.sortOrder = 0;
 
-      // Nested relations â€” always send so backend replaces them
+      // Nested relations  always send so backend replaces them
       payload.education    = eduRows.filter(e => e.degree.trim()).map(e => ({ degree: e.degree.trim(), institution: e.institution.trim(), year: Number(e.year) }));
       payload.publications = pubRows.filter(p => p.title.trim()).map(p => ({ title: p.title.trim(), authors: p.authors.trim(), venue: p.venue.trim(), year: Number(p.year), type: p.type, ...(p.doi.trim() ? { doi: p.doi.trim() } : {}), ...(p.url.trim() ? { url: p.url.trim() } : {}) }));
       payload.awards       = awardRows.filter(a => a.title.trim()).map(a => ({ title: a.title.trim(), awardedBy: a.awardedBy.trim(), year: Number(a.year), ...(a.description.trim() ? { description: a.description.trim() } : {}) }));
@@ -238,7 +238,7 @@ export default function PeoplePage() {
                 activeType === t.key
                   ? 'bg-green-700 text-white border-green-700 shadow-sm'
                   : 'bg-white text-slate-600 border-slate-200 hover:border-green-400 hover:text-green-700')}>
-              <span>{t.icon}</span><span>{t.label}</span>
+              <span>{t.label}</span>
               <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-bold',
                 activeType === t.key ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500')}>
                 {count}
@@ -276,7 +276,7 @@ export default function PeoplePage() {
 
       {/* Add + Cleanup */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-        <SearchInput value={query} onChange={v => setQuery(v)} placeholder={`Search ${current.label.toLowerCase()}â€¦`} className="sm:max-w-xs"/>
+        <SearchInput value={query} onChange={v => setQuery(v)} placeholder={`Search ${current.label.toLowerCase()}`} className="sm:max-w-xs"/>
         <div className="flex gap-2">
           <button onClick={cleanupAnonymous}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-50 transition">
@@ -292,7 +292,7 @@ export default function PeoplePage() {
         </div>
       </div>
 
-      {/* â”€â”€ Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/*  Modal  */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-start justify-center p-4 overflow-y-auto">
           <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-3xl my-4">
@@ -300,7 +300,7 @@ export default function PeoplePage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">
-                  {editing ? 'Edit' : 'Add'} {current.icon} {current.label.replace(/s$/, '')}
+                  {editing ? 'Edit' : 'Add'} {current.label.replace(/s$/, '')}
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">Fields marked * are required</p>
               </div>
@@ -311,7 +311,7 @@ export default function PeoplePage() {
               </button>
             </div>
 
-            {/* Sub-tabs â€” only show extras for faculty/chairman/dean */}
+            {/* Sub-tabs  only show extras for faculty/chairman/dean */}
             {isFaculty && (
               <div className="flex gap-1 px-6 pt-4 pb-0 overflow-x-auto">
                 {MODAL_TABS.map(t => (
@@ -332,7 +332,7 @@ export default function PeoplePage() {
 
             {err && <p className="mx-6 mt-3 bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-2 text-sm">{err}</p>}
 
-            {/* â”€â”€ Tab: Basic Info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/*  Tab: Basic Info  */}
             <div className={cn('px-6 py-5 space-y-4', (isFaculty && modalTab !== 'basic') ? 'hidden' : '')}>
               <ImageUpload label="Photo" value={form.photo} onChange={v => F('photo', v)} previewRounded dark />
 
@@ -385,7 +385,7 @@ export default function PeoplePage() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">Full Biography</label>
-                <textarea rows={4} value={form.fullBio} onChange={e=>F('fullBio',e.target.value)} placeholder="Detailed biographyâ€¦" className={`${iCls} resize-none`}/>
+                <textarea rows={4} value={form.fullBio} onChange={e=>F('fullBio',e.target.value)} placeholder="Detailed biography" className={`${iCls} resize-none`}/>
               </div>
 
               {isFaculty && (
@@ -397,15 +397,15 @@ export default function PeoplePage() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Google Scholar URL</label>
-                      <input type="url" value={form.googleScholarUrl} onChange={e=>F('googleScholarUrl',e.target.value)} placeholder="https://scholar.google.com/â€¦" className={iCls}/></div>
+                      <input type="url" value={form.googleScholarUrl} onChange={e=>F('googleScholarUrl',e.target.value)} placeholder="https://scholar.google.com/" className={iCls}/></div>
                     <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">LinkedIn URL</label>
-                      <input type="url" value={form.linkedinUrl} onChange={e=>F('linkedinUrl',e.target.value)} placeholder="https://linkedin.com/in/â€¦" className={iCls}/></div>
+                      <input type="url" value={form.linkedinUrl} onChange={e=>F('linkedinUrl',e.target.value)} placeholder="https://linkedin.com/in/" className={iCls}/></div>
                     <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">ResearchGate URL</label>
-                      <input type="url" value={form.researchGateUrl} onChange={e=>F('researchGateUrl',e.target.value)} placeholder="https://researchgate.net/â€¦" className={iCls}/></div>
+                      <input type="url" value={form.researchGateUrl} onChange={e=>F('researchGateUrl',e.target.value)} placeholder="https://researchgate.net/" className={iCls}/></div>
                     <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">ORCID ID</label>
                       <input value={form.orcidId} onChange={e=>F('orcidId',e.target.value)} placeholder="0000-0000-0000-0000" className={iCls}/></div>
                     <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Personal Website</label>
-                      <input type="url" value={form.websiteUrl} onChange={e=>F('websiteUrl',e.target.value)} placeholder="https://â€¦" className={iCls}/></div>
+                      <input type="url" value={form.websiteUrl} onChange={e=>F('websiteUrl',e.target.value)} placeholder="https://" className={iCls}/></div>
                     <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Joining Date</label>
                       <input type="date" value={form.joinedAt} onChange={e=>F('joinedAt',e.target.value)} className={iCls}/></div>
                   </div>
@@ -454,7 +454,7 @@ export default function PeoplePage() {
               )}
             </div>
 
-            {/* â”€â”€ Tab: Education â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/*  Tab: Education  */}
             {isFaculty && modalTab === 'education' && (
               <div className="px-6 py-5 space-y-3">
                 <p className="text-xs text-slate-500">Add degrees in reverse chronological order (newest first).</p>
@@ -491,7 +491,7 @@ export default function PeoplePage() {
               </div>
             )}
 
-            {/* â”€â”€ Tab: Publications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/*  Tab: Publications  */}
             {isFaculty && modalTab === 'publications' && (
               <div className="px-6 py-5 space-y-4">
                 <p className="text-xs text-slate-500">Add research publications. Title is required; others are optional.</p>
@@ -518,7 +518,7 @@ export default function PeoplePage() {
                       <div className="sm:col-span-2">
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Venue / Journal</label>
                         <input value={row.venue} onChange={e=>setPubRows(r=>r.map((x,j)=>j===i?{...x,venue:e.target.value}:x))}
-                          placeholder="IEEE Transactions onâ€¦" className={iCls}/>
+                          placeholder="IEEE Transactions on" className={iCls}/>
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Year</label>
@@ -536,12 +536,12 @@ export default function PeoplePage() {
                       <div>
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">DOI</label>
                         <input value={row.doi} onChange={e=>setPubRows(r=>r.map((x,j)=>j===i?{...x,doi:e.target.value}:x))}
-                          placeholder="10.1109/â€¦" className={iCls}/>
+                          placeholder="10.1109/" className={iCls}/>
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">URL</label>
                         <input type="url" value={row.url} onChange={e=>setPubRows(r=>r.map((x,j)=>j===i?{...x,url:e.target.value}:x))}
-                          placeholder="https://â€¦" className={iCls}/>
+                          placeholder="https://" className={iCls}/>
                       </div>
                     </div>
                   </div>
@@ -554,7 +554,7 @@ export default function PeoplePage() {
               </div>
             )}
 
-            {/* â”€â”€ Tab: Awards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/*  Tab: Awards  */}
             {isFaculty && modalTab === 'awards' && (
               <div className="px-6 py-5 space-y-3">
                 <p className="text-xs text-slate-500">Add honors, awards and recognitions.</p>
@@ -568,7 +568,7 @@ export default function PeoplePage() {
                     <div className="col-span-4">
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Awarded By</label>
                       <input value={row.awardedBy} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,awardedBy:e.target.value}:x))}
-                        placeholder="IEEE, NeurIPSâ€¦" className={iCls}/>
+                        placeholder="IEEE, NeurIPS" className={iCls}/>
                     </div>
                     <div className="col-span-1">
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Year</label>
@@ -578,7 +578,7 @@ export default function PeoplePage() {
                     <div className="col-span-2">
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Description</label>
                       <input value={row.description} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,description:e.target.value}:x))}
-                        placeholder="Optional noteâ€¦" className={iCls}/>
+                        placeholder="Optional note" className={iCls}/>
                     </div>
                     <div className="col-span-1 pt-6">
                       <button onClick={()=>setAwardRows(r=>r.filter((_,j)=>j!==i))}
@@ -596,7 +596,7 @@ export default function PeoplePage() {
               </div>
             )}
 
-            {/* â”€â”€ Tab: Office Hours â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/*  Tab: Office Hours  */}
             {isFaculty && modalTab === 'hours' && (
               <div className="px-6 py-5 space-y-3">
                 <p className="text-xs text-slate-500">Set weekly office hours that students can see on the profile page.</p>
@@ -678,12 +678,12 @@ export default function PeoplePage() {
                       )}
                       <div>
                         {(!m.name || m.name.toLowerCase() === 'anonymous') ? (
-                          <p className="font-semibold text-red-500 text-xs">âš  No name â€” please Edit or Delete</p>
+                          <p className="font-semibold text-red-500 text-xs"> No name  please Edit or Delete</p>
                         ) : (
                           <p className="font-semibold text-slate-900">{m.title} {m.name}</p>
                         )}
                         {m.email && !m.email.match(/^faculty-\d+@/) && <p className="text-xs text-slate-500">{m.email}</p>}
-                        {m.email && m.email.match(/^faculty-\d+@/) && <p className="text-xs text-red-400 italic">âš  Invalid email</p>}
+                        {m.email && m.email.match(/^faculty-\d+@/) && <p className="text-xs text-red-400 italic"> Invalid email</p>}
                       </div>
                     </div>
                   </td>
@@ -691,8 +691,8 @@ export default function PeoplePage() {
                   {activeType === 'chairman' && (
                     <td className="px-4 py-3 text-center hidden md:table-cell">
                       <span className="text-xs text-slate-600">
-                        {m.chairmanFrom ? new Date(m.chairmanFrom).toLocaleDateString('en-GB') : 'â€”'}
-                        {' â†’ '}
+                        {m.chairmanFrom ? new Date(m.chairmanFrom).toLocaleDateString('en-GB') : ''}
+                        {'  '}
                         {m.chairmanTo ? new Date(m.chairmanTo).toLocaleDateString('en-GB') : <span className="text-green-600 font-semibold">Present</span>}
                       </span>
                     </td>
