@@ -333,7 +333,7 @@ export default async function FacultyDetailPage({
                   className="block text-center w-full py-2.5 rounded-xl text-sm font-bold text-white transition hover:opacity-90"
                   style={{ background: 'linear-gradient(135deg,#166534,#15803d)' }}
                 >
-                  Contact {f.name.split(' ')[0]}
+                  Send Email
                 </a>
               ) : (
                 <Link
