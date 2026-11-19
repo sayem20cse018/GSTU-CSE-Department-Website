@@ -54,7 +54,7 @@ export async function adminPatch<T>(path: string, body: unknown): Promise<T> {
   return (json as { data: T }).data;
 }
 
-export async function adminDelete(path: string): Promise<void> {
+export async function adminDelete<T = void>(path: string): Promise<T> {
   const r = await fetch(`${BASE}${path}`, {
     method: 'DELETE',
     credentials: 'include',
@@ -63,4 +63,7 @@ export async function adminDelete(path: string): Promise<void> {
     const json = await safeJson(r);
     throw new Error((json?.message as string) ?? `Delete failed: ${r.status}`);
   }
+  if (r.status === 204) return undefined as T;
+  const json = await safeJson(r);
+  return (json as { data: T }).data ?? (json as T);
 }

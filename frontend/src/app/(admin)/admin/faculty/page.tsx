@@ -24,6 +24,14 @@ const STAFF_TYPES = [
 
 type StaffType = typeof STAFF_TYPES[number]['key'];
 
+// Sub-filters for Faculty Members tab — BUET style
+const FACULTY_FILTERS = [
+  { key: 'all' as const,      label: 'All Faculty' },
+  { key: 'active' as const,    label: 'Active' },
+  { key: 'on_leave' as const,  label: 'On Leave' },
+];
+type FacultyFilter = typeof FACULTY_FILTERS[number]['key'];
+
 const EMPTY = {
   name:'', title:'Dr.', designation:'Lecturer', email:'', phone:'', photo:'',
   shortBio:'', fullBio:'', officeRoom:'', researchInterests:'',
@@ -47,6 +55,7 @@ export default function PeoplePage() {
   const [list, setList]       = useState<FacultyMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState<StaffType>('faculty');
+  const [facultyFilter, setFacultyFilter] = useState<FacultyFilter>('all');
   const [form, setForm]       = useState(EMPTY);
   const [editing, setEditing] = useState<FacultyMember|null>(null);
   const [open, setOpen]       = useState(false);
@@ -66,7 +75,13 @@ export default function PeoplePage() {
   useEffect(() => { load(); }, [load]);
 
   const byType = useMemo(() => list.filter(m => (m.staffType || 'faculty') === activeType), [list, activeType]);
-  const filtered = useMemo(() => query ? byType.filter(m => m.name.toLowerCase().includes(query.toLowerCase()) || m.designation.toLowerCase().includes(query.toLowerCase())) : byType, [byType, query]);
+  const filteredByStatus = useMemo(() => {
+    if (activeType !== 'faculty' || facultyFilter === 'all') return byType;
+    if (facultyFilter === 'active') return byType.filter(m => m.employmentStatus !== 'on_leave');
+    if (facultyFilter === 'on_leave') return byType.filter(m => m.employmentStatus === 'on_leave');
+    return byType;
+  }, [byType, activeType, facultyFilter]);
+  const filtered = useMemo(() => query ? filteredByStatus.filter(m => m.name.toLowerCase().includes(query.toLowerCase()) || m.designation.toLowerCase().includes(query.toLowerCase())) : filteredByStatus, [filteredByStatus, query]);
   const F = (k: keyof typeof EMPTY, v: unknown) => setForm(p => ({ ...p, [k]: v }));
 
   function openNew() {
@@ -132,6 +147,16 @@ export default function PeoplePage() {
     finally { setDelId(null); }
   }
 
+  async function cleanupAnonymous() {
+    const ok = await confirm({ title: 'Delete anonymous records?', description: 'This will permanently delete all faculty records with empty names or auto-generated fake emails.', confirmLabel: 'Delete All' });
+    if (!ok) return;
+    try {
+      await adminDelete<{ deleted?: number; message?: string }>('/faculty/cleanup');
+      toast.success('Anonymous records cleaned up');
+      load();
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Cleanup failed'); }
+  }
+
   const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500';
   const current = STAFF_TYPES.find(t => t.key === activeType)!;
 
@@ -142,11 +167,11 @@ export default function PeoplePage() {
       <PageHeader title="People Management" description="Manage faculty, staff, officers and chairman list"/>
 
       {/* Type Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-3">
         {STAFF_TYPES.map(t => {
           const count = list.filter(m => (m.staffType || 'faculty') === t.key).length;
           return (
-            <button key={t.key} onClick={() => setActiveType(t.key)}
+            <button key={t.key} onClick={() => { setActiveType(t.key); setFacultyFilter('all'); }}
               className={cn('flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border',
                 activeType === t.key
                   ? 'bg-green-700 text-white border-green-700 shadow-sm'
@@ -163,15 +188,49 @@ export default function PeoplePage() {
         })}
       </div>
 
-      {/* Add button */}
+      {/* BUET-style sub-filters for Faculty Members */}
+      {activeType === 'faculty' && (
+        <div className="flex flex-wrap items-center gap-2 mb-4 pl-1">
+          {FACULTY_FILTERS.map(f => {
+            const count = f.key === 'all'
+              ? list.filter(m => (m.staffType || 'faculty') === 'faculty').length
+              : f.key === 'active'
+              ? list.filter(m => (m.staffType || 'faculty') === 'faculty' && m.employmentStatus !== 'on_leave').length
+              : list.filter(m => (m.staffType || 'faculty') === 'faculty' && m.employmentStatus === 'on_leave').length;
+            return (
+              <button key={f.key} onClick={() => setFacultyFilter(f.key)}
+                className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition border',
+                  facultyFilter === f.key
+                    ? 'bg-slate-800 text-white border-slate-800'
+                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
+                )}>
+                {f.label}
+                <span className={cn('text-[10px] px-1 py-0.5 rounded-full font-bold',
+                  facultyFilter === f.key ? 'bg-white/20' : 'bg-slate-100')}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Add + Cleanup buttons */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <SearchInput value={query} onChange={v => setQuery(v)} placeholder={`Search ${current.label.toLowerCase()}…`} className="sm:max-w-xs"/>
-        <Button onClick={openNew} icon={
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
-          </svg>}>
-          Add {current.label.replace(/s$/, '')}
-        </Button>
+        <div className="flex gap-2">
+          <button onClick={cleanupAnonymous}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-50 transition">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+            Clean Anonymous
+          </button>
+          <Button onClick={openNew} icon={
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="w-full h-full">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>}>
+            Add {current.label.replace(/s$/, '')}
+          </Button>
+        </div>
       </div>
 
       {/* Modal */}

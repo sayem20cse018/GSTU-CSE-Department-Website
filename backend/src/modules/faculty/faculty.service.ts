@@ -126,6 +126,24 @@ export class FacultyService {
     return this.prisma.faculty.delete({ where: { id } });
   }
 
+  // ─── Clean up bad records (empty names, auto-generated emails) ─────────────
+  async cleanupBadRecords() {
+    const all = await this.prisma.faculty.findMany();
+    const bad = all.filter(f =>
+      !f.name || f.name.trim() === '' ||
+      (f.email && f.email.match(/^faculty-\d+@/))
+    );
+    if (bad.length === 0) return { deleted: 0, message: 'No bad records found.' };
+    const ids = bad.map(f => f.id);
+    // Delete related records first
+    await this.prisma.facultyEducation.deleteMany({ where: { facultyId: { in: ids } } });
+    await this.prisma.facultyPublication.deleteMany({ where: { facultyId: { in: ids } } });
+    await this.prisma.facultyAward.deleteMany({ where: { facultyId: { in: ids } } });
+    await this.prisma.facultyOfficeHours.deleteMany({ where: { facultyId: { in: ids } } });
+    await this.prisma.faculty.deleteMany({ where: { id: { in: ids } } });
+    return { deleted: bad.length, message: `Deleted ${bad.length} anonymous/invalid records.` };
+  }
+
   // ─── Recent publications (dashboard widget) ──────────────────────────────
   async getRecentPublications(limit = 5) {
     const pubs = await this.prisma.facultyPublication.findMany({

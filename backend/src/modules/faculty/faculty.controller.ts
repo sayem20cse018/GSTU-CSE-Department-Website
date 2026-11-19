@@ -77,6 +77,22 @@ export class FacultyController {
     return result;
   }
 
+  @Delete('cleanup')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '[Admin] Delete records with empty names or auto-generated emails' })
+  async cleanup(
+    @CurrentUser() admin: Admin,
+    @Req() req: Request,
+  ) {
+    const result = await this.facultyService.cleanupBadRecords();
+    const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
+    void this.logger.log(admin.id, 'CLEANUP_FACULTY', ip);
+    return result;
+  }
+
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles('super_admin')
