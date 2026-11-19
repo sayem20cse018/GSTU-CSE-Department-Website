@@ -14,9 +14,16 @@ export const metadata: Metadata = {
 export default async function FacultyPage() {
   const result = await fetchFacultyList(false);
 
-  // All valid, active records — the directory component handles its own partitioning
+  /**
+   * Pass every valid record — the FacultyDirectory client component
+   * partitions them into the correct tabs:
+   *   Active Faculty  → staffType=faculty AND NOT on_leave AND isActive=true
+   *   On Leave        → staffType=faculty AND on_leave
+   *   Ex Chairman     → staffType=chairman OR dean
+   *   Staff & Officers → staffType=staff OR officer
+   */
   const all = result.ok
-    ? result.members.filter(f => isValidFacultyRecord(f) && f.isActive !== false)
+    ? result.members.filter(f => isValidFacultyRecord(f))
     : [];
 
   return (
@@ -32,7 +39,8 @@ export default async function FacultyPage() {
           {!result.ok ? (
             <FacultyLoadError title="Couldn't load faculty & staff" />
           ) : (
-            <FacultyDirectory all={all} />
+            /* defaultTab='active' means Active Faculty tab is selected on first load */
+            <FacultyDirectory all={all} defaultTab="active" />
           )}
         </div>
       </main>
