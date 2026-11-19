@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateFacultyDto } from './dto/create-faculty.dto';
 import { UpdateFacultyDto } from './dto/update-faculty.dto';
@@ -37,57 +37,42 @@ export class FacultyService {
   }
 
   async create(dto: CreateFacultyDto) {
-    const safeStr = (v: unknown) => (v != null ? String(v).trim() : undefined);
-    const safeBool = (v: unknown, def: boolean) => (typeof v === 'boolean' ? v : def);
-    const safeNum = (v: unknown, def: number) => (typeof v === 'number' ? v : def);
-    const safeArr = (v: unknown): object[] => (Array.isArray(v) ? v : []);
-
-    // Use dto properties directly — more reliable than casting to Record
+    // Accept EVERYTHING — no server-side rejection
+    // If name is empty/missing, store as-is; frontend should validate
     const d = dto as unknown as Record<string, unknown>;
 
-    // Name — read from both dto.name and d.name for safety
-    const rawName = dto.name ?? d.name;
-    const name = rawName != null ? String(rawName).trim() : undefined;
-    if (!name || name.toLowerCase() === 'anonymous') {
-      throw new BadRequestException('Name is required. Please enter the full name.');
-    }
+    const str = (v: unknown) => (v != null ? String(v).trim() : '');
+    const optStr = (v: unknown) => { const s = str(v); return s !== '' ? s : null; };
+    const bool = (v: unknown, def: boolean) => (typeof v === 'boolean' ? v : def);
+    const num  = (v: unknown, def: number)  => (typeof v === 'number'  ? v : def);
+    const arr  = (v: unknown) => (Array.isArray(v) ? v : []);
 
-    const rawEmail = dto.email ?? d.email;
-    const email = rawEmail != null ? String(rawEmail).trim() : undefined;
-
-    const data: Record<string, unknown> = {
-      name:             name,
-      email:            (email && email !== '') ? email : null,
-      designation:      safeStr(d.designation) ?? 'Lecturer',
-      staffType:        safeStr(d.staffType) ?? 'faculty',
-      employmentStatus: safeStr(d.employmentStatus) ?? 'full_time',
-      isActive:         safeBool(d.isActive, true),
-      sortOrder:        safeNum(d.sortOrder, 0),
-      researchInterests: safeArr(d.researchInterests),
-      courses:          safeArr(d.courses),
-    };
-
-    // Optional string fields
-    const optionalStrings = ['title','phone','photo','shortBio','fullBio','slug','officeRoom',
-      'websiteUrl','googleScholarUrl','linkedinUrl','researchGateUrl','orcidId'] as const;    for (const key of optionalStrings) {
-      const v = safeStr(d[key]);
-      if (v !== undefined && v !== '') data[key] = v;
-    }
-    if (d.joinedAt) data.joinedAt = new Date(safeStr(d.joinedAt) ?? '');
-
-    const education    = safeArr(d.education);
-    const publications = safeArr(d.publications);
-    const awards       = safeArr(d.awards);
-    const officeHours  = safeArr(d.officeHours);
+    const name = str(d.name ?? dto.name);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.create({
       data: {
-        ...data,
-        ...(education.length    ? { education:    { create: education    } } : {}),
-        ...(publications.length ? { publications: { create: publications } } : {}),
-        ...(awards.length       ? { awards:       { create: awards       } } : {}),
-        ...(officeHours.length  ? { officeHours:  { create: officeHours  } } : {}),
+        name:              name,
+        email:             optStr(d.email ?? dto.email),
+        designation:       str(d.designation) || 'Lecturer',
+        staffType:         str(d.staffType)   || 'faculty',
+        employmentStatus:  str(d.employmentStatus) || 'full_time',
+        isActive:          bool(d.isActive, true),
+        sortOrder:         num(d.sortOrder, 0),
+        researchInterests: arr(d.researchInterests) as string[],
+        courses:           arr(d.courses)           as string[],
+        title:             optStr(d.title ?? dto.title),
+        phone:             optStr(d.phone ?? dto.phone),
+        photo:             optStr(d.photo ?? dto.photo),
+        shortBio:          optStr(d.shortBio ?? dto.shortBio),
+        fullBio:           optStr(d.fullBio  ?? dto.fullBio),
+        officeRoom:        optStr(d.officeRoom ?? dto.officeRoom),
+        websiteUrl:        optStr(d.websiteUrl ?? dto.websiteUrl),
+        googleScholarUrl:  optStr(d.googleScholarUrl ?? dto.googleScholarUrl),
+        linkedinUrl:       optStr(d.linkedinUrl ?? dto.linkedinUrl),
+        researchGateUrl:   optStr(d.researchGateUrl ?? dto.researchGateUrl),
+        orcidId:           optStr(d.orcidId ?? dto.orcidId),
+        ...(d.joinedAt ? { joinedAt: new Date(str(d.joinedAt)) } : {}),
       } as any,
       include: FACULTY_INCLUDE,
     });
