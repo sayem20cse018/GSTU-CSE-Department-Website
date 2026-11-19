@@ -64,14 +64,14 @@ export default async function SiteHeader() {
           </div>
 
           {/* Text */}
-          <div>
-            <p className="leading-none mb-0.5" style={{ fontFamily:'var(--font-montserrat)', fontWeight:700, fontSize:'0.6rem', letterSpacing:'0.2em', textTransform:'uppercase', color:'#4b5563' }}>
+          <div className="flex flex-col justify-center" style={{ gap: '2px' }}>
+            <p style={{ fontFamily:'var(--font-montserrat)', fontWeight:700, fontSize:'0.68rem', letterSpacing:'0.18em', textTransform:'uppercase', color:'#4b5563', lineHeight: 1.1, marginBottom: '3px' }}>
               {s.showDeptPrefix !== false ? 'Department of' : ''}
             </p>
-            <p className="leading-tight group-hover:opacity-80 transition-opacity" style={{ fontFamily, fontWeight:900, fontSize:'1.65rem', letterSpacing:'-0.01em', color: accentColor, textTransform:'uppercase' }}>
+            <p style={{ fontFamily, fontWeight:900, fontSize:'1.55rem', letterSpacing:'-0.01em', color: accentColor, textTransform:'uppercase', lineHeight: 1.15 }}>
               {deptCore}
             </p>
-            <p className="mt-1.5" style={{ fontFamily:'var(--font-montserrat)', fontWeight:800, fontSize:'0.68rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'#111827' }}>
+            <p style={{ fontFamily:'var(--font-montserrat)', fontWeight:800, fontSize:'0.72rem', letterSpacing:'0.12em', textTransform:'uppercase', color:'#111827', lineHeight: 1.1, marginTop: '4px' }}>
               {s.universityName}
             </p>
           </div>

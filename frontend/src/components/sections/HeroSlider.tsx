@@ -81,7 +81,7 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
       {slide.tag && (
         <div
           className={cn(
-            'inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-5',
+            'inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-4',
             active ? 'slide-text-1' : 'opacity-0',
           )}
         >
@@ -93,7 +93,7 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
       {/* Title */}
       <h1
         className={cn(
-          'text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-6xl font-extrabold text-white leading-[1.1] tracking-tight max-w-3xl',
+          'text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.15] tracking-tight max-w-3xl',
           active ? 'slide-text-2' : 'opacity-0',
         )}
       >
@@ -103,7 +103,7 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
       {/* Subtitle */}
       <p
         className={cn(
-          'mt-5 text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl',
+          'mt-4 text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl',
           active ? 'slide-text-3' : 'opacity-0',
         )}
       >
@@ -112,7 +112,7 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
 
       {/* Buttons */}
       {(slide.primaryBtn || slide.secondaryBtn) && (
-        <div className={cn('mt-8 flex flex-wrap gap-3', active ? 'slide-text-3' : 'opacity-0')}>
+        <div className={cn('mt-6 flex flex-wrap gap-3', active ? 'slide-text-3' : 'opacity-0')}>
           {slide.primaryBtn && (
             <Link
               href={slide.primaryBtn.href}
@@ -189,7 +189,7 @@ export default function HeroSlider({ initialSlides = [] }: { initialSlides?: Api
   return (
     <section
       className={cn('relative overflow-hidden z-0', slides.length === 0 ? 'bg-white' : 'bg-[#0b3d1f]')}
-      style={{ height: '100vh', minHeight: '580px', maxHeight: '960px' }}
+      style={{ height: '520px', minHeight: '420px', maxHeight: '640px' }}
       aria-label="Hero slider"
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}
