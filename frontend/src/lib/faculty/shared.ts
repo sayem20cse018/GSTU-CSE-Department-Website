@@ -66,7 +66,7 @@ export interface FacultyMember {
   orcidId?: string | null;
   isActive: boolean;
   employmentStatus: string; // full_time | on_leave | contract | ...
-  staffType: string;         // faculty | chairman | staff | officer
+  staffType: string;         // faculty | chairman | dean | staff | officer
   sortOrder: number;
   joinedAt?: string | null;
   createdAt: string;
@@ -91,34 +91,34 @@ export const DESIGNATION_ORDER = [
 export interface BadgeStyle {
   bg: string;
   text: string;
+  border: string;
 }
 
 export const DESIGNATION_BADGE: Record<string, BadgeStyle> = {
-  Professor: { bg: 'rgba(30,64,175,0.12)', text: '#1d4ed8' },
-  'Associate Professor': { bg: 'rgba(109,40,217,0.12)', text: '#6d28d9' },
-  'Assistant Professor': { bg: 'rgba(22,101,52,0.12)', text: '#166534' },
-  'Senior Lecturer': { bg: 'rgba(15,118,110,0.12)', text: '#0f766e' },
-  Lecturer: { bg: 'rgba(180,83,9,0.12)', text: '#b45309' },
-  'Adjunct Faculty': { bg: 'rgba(71,85,105,0.12)', text: '#475569' },
+  Professor:             { bg: '#1d4ed8', text: '#fff', border: '#1d4ed8' },
+  'Associate Professor': { bg: '#6d28d9', text: '#fff', border: '#6d28d9' },
+  'Assistant Professor': { bg: '#166534', text: '#fff', border: '#166534' },
+  'Senior Lecturer':     { bg: '#0f766e', text: '#fff', border: '#0f766e' },
+  Lecturer:              { bg: '#b45309', text: '#fff', border: '#b45309' },
+  'Adjunct Faculty':     { bg: '#475569', text: '#fff', border: '#475569' },
 };
 
 export function getBadgeStyle(designation: string): BadgeStyle {
   return (
     DESIGNATION_BADGE[designation] ?? {
-      bg: 'rgba(22,101,52,0.1)',
-      text: '#166534',
+      bg: '#166534', text: '#fff', border: '#166534',
     }
   );
 }
 
-// Gradient backgrounds for the initials fallback (no photo).
+// Gradient backgrounds for initials fallback (no photo).
 export const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg,#0b3d1f,#0a2e1a)',
-  'linear-gradient(135deg,#1d4ed8,#1e3a8a)',
-  'linear-gradient(135deg,#6d28d9,#3b0764)',
-  'linear-gradient(135deg,#b45309,#78350f)',
-  'linear-gradient(135deg,#0f766e,#134e4a)',
-  'linear-gradient(135deg,#9f1239,#4c0519)',
+  'linear-gradient(160deg,#0b3d1f,#1a7a3c)',
+  'linear-gradient(160deg,#1d4ed8,#2563eb)',
+  'linear-gradient(160deg,#6d28d9,#7c3aed)',
+  'linear-gradient(160deg,#b45309,#d97706)',
+  'linear-gradient(160deg,#0f766e,#0d9488)',
+  'linear-gradient(160deg,#9f1239,#be123c)',
 ];
 
 // ─── Pure helpers ─────────────────────────────────────────────────────────────
@@ -132,7 +132,7 @@ export function getInitials(name: string): string {
 
 const FAKE_EMAIL = /^faculty-\d+@/i;
 
-/** Exclude anonymous / empty-name / auto-generated-email records from the public site. */
+/** Exclude anonymous / empty-name / auto-generated-email records. */
 export function isValidFacultyRecord(
   f: Partial<Pick<FacultyMember, 'name' | 'email'>>,
 ): boolean {
@@ -142,13 +142,23 @@ export function isValidFacultyRecord(
   return true;
 }
 
+/** Head of Department: staffType === 'chairman' */
+export function isChairman(f: Pick<FacultyMember, 'staffType'>): boolean {
+  return (f.staffType ?? '').toLowerCase() === 'chairman';
+}
+
+/** Dean: staffType === 'dean' */
+export function isDean(f: Pick<FacultyMember, 'staffType'>): boolean {
+  return (f.staffType ?? '').toLowerCase() === 'dean';
+}
+
 /**
- * Only teaching faculty and the chairman belong on the public Faculty
- * directory. Staff and officers are listed on their own separate pages.
+ * Teaching faculty (faculty | chairman | dean) belong on the public directory.
+ * Staff and officers are listed on separate pages.
  */
 export function isDirectoryFaculty(f: Pick<FacultyMember, 'staffType'>): boolean {
   const t = (f.staffType ?? 'faculty').toLowerCase();
-  return t === 'faculty' || t === 'chairman';
+  return t === 'faculty' || t === 'chairman' || t === 'dean';
 }
 
 export function designationPriority(designation: string): number {

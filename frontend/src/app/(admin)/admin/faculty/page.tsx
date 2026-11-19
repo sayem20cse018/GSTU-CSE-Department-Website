@@ -17,7 +17,8 @@ const DESIG     = ['Professor','Associate Professor','Assistant Professor','Lect
 const EMP_STATUS = ['full_time','part_time','on_leave','retired'];
 const STAFF_TYPES = [
   { key: 'faculty',   label: 'Faculty Members', icon: '👨‍🏫' },
-  { key: 'chairman',  label: 'Chairman List',   icon: '🎓' },
+  { key: 'dean',      label: 'Dean',            icon: '🏛️' },
+  { key: 'chairman',  label: 'Chairman / Head', icon: '🎓' },
   { key: 'staff',     label: 'Staff',           icon: '🏢' },
   { key: 'officer',   label: 'Officers',        icon: '📋' },
 ] as const;
