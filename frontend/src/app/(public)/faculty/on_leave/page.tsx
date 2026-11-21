@@ -8,8 +8,15 @@ export const maxDuration = 25;
 
 export const metadata: Metadata = {
   title: 'Faculty on Leave — GSTU CSE',
-  description: 'Faculty members of the Department of CSE, GSTU currently on leave.',
 };
+
+function GroupLabel({ label, count }: { label: string; count: number }) {
+  return (
+    <div className="mb-5 pb-1.5 border-b-2 border-slate-800">
+      <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-wide">{label}</h2>
+    </div>
+  );
+}
 
 export default async function FacultyOnLeavePage() {
   const result = await fetchFacultyList(false);
@@ -17,7 +24,7 @@ export default async function FacultyOnLeavePage() {
   if (!result.ok) {
     return (
       <main className="bg-white min-h-screen pt-28 pb-16">
-        <div className="container-custom max-w-7xl">
+        <div className="container-custom max-w-6xl">
           <FacultyLoadError title="Couldn't load faculty records" />
         </div>
       </main>
@@ -36,25 +43,17 @@ export default async function FacultyOnLeavePage() {
 
   return (
     <main className="bg-white min-h-screen pt-28 pb-16">
-      <div className="container-custom max-w-7xl">
+      <div className="container-custom max-w-6xl">
 
         {members.length === 0 ? (
-          <div className="text-center py-24 text-slate-400 font-medium">
-            No faculty members are currently on leave.
-          </div>
+          <p className="text-slate-400 text-center py-24">No faculty members are currently on leave.</p>
         ) : (
-          <div className="space-y-14">
+          <div className="space-y-12">
             {groups.map(({ designation, members: list }) => (
-              <section key={designation} id={designation.replace(/\s+/g, '-').toLowerCase()}>
-                <div className="mb-5 flex items-center gap-3">
-                  <h2 className="text-base font-extrabold uppercase tracking-wide text-slate-800">{designation}</h2>
-                  <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-xs font-semibold text-slate-400">{list.length}</span>
-                </div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4">
-                  {list.map((m, i) => (
-                    <FacultyCard key={m.id} member={m} index={i} ribbon="On Leave" ribbonColor="#d97706" />
-                  ))}
+              <section key={designation}>
+                <GroupLabel label={designation} count={list.length} />
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+                  {list.map((m, i) => <FacultyCard key={m.id} member={m} index={i} />)}
                 </div>
               </section>
             ))}
