@@ -18,11 +18,12 @@ const PUB_TYPES  = ['journal','conference','book','book_chapter','thesis','other
 const DAYS       = ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'];
 
 const STAFF_TYPES = [
-  { key: 'faculty',   label: 'Faculty Members' },
-  { key: 'dean',      label: 'Dean'            },
-  { key: 'chairman',  label: 'Chairman / Head' },
-  { key: 'staff',     label: 'Staff'           },
-  { key: 'officer',   label: 'Officers'        },
+  { key: 'faculty',      label: 'Faculty Members' },
+  { key: 'dean',         label: 'Dean'            },
+  { key: 'chairman',     label: 'Chairman / Head' },
+  { key: 'ex_chairman',  label: 'Ex Chairman'     },
+  { key: 'staff',        label: 'Staff'           },
+  { key: 'officer',      label: 'Officers'        },
 ] as const;
 
 type StaffType = typeof STAFF_TYPES[number]['key'];
@@ -122,7 +123,13 @@ export default function PeoplePage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [load]);
 
-  const byType = useMemo(() => list.filter(m => (m.staffType || 'faculty') === activeType), [list, activeType]);
+  // ex_chairman is a view over chairman records with leadershipRole=former_chairman
+  const byType = useMemo(() => {
+    if (activeType === 'ex_chairman') {
+      return list.filter(m => m.staffType === 'chairman' && m.leadershipRole === 'former_chairman');
+    }
+    return list.filter(m => (m.staffType || 'faculty') === activeType);
+  }, [list, activeType]);
   const filteredByStatus = useMemo(() => {
     if (activeType !== 'faculty' || facultyFilter === 'all') return byType;
     if (facultyFilter === 'active') return byType.filter(m => m.employmentStatus !== 'on_leave');
@@ -139,7 +146,14 @@ export default function PeoplePage() {
 
   function openNew() {
     setEditing(null);
-    setForm({ ...EMPTY, staffType: activeType });
+    // ex_chairman tab → automatically set staffType=chairman + leadershipRole=former_chairman
+    const baseStaffType = activeType === 'ex_chairman' ? 'chairman' : activeType;
+    setForm({
+      ...EMPTY,
+      staffType: baseStaffType as StaffType,
+      leadershipRole: activeType === 'ex_chairman' ? 'former_chairman' : '',
+      isCurrentChairman: false,
+    });
     setEduRows([]); setPubRows([]); setAwardRows([]); setOhRows([]);
     setModalTab('basic'); setErr(''); setOpen(true);
   }
@@ -186,7 +200,8 @@ export default function PeoplePage() {
       // Always include these fields explicitly — never skip them via the empty-string filter
       payload.name             = form.name.trim();
       payload.email            = form.email.trim();
-      payload.staffType        = form.staffType;
+      // ex_chairman tab saves as staffType=chairman in the DB
+      payload.staffType        = form.staffType === 'ex_chairman' ? 'chairman' : form.staffType;
       payload.isActive         = form.isActive;
       payload.sortOrder        = form.sortOrder ?? 0;
       // ↓ CRITICAL: always send employmentStatus exactly as the admin chose — never fall back
@@ -216,9 +231,14 @@ export default function PeoplePage() {
       payload.awards       = awardRows.filter(a => a.title.trim()).map(a => ({ title: a.title.trim(), awardedBy: a.awardedBy.trim(), year: Number(a.year), ...(a.description.trim() ? { description: a.description.trim() } : {}) }));
       payload.officeHours  = ohRows.filter(h => h.day).map(h => ({ day: h.day, startTime: h.startTime, endTime: h.endTime }));
 
-      // Leadership fields
-      if (form.leadershipRole) payload.leadershipRole = form.leadershipRole; else payload.leadershipRole = null;
-      payload.isCurrentChairman = form.isCurrentChairman;
+      // Leadership fields — ex_chairman tab always saves as former_chairman
+      if (activeType === 'ex_chairman') {
+        payload.leadershipRole    = 'former_chairman';
+        payload.isCurrentChairman = false;
+      } else {
+        if (form.leadershipRole) payload.leadershipRole = form.leadershipRole; else payload.leadershipRole = null;
+        payload.isCurrentChairman = form.isCurrentChairman;
+      }
       if (form.chairmanFrom) payload.chairmanFrom = form.chairmanFrom;
       if (form.chairmanTo)   payload.chairmanTo   = form.chairmanTo;
 
@@ -249,7 +269,7 @@ export default function PeoplePage() {
 
   const iCls = 'w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition';
   const current = STAFF_TYPES.find(t => t.key === activeType)!;
-  const isFaculty = activeType === 'faculty' || activeType === 'chairman' || activeType === 'dean';
+  const isFaculty = activeType === 'faculty' || activeType === 'chairman' || activeType === 'dean' || activeType === 'ex_chairman';
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -446,38 +466,44 @@ export default function PeoplePage() {
                 <span className="text-sm font-medium text-slate-700">Active</span>
               </label>
 
-              {activeType === 'chairman' && (
+              {(activeType === 'chairman' || activeType === 'ex_chairman') && (
                 <div className="border-t border-slate-100 pt-4 space-y-3">
                   <p className="text-xs font-black text-slate-700 uppercase tracking-wider">
-                    Leadership Role &amp; Service Period
+                    {activeType === 'ex_chairman' ? 'Ex Chairman — Service Period' : 'Leadership Role & Service Period'}
                   </p>
-                  <div className="rounded-xl border border-blue-100 bg-blue-50/50 px-4 py-3 text-xs text-blue-700 leading-relaxed">
-                    <strong>How to add an Ex Chairman:</strong> Select <em>Former Chairman</em> as the Leadership Role, enter the
-                    Service Start and End dates, then save. The person will appear on the public
-                    &ldquo;Ex Chairman&rdquo; page under <strong>Former Chairmen</strong>.<br/>
-                    For the current/running chairman, select <em>Running Chairman</em> (or tick the checkbox).
-                  </div>
 
-                  {/* Leadership role selector */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Leadership Role *</label>
-                    <select value={form.leadershipRole} onChange={e=>F('leadershipRole',e.target.value)} className={iCls}>
-                      <option value="">— Select Role —</option>
-                      <option value="running_chairman">Running Chairman (Current Head)</option>
-                      <option value="former_chairman">Former Chairman (Ex Chairman)</option>
-                      <option value="former_head">Former Head of the Department</option>
-                    </select>
-                  </div>
+                  {/* For ex_chairman tab: role is fixed, just show service period */}
+                  {activeType === 'ex_chairman' ? (
+                    <div className="rounded-xl border border-green-100 bg-green-50/50 px-4 py-2 text-xs text-green-700">
+                      This record will be saved as <strong>Former Chairman</strong> and appear on the
+                      public <strong>Ex Chairman</strong> page under Former Chairmen.
+                    </div>
+                  ) : (
+                    <>
+                      <div className="rounded-xl border border-blue-100 bg-blue-50/50 px-4 py-3 text-xs text-blue-700 leading-relaxed">
+                        <strong>How to add an Ex Chairman:</strong> Select <em>Former Chairman</em> as the Leadership Role, enter the
+                        Service Start and End dates, then save. The person will appear on the public
+                        &ldquo;Ex Chairman&rdquo; page under <strong>Former Chairmen</strong>.<br/>
+                        For the current/running chairman, select <em>Running Chairman</em> (or tick the checkbox).
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">Leadership Role *</label>
+                        <select value={form.leadershipRole} onChange={e=>F('leadershipRole',e.target.value)} className={iCls}>
+                          <option value="">— Select Role —</option>
+                          <option value="running_chairman">Running Chairman (Current Head)</option>
+                          <option value="former_chairman">Former Chairman (Ex Chairman)</option>
+                          <option value="former_head">Former Head of the Department</option>
+                        </select>
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" checked={form.isCurrentChairman}
+                          onChange={e=>{F('isCurrentChairman',e.target.checked); if(e.target.checked) F('leadershipRole','running_chairman');}}
+                          className="accent-green-500"/>
+                        <span className="text-sm font-medium text-slate-700">Currently Serving Chairman</span>
+                      </label>
+                    </>
+                  )}
 
-                  {/* Running chairman toggle */}
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form.isCurrentChairman}
-                      onChange={e=>{F('isCurrentChairman',e.target.checked); if(e.target.checked) F('leadershipRole','running_chairman');}}
-                      className="accent-green-500"/>
-                    <span className="text-sm font-medium text-slate-700">Currently Serving Chairman</span>
-                  </label>
-
-                  {/* Service period */}
                   <div>
                     <p className="text-xs font-semibold text-slate-600 mb-2">Service Period</p>
                     <div className="grid grid-cols-2 gap-3">
@@ -702,6 +728,7 @@ export default function PeoplePage() {
                 <th className="text-left px-4 py-3 hidden md:table-cell">Designation</th>
                 {activeType === 'chairman' && <th className="text-center px-4 py-3 hidden md:table-cell">Role</th>}
                 {activeType === 'chairman' && <th className="text-center px-4 py-3 hidden md:table-cell">Service Period</th>}
+                {activeType === 'ex_chairman' && <th className="text-center px-4 py-3 hidden md:table-cell">Service Period</th>}
                 <th className="text-center px-4 py-3 hidden sm:table-cell">Status</th>
                 <th className="text-right px-5 py-3">Actions</th>
               </tr>
@@ -754,7 +781,7 @@ export default function PeoplePage() {
                       )}
                     </td>
                   )}
-                  {activeType === 'chairman' && (
+                  {(activeType === 'chairman' || activeType === 'ex_chairman') && (
                     <td className="px-4 py-3 text-center hidden md:table-cell">
                       <span className="text-xs text-slate-600">
                         {m.chairmanFrom ? new Date(m.chairmanFrom).toLocaleDateString('en-GB') : '—'}
