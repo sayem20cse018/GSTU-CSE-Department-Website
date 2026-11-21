@@ -168,25 +168,40 @@ export default function PeoplePage() {
     setSaving(true); setErr('');
     try {
       const payload: Record<string, unknown> = {};
-      for (const [k, v] of Object.entries(form)) {
-        if (k === 'name') { payload.name = String(v).trim(); continue; }
-        if (k === 'email') { payload.email = String(v).trim(); continue; }
-        if (['leadershipRole','isCurrentChairman','chairmanFrom','chairmanTo'].includes(k)) continue;
-        if (v === '' || v === null) continue;
-        if (k === 'researchInterests') {
-          payload[k] = String(v).split(',').map(s => s.trim()).filter(Boolean);
-        } else { payload[k] = v; }
-      }
-      if (!payload.name) payload.name = form.name.trim();
-      if (!payload.email) payload.email = form.email.trim();
-      if (payload.isActive === undefined) payload.isActive = true;
-      if (payload.sortOrder === undefined) payload.sortOrder = 0;
 
-      // Nested relations  always send so backend replaces them
+      // Always include these fields explicitly — never skip them via the empty-string filter
+      payload.name             = form.name.trim();
+      payload.email            = form.email.trim();
+      payload.staffType        = form.staffType;
+      payload.isActive         = form.isActive;
+      payload.sortOrder        = form.sortOrder ?? 0;
+      // ↓ CRITICAL: always send employmentStatus exactly as the admin chose — never fall back
+      payload.employmentStatus = form.employmentStatus || 'full_time';
+
+      // Other optional fields — skip only if genuinely empty
+      const optionalFields = [
+        'title','phone','photo','shortBio','fullBio','officeRoom',
+        'designation','googleScholarUrl','linkedinUrl','researchGateUrl',
+        'orcidId','websiteUrl','joinedAt',
+      ] as const;
+      for (const k of optionalFields) {
+        const v = form[k];
+        if (v !== '' && v !== null && v !== undefined) payload[k] = v;
+      }
+
+      // Research interests
+      if (form.researchInterests.trim()) {
+        payload.researchInterests = form.researchInterests.split(',').map(s => s.trim()).filter(Boolean);
+      } else {
+        payload.researchInterests = [];
+      }
+
+      // Nested relations — always send so backend replaces them
       payload.education    = eduRows.filter(e => e.degree.trim()).map(e => ({ degree: e.degree.trim(), institution: e.institution.trim(), year: Number(e.year) }));
       payload.publications = pubRows.filter(p => p.title.trim()).map(p => ({ title: p.title.trim(), authors: p.authors.trim(), venue: p.venue.trim(), year: Number(p.year), type: p.type, ...(p.doi.trim() ? { doi: p.doi.trim() } : {}), ...(p.url.trim() ? { url: p.url.trim() } : {}) }));
       payload.awards       = awardRows.filter(a => a.title.trim()).map(a => ({ title: a.title.trim(), awardedBy: a.awardedBy.trim(), year: Number(a.year), ...(a.description.trim() ? { description: a.description.trim() } : {}) }));
       payload.officeHours  = ohRows.filter(h => h.day).map(h => ({ day: h.day, startTime: h.startTime, endTime: h.endTime }));
+
       // Leadership fields
       if (form.leadershipRole) payload.leadershipRole = form.leadershipRole; else payload.leadershipRole = null;
       payload.isCurrentChairman = form.isCurrentChairman;
@@ -419,20 +434,25 @@ export default function PeoplePage() {
 
               {activeType === 'chairman' && (
                 <div className="border-t border-slate-100 pt-4 space-y-3">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Leadership Role & Service Period</p>
+                  <p className="text-xs font-black text-slate-700 uppercase tracking-wider">
+                    Leadership Role &amp; Service Period
+                  </p>
+                  <div className="rounded-xl border border-blue-100 bg-blue-50/50 px-4 py-3 text-xs text-blue-700 leading-relaxed">
+                    <strong>How to add an Ex Chairman:</strong> Select <em>Former Chairman</em> as the Leadership Role, enter the
+                    Service Start and End dates, then save. The person will appear on the public
+                    &ldquo;Ex Chairman&rdquo; page under <strong>Former Chairmen</strong>.<br/>
+                    For the current/running chairman, select <em>Running Chairman</em> (or tick the checkbox).
+                  </div>
 
                   {/* Leadership role selector */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Leadership Role</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Leadership Role *</label>
                     <select value={form.leadershipRole} onChange={e=>F('leadershipRole',e.target.value)} className={iCls}>
                       <option value="">— Select Role —</option>
-                      <option value="running_chairman">Running Chairman</option>
-                      <option value="former_chairman">Former Chairman</option>
+                      <option value="running_chairman">Running Chairman (Current Head)</option>
+                      <option value="former_chairman">Former Chairman (Ex Chairman)</option>
                       <option value="former_head">Former Head of the Department</option>
                     </select>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      &quot;Former Head&quot; appears on the Honorable Heads page. These are independent roles — do not confuse them.
-                    </p>
                   </div>
 
                   {/* Running chairman toggle */}
@@ -444,42 +464,51 @@ export default function PeoplePage() {
                   </label>
 
                   {/* Service period */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Service Start Date</label>
-                      <input type="date" value={form.chairmanFrom} onChange={e=>F('chairmanFrom',e.target.value)} className={iCls}/></div>
-                    <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Service End Date <span className="text-slate-400 font-normal">(blank = Present)</span></label>
-                      <input type="date" value={form.chairmanTo} onChange={e=>F('chairmanTo',e.target.value)} className={iCls}/></div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 mb-2">Service Period</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">Start Date</label>
+                        <input type="date" value={form.chairmanFrom} onChange={e=>F('chairmanFrom',e.target.value)} className={iCls}/>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">
+                          End Date <span className="text-slate-400">(blank = Present)</span>
+                        </label>
+                        <input type="date" value={form.chairmanTo} onChange={e=>F('chairmanTo',e.target.value)} className={iCls}/>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/*  Tab: Education  */}
             {isFaculty && modalTab === 'education' && (
               <div className="px-6 py-5 space-y-3">
                 <p className="text-xs text-slate-500">Add degrees in reverse chronological order (newest first).</p>
                 {eduRows.map((row, i) => (
-                  <div key={i} className="grid grid-cols-12 gap-2 items-start bg-slate-50 border border-slate-200 rounded-xl p-3">
-                    <div className="col-span-5">
+                  <div key={i} className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-600">Education {i + 1}</span>
+                      <button onClick={()=>setEduRows(r=>r.filter((_,j)=>j!==i))}
+                        className="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                    <div>
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Degree *</label>
                       <input value={row.degree} onChange={e=>setEduRows(r=>r.map((x,j)=>j===i?{...x,degree:e.target.value}:x))}
-                        placeholder="PhD in Computer Science" className={iCls}/>
+                        placeholder="PhD in Computer Science and Engineering" className={iCls}/>
                     </div>
-                    <div className="col-span-5">
+                    <div>
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Institution *</label>
                       <input value={row.institution} onChange={e=>setEduRows(r=>r.map((x,j)=>j===i?{...x,institution:e.target.value}:x))}
-                        placeholder="University of Melbourne" className={iCls}/>
+                        placeholder="University of Melbourne, Australia" className={iCls}/>
                     </div>
-                    <div className="col-span-1">
+                    <div className="w-32">
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Year</label>
                       <input type="number" min={1950} max={2099} value={row.year}
                         onChange={e=>setEduRows(r=>r.map((x,j)=>j===i?{...x,year:e.target.value}:x))} className={iCls}/>
-                    </div>
-                    <div className="col-span-1 pt-6">
-                      <button onClick={()=>setEduRows(r=>r.filter((_,j)=>j!==i))}
-                        className="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition" title="Remove">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -554,37 +583,39 @@ export default function PeoplePage() {
               </div>
             )}
 
-            {/*  Tab: Awards  */}
             {isFaculty && modalTab === 'awards' && (
               <div className="px-6 py-5 space-y-3">
                 <p className="text-xs text-slate-500">Add honors, awards and recognitions.</p>
                 {awardRows.map((row, i) => (
-                  <div key={i} className="grid grid-cols-12 gap-2 items-start bg-slate-50 border border-slate-200 rounded-xl p-3">
-                    <div className="col-span-4">
-                      <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Award Title *</label>
-                      <input value={row.title} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,title:e.target.value}:x))}
-                        placeholder="Best Paper Award" className={iCls}/>
+                  <div key={i} className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-600">Award {i + 1}</span>
+                      <button onClick={()=>setAwardRows(r=>r.filter((_,j)=>j!==i))}
+                        className="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
                     </div>
-                    <div className="col-span-4">
-                      <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Awarded By</label>
-                      <input value={row.awardedBy} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,awardedBy:e.target.value}:x))}
-                        placeholder="IEEE, NeurIPS" className={iCls}/>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Award Title *</label>
+                        <input value={row.title} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,title:e.target.value}:x))}
+                          placeholder="Best Paper Award" className={iCls}/>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Awarded By</label>
+                        <input value={row.awardedBy} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,awardedBy:e.target.value}:x))}
+                          placeholder="IEEE, NeurIPS" className={iCls}/>
+                      </div>
                     </div>
-                    <div className="col-span-1">
+                    <div className="w-32">
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Year</label>
                       <input type="number" min={1950} max={2099} value={row.year}
                         onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,year:e.target.value}:x))} className={iCls}/>
                     </div>
-                    <div className="col-span-2">
+                    <div>
                       <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Description</label>
-                      <input value={row.description} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,description:e.target.value}:x))}
-                        placeholder="Optional note" className={iCls}/>
-                    </div>
-                    <div className="col-span-1 pt-6">
-                      <button onClick={()=>setAwardRows(r=>r.filter((_,j)=>j!==i))}
-                        className="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
-                      </button>
+                      <textarea rows={2} value={row.description} onChange={e=>setAwardRows(r=>r.map((x,j)=>j===i?{...x,description:e.target.value}:x))}
+                        placeholder="Optional description of the award..." className={`${iCls} resize-none`}/>
                     </div>
                   </div>
                 ))}
@@ -655,6 +686,7 @@ export default function PeoplePage() {
               <tr className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500 font-semibold uppercase tracking-wider">
                 <th className="text-left px-5 py-3">Person</th>
                 <th className="text-left px-4 py-3 hidden md:table-cell">Designation</th>
+                {activeType === 'chairman' && <th className="text-center px-4 py-3 hidden md:table-cell">Role</th>}
                 {activeType === 'chairman' && <th className="text-center px-4 py-3 hidden md:table-cell">Service Period</th>}
                 <th className="text-center px-4 py-3 hidden sm:table-cell">Status</th>
                 <th className="text-right px-5 py-3">Actions</th>
@@ -690,9 +722,29 @@ export default function PeoplePage() {
                   <td className="px-4 py-3 hidden md:table-cell text-slate-600 text-xs">{m.designation}</td>
                   {activeType === 'chairman' && (
                     <td className="px-4 py-3 text-center hidden md:table-cell">
+                      {m.leadershipRole === 'running_chairman' || m.isCurrentChairman ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shrink-0"/>
+                          Running
+                        </span>
+                      ) : m.leadershipRole === 'former_chairman' ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          Ex Chairman
+                        </span>
+                      ) : m.leadershipRole === 'former_head' ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                          Former Head
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">—</span>
+                      )}
+                    </td>
+                  )}
+                  {activeType === 'chairman' && (
+                    <td className="px-4 py-3 text-center hidden md:table-cell">
                       <span className="text-xs text-slate-600">
-                        {m.chairmanFrom ? new Date(m.chairmanFrom).toLocaleDateString('en-GB') : ''}
-                        {'  '}
+                        {m.chairmanFrom ? new Date(m.chairmanFrom).toLocaleDateString('en-GB') : '—'}
+                        {' → '}
                         {m.chairmanTo ? new Date(m.chairmanTo).toLocaleDateString('en-GB') : <span className="text-green-600 font-semibold">Present</span>}
                       </span>
                     </td>

@@ -80,7 +80,7 @@ export default async function ActiveFacultyPage() {
               <section>
                 <SectionHeading label="Dean" count={deans.length} accent={SECTION_ACCENT['Dean']} />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
-                  {deans.map((m, i) => <FacultyCard key={m.id} member={m} index={i} />)}
+                  {deans.map((m, i) => <FacultyCard key={m.id} member={m} index={i} roleLabel="Dean" />)}
                 </div>
               </section>
             )}
@@ -89,7 +89,7 @@ export default async function ActiveFacultyPage() {
               <section>
                 <SectionHeading label="Head of the Department" count={chairmen.length} accent={SECTION_ACCENT['Head of the Department']} />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
-                  {chairmen.map((m, i) => <FacultyCard key={m.id} member={m} index={i} />)}
+                  {chairmen.map((m, i) => <FacultyCard key={m.id} member={m} index={i} roleLabel="Head of Dept." />)}
                 </div>
               </section>
             )}
