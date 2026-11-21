@@ -103,8 +103,22 @@ export default function PeoplePage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { setList(await adminGet<FacultyMember[]>('/faculty?admin=true')); }
-    catch { toast.error('Failed to load people'); setList([]); } finally { setLoading(false); }
+    try {
+      // 25s timeout — prevents hanging when Render backend is cold-starting
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 25000);
+      const data = await adminGet<FacultyMember[]>('/faculty?admin=true');
+      clearTimeout(timer);
+      setList(data);
+    } catch (e) {
+      const msg = e instanceof Error && e.name === 'AbortError'
+        ? 'Server is warming up — please reload in a moment.'
+        : 'Failed to load people';
+      toast.error(msg);
+      setList([]);
+    } finally {
+      setLoading(false);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [load]);
 
