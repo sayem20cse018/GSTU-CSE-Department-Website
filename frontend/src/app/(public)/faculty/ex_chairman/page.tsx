@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import FacultyCard from '@/components/faculty/FacultyCard';
 import FacultyLoadError from '@/components/faculty/FacultyLoadError';
 import { fetchFacultyList } from '@/lib/faculty/data';
 import {
@@ -10,16 +9,6 @@ import {
 } from '@/lib/faculty/shared';
 
 export const metadata: Metadata = { title: 'Ex Chairman — GSTU CSE' };
-
-function SectionHead({ label, accent = '#166534' }: { label: string; accent?: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-6">
-      <div className="w-1 h-6 rounded-full shrink-0" style={{ background: accent }} />
-      <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-widest">{label}</h2>
-      <div className="flex-1 h-px bg-slate-100" />
-    </div>
-  );
-}
 
 export default async function ExChairmanPage() {
   const result = await fetchFacultyList(false);
@@ -34,20 +23,16 @@ export default async function ExChairmanPage() {
     );
   }
 
-  // ── ONLY staffType=chairman — Dean is separate ───────────────────────────
-  const chairmen = result.members.filter(
-    m => isValidFacultyRecord(m) && m.staffType === 'chairman',
-  );
-
-  // Running = isCurrentChairman OR leadershipRole=running_chairman
-  const running = chairmen.filter(
-    m => m.isCurrentChairman || m.leadershipRole === 'running_chairman',
-  );
-
-  // Former = all others, sorted by chairmanFrom ascending (oldest first → serial 1,2,3…)
-  const former = chairmen
-    .filter(m => !m.isCurrentChairman && m.leadershipRole !== 'running_chairman')
+  // ONLY former chairmen — running chairman stays on Active Faculty page
+  const former = result.members
+    .filter(m =>
+      isValidFacultyRecord(m) &&
+      m.staffType === 'chairman' &&
+      !m.isCurrentChairman &&
+      m.leadershipRole === 'former_chairman',
+    )
     .sort((a, b) => {
+      // oldest first → serial 1, 2, 3…
       const ay = a.chairmanFrom ? new Date(a.chairmanFrom).getTime() : 999999999999;
       const by = b.chairmanFrom ? new Date(b.chairmanFrom).getTime() : 999999999999;
       return ay - by;
@@ -56,72 +41,71 @@ export default async function ExChairmanPage() {
   return (
     <main className="bg-white min-h-screen pt-28 pb-16">
       <div className="container-custom max-w-5xl">
-        <div className="space-y-14">
 
-          {/* ── Current Head of Department ─────────────────────── */}
-          {running.length > 0 && (
-            <section>
-              <SectionHead label="Head of the Department" accent="#166534" />
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
-                {running.map((m, i) => (
-                  <FacultyCard key={m.id} member={m} index={i} />
-                ))}
-              </div>
-            </section>
+        {/* Section heading */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-1 h-6 rounded-full shrink-0" style={{ background: '#475569' }} />
+          <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-widest">
+            Former Chairmen of the Department
+          </h2>
+          <div className="flex-1 h-px bg-slate-100" />
+          {former.length > 0 && (
+            <span className="text-xs font-semibold text-slate-400">{former.length} records</span>
           )}
-
-          {/* ── Former Chairmen — numbered horizontal cards ───── */}
-          <section>
-            <SectionHead label="Former Chairmen" accent="#475569" />
-            {former.length === 0 ? (
-              <p className="text-slate-400 text-sm py-6">
-                No former chairman records found. Add them from the admin panel under
-                <strong className="text-slate-600"> Chairman / Head</strong> tab → Leadership Role:
-                <em className="text-slate-600"> Former Chairman</em>.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {former.map((m, idx) => (
-                  <FormerChairCard key={m.id} member={m} serial={idx + 1} index={idx} />
-                ))}
-              </div>
-            )}
-          </section>
-
         </div>
+
+        {former.length === 0 ? (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl px-6 py-10 text-center">
+            <p className="text-slate-500 text-sm mb-2">No former chairman records found.</p>
+            <p className="text-slate-400 text-xs">
+              Admin can add former chairmen from the admin panel → <strong>Chairman / Head</strong> tab → select
+              <strong> Ex Chairman</strong> sub-filter → <strong>Add Ex Chairman</strong>.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {former.map((m, idx) => (
+              <FormerChairCard key={m.id} member={m} serial={idx + 1} index={idx} />
+            ))}
+          </div>
+        )}
+
       </div>
     </main>
   );
 }
 
-/**
- * Horizontal card — BUET ex_heads style but more visual:
- * Serial | Photo | Name + Designation + "Former Chairman" badge | Service Period
- */
 function FormerChairCard({
   member: m, serial, index,
 }: { member: FacultyMember; serial: number; index: number }) {
   const initials  = getInitials(m.name);
   const href      = profileHref(m);
   const badge     = getBadgeStyle(m.designation);
-  const period    = formatServicePeriod(m.chairmanFrom, m.chairmanTo);
-  const showEmail = !!(m.email?.includes('@') && !/^faculty-\d+@/i.test(m.email ?? ''));
+  // Format: "Jan 2020 – Jan 2024" using actual dates
+  const rawFrom   = m.chairmanFrom ? new Date(m.chairmanFrom) : null;
+  const rawTo     = m.chairmanTo   ? new Date(m.chairmanTo)   : null;
+  const fmtDate   = (d: Date) => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const period    = rawFrom
+    ? `${fmtDate(rawFrom)} – ${rawTo ? fmtDate(rawTo) : 'Present'}`
+    : formatServicePeriod(m.chairmanFrom, m.chairmanTo);
 
   return (
     <Link href={href} className="group block">
-      <article className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-green-300 hover:shadow-md transition-all duration-200">
+      <article className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-4 hover:border-green-300 hover:shadow-md transition-all duration-200">
 
         {/* Serial number */}
-        <span className="shrink-0 w-7 text-sm font-bold text-slate-400 text-right">{serial}.</span>
+        <span className="shrink-0 w-8 text-sm font-bold text-slate-400 text-right leading-none">
+          {serial}.
+        </span>
 
         {/* Photo */}
-        <div className="relative shrink-0 w-14 h-16 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
+        <div className="shrink-0 w-16 h-20 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
           {m.photo ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={m.photo} alt={m.name}
               className="w-full h-full object-cover object-top" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center select-none font-black text-white text-lg"
+            <div className="w-full h-full flex items-center justify-center select-none font-black text-white text-xl"
               style={{ background: AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length] }}>
               {initials}
             </div>
@@ -130,10 +114,10 @@ function FormerChairCard({
 
         {/* Info */}
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-900 group-hover:text-green-700 transition-colors leading-snug line-clamp-1">
+          <p className="text-sm font-bold text-slate-900 group-hover:text-green-700 transition-colors leading-snug">
             {m.title ? `${m.title} ` : ''}{m.name}
           </p>
-          <div className="flex flex-wrap items-center gap-2 mt-1">
+          <div className="flex flex-wrap items-center gap-2 mt-1.5">
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
               style={{ background: badge.bg, color: badge.text }}>
               {m.designation}
@@ -142,16 +126,24 @@ function FormerChairCard({
               Former Chairman
             </span>
           </div>
-          {showEmail && (
-            <p className="text-[9px] text-slate-400 mt-0.5 truncate">{m.email}</p>
-          )}
         </div>
 
-        {/* Service period */}
+        {/* Service period — right aligned */}
         {period && (
           <div className="shrink-0 text-right hidden sm:block">
-            <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Service Period</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+              Service Period
+            </p>
             <p className="text-xs font-bold text-slate-700">{period}</p>
+          </div>
+        )}
+
+        {/* Mobile: service period below */}
+        {period && (
+          <div className="sm:hidden w-full mt-1">
+            <p className="text-[9px] text-slate-500">
+              <span className="font-bold">Service Period:</span> {period}
+            </p>
           </div>
         )}
 
