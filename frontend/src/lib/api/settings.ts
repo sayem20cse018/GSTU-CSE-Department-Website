@@ -80,7 +80,7 @@ export async function fetchSettings(): Promise<SiteSettings> {
       ?? process.env.NEXT_PUBLIC_API_URL
       ?? 'http://localhost:4000/api';
     const r = await fetch(`${api}/settings`, {
-      next: { revalidate: 300 }, // revalidate every 5 min — fast enough for logo/name changes
+      cache: 'no-store',  // settings is small enough to fetch fresh — avoids 2MB cache limit error
     });
     if (!r.ok) return SETTINGS_FALLBACK;
     const d = await r.json() as { data?: SiteSettings; success?: boolean } | SiteSettings;

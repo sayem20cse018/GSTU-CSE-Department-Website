@@ -190,7 +190,7 @@ export default function HeroSlider({ initialSlides = [] }: { initialSlides?: Api
   return (
     <section
       className={cn('relative overflow-hidden z-0', slides.length === 0 ? 'bg-white' : 'bg-[#0b3d1f]')}
-      style={{ height: 'clamp(480px, 60vh, 680px)', minHeight: '480px' }}
+      style={{ height: 'clamp(560px, 85vh, 820px)', minHeight: '560px' }}
       aria-label="Hero slider"
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}
