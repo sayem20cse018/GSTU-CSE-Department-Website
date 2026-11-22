@@ -92,49 +92,190 @@ export default async function FacultyDetailPage({
         <div className="flex flex-col lg:flex-row gap-8 items-start">
 
           {/* ── Left sidebar ──────────────────────────────────────────── */}
-          <aside className="w-full lg:w-56 xl:w-60 shrink-0">
-            {/* Square photo */}
-            <div className="w-full aspect-square rounded-sm overflow-hidden bg-slate-100 border border-slate-200">
-              {f.photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={f.photo}
-                  alt={f.name}
-                  className="w-full h-full object-contain object-top"
-                />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center select-none"
-                  style={{ background: AVATAR_GRADIENTS[0] }}
-                >
-                  <span className="text-6xl font-black text-white">{initials}</span>
-                </div>
-              )}
-            </div>
+          <aside className="w-full lg:w-64 xl:w-72 shrink-0">
 
-            {/* Name + designation */}
-            <div className="mt-3">
-              <h1 className="text-base font-extrabold text-slate-900 leading-snug">
-                {f.title ? `${f.title} ` : ''}{f.name}
-              </h1>
-              <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-                <span
-                  className="text-[10px] font-bold px-2 py-0.5 rounded-sm"
-                  style={{ background: badge.bg, color: badge.text }}
-                >
+            {/* ═══════════════════════════════════════════════════════
+                PROFILE IMAGE CARD — reference design recreation
+                - White card, rounded corners
+                - Green decorative swirl shapes at top-left & bottom-right
+                - Double green border ring around photo
+                - Photo clean (nothing on face)
+                - Name bold dark-green, one line
+                - Designation, Email below — gray, clean
+            ═══════════════════════════════════════════════════════ */}
+            <div style={{
+              position: 'relative',
+              background: 'white',
+              borderRadius: '24px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+              border: '1px solid #e2e8f0',
+              overflow: 'visible',
+              paddingBottom: '20px',
+            }}>
+
+              {/* ── top-left green swirl decoration ── */}
+              <div aria-hidden="true" style={{
+                position: 'absolute', top: '-2px', left: '-2px',
+                width: '90px', height: '90px', zIndex: 2, pointerEvents: 'none',
+              }}>
+                <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
+                  {/* large filled arc shape */}
+                  <path d="M0 0 Q0 60 60 90 L0 90 Z"
+                    fill="url(#gl1)" opacity="0.9"/>
+                  {/* inner lighter arc */}
+                  <path d="M0 0 Q0 40 40 68"
+                    stroke="#4ade80" strokeWidth="3" fill="none" opacity="0.7"
+                    strokeLinecap="round"/>
+                  <path d="M0 0 Q0 25 25 48"
+                    stroke="#86efac" strokeWidth="2" fill="none" opacity="0.5"
+                    strokeLinecap="round"/>
+                  <defs>
+                    <linearGradient id="gl1" x1="0" y1="0" x2="90" y2="90">
+                      <stop offset="0%" stopColor="#16a34a"/>
+                      <stop offset="100%" stopColor="#4ade80"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              {/* ── bottom-right green swirl decoration ── */}
+              <div aria-hidden="true" style={{
+                position: 'absolute', bottom: '64px', right: '-2px',
+                width: '90px', height: '90px', zIndex: 2, pointerEvents: 'none',
+              }}>
+                <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
+                  <path d="M90 90 Q90 30 30 0 L90 0 Z"
+                    fill="url(#gl2)" opacity="0.9"/>
+                  <path d="M90 90 Q90 50 50 22"
+                    stroke="#4ade80" strokeWidth="3" fill="none" opacity="0.7"
+                    strokeLinecap="round"/>
+                  <path d="M90 90 Q90 65 65 42"
+                    stroke="#86efac" strokeWidth="2" fill="none" opacity="0.5"
+                    strokeLinecap="round"/>
+                  <defs>
+                    <linearGradient id="gl2" x1="90" y1="90" x2="0" y2="0">
+                      <stop offset="0%" stopColor="#16a34a"/>
+                      <stop offset="100%" stopColor="#4ade80"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              {/* ── photo area with double green border ring ── */}
+              <div style={{ padding: '16px 16px 12px', position: 'relative', zIndex: 3 }}>
+
+                {/* outer dark green ring */}
+                <div style={{
+                  borderRadius: '18px',
+                  padding: '4px',
+                  background: 'linear-gradient(135deg, #15803d, #16a34a, #4ade80, #16a34a)',
+                }}>
+                  {/* inner white gap */}
+                  <div style={{
+                    borderRadius: '15px',
+                    padding: '3px',
+                    background: 'white',
+                  }}>
+                    {/* photo */}
+                    <div style={{
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      aspectRatio: '3 / 3.6',
+                      background: '#f1f5f9',
+                      position: 'relative',
+                    }}>
+                      {f.photo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={f.photo}
+                          alt={f.name}
+                          style={{
+                            position: 'absolute', inset: 0,
+                            width: '100%', height: '100%',
+                            objectFit: 'cover', objectPosition: 'center top',
+                            display: 'block',
+                          }}
+                        />
+                      ) : (
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: AVATAR_GRADIENTS[0],
+                        }}>
+                          <span style={{
+                            fontSize: '3.5rem', fontWeight: 900, color: 'white', userSelect: 'none',
+                          }}>{initials}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Name / Designation / Email ── clean, no icons ── */}
+              <div style={{
+                padding: '0 16px 4px',
+                textAlign: 'center',
+                position: 'relative', zIndex: 3,
+              }}>
+                {/* Name — bold, dark green, one line */}
+                <h1 style={{
+                  fontSize: '1rem',
+                  fontWeight: 800,
+                  color: '#14532d',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  lineHeight: 1.3,
+                  marginBottom: '4px',
+                }}>
+                  {f.title ? `${f.title} ` : ''}{f.name}
+                </h1>
+
+                {/* Leadership role (Chairman/Dean) if present */}
+                {(f.leadershipRole === 'running_chairman' || f.staffType === 'dean') && (
+                  <p style={{
+                    fontSize: '0.78rem', color: '#6b7280',
+                    marginBottom: '2px', lineHeight: 1.3,
+                  }}>
+                    {f.staffType === 'dean' ? 'Dean' : 'Chairman'}
+                  </p>
+                )}
+
+                {/* Designation */}
+                <p style={{
+                  fontSize: '0.78rem', color: '#6b7280',
+                  marginBottom: '2px', lineHeight: 1.3,
+                }}>
                   {f.designation}
-                </span>
+                </p>
+
+                {/* Email — one line */}
+                {showEmail && (
+                  <a href={`mailto:${f.email}`} style={{
+                    display: 'block',
+                    fontSize: '0.72rem', color: '#6b7280',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    textDecoration: 'none',
+                    lineHeight: 1.4,
+                  }}>
+                    {f.email}
+                  </a>
+                )}
+
                 {onLeave && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm"
-                    style={{ background: '#d97706', color: '#fff' }}>
-                    On Leave
-                  </span>
+                  <span style={{
+                    display: 'inline-block', marginTop: '6px',
+                    fontSize: '0.65rem', fontWeight: 700,
+                    padding: '2px 10px', borderRadius: '999px',
+                    background: '#d97706', color: 'white',
+                  }}>On Leave</span>
                 )}
               </div>
             </div>
 
-            {/* Contact + details list */}
-            <ul className="mt-4 space-y-2.5 text-xs text-slate-600">
+            {/* ── Contact + details list (unchanged) ── */}
+            <ul className="mt-5 space-y-2.5 text-xs text-slate-600">
               {showEmail && (
                 <li className="flex items-start gap-2">
                   <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,9 +309,7 @@ export default async function FacultyDetailPage({
                   <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.42A12 12 0 0112 21a12 12 0 01-6.16-10.42L12 14z" />
                   </svg>
-                  <a href={f.googleScholarUrl} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">
-                    Google Scholar
-                  </a>
+                  <a href={f.googleScholarUrl} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">Google Scholar</a>
                 </li>
               )}
               {f.researchGateUrl && (
@@ -178,9 +317,7 @@ export default async function FacultyDetailPage({
                   <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  <a href={f.researchGateUrl} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">
-                    ResearchGate
-                  </a>
+                  <a href={f.researchGateUrl} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">ResearchGate</a>
                 </li>
               )}
               {f.linkedinUrl && (
@@ -189,9 +326,7 @@ export default async function FacultyDetailPage({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
                     <circle cx="4" cy="4" r="2" strokeWidth={2} />
                   </svg>
-                  <a href={f.linkedinUrl} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">
-                    LinkedIn
-                  </a>
+                  <a href={f.linkedinUrl} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">LinkedIn</a>
                 </li>
               )}
               {f.orcidId && (
@@ -200,9 +335,7 @@ export default async function FacultyDetailPage({
                     <circle cx="12" cy="12" r="9" strokeWidth={2} />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 8v8M14 8v8M8 12h8" />
                   </svg>
-                  <a href={`https://orcid.org/${f.orcidId}`} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">
-                    ORCID
-                  </a>
+                  <a href={`https://orcid.org/${f.orcidId}`} target="_blank" rel="noopener noreferrer" className="hover:text-green-700 transition">ORCID</a>
                 </li>
               )}
               {f.officeRoom && (
