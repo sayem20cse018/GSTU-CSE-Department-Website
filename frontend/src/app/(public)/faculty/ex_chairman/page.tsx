@@ -23,12 +23,15 @@ export default async function ExChairmanPage() {
     );
   }
 
-  // ONLY former chairmen — running chairman stays on Active Faculty page
+  // ONLY former chairmen:
+  //  - staffType must be 'chairman' (never dean or faculty)
+  //  - isCurrentChairman must be false
+  //  - leadershipRole must be 'former_chairman' (not former_head, not running_chairman)
   const former = result.members
     .filter(m =>
       isValidFacultyRecord(m) &&
       m.staffType === 'chairman' &&
-      !m.isCurrentChairman &&
+      m.isCurrentChairman !== true &&
       m.leadershipRole === 'former_chairman',
     )
     .sort((a, b) => {

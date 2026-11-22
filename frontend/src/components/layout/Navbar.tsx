@@ -87,7 +87,7 @@ function DropdownPortal({
 const ITEM_BASE = [
   'relative flex items-center gap-1',
   'px-3 h-[3.25rem]',
-  'text-[0.8rem] font-semibold whitespace-nowrap',
+  'text-[0.8rem] font-bold whitespace-nowrap',
   'transition-colors duration-200',
   'after:absolute after:bottom-0 after:left-0 after:h-[2.5px] after:w-full',
   'after:scale-x-0 after:origin-left after:transition-transform after:duration-250',
@@ -249,11 +249,11 @@ export default function Navbar() {
                 );
               })}
 
-              {/* Student avatar / login — after all nav items */}
+              {/* Theme/lang switcher — desktop only */}
               {!studentLoading && (
                 <div className="ml-auto shrink-0 flex items-center gap-2 pl-3">
                   <ThemeLangSwitcher />
-                  {student ? (
+                  {student && (
                     <>
                       <Link href="/students"
                         className="flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all"
@@ -274,18 +274,6 @@ export default function Navbar() {
                         </svg>
                       </button>
                     </>
-                  ) : (
-                    <Link href="/student/login"
-                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all"
-                      style={{ color: '#1a7a3c', borderColor: 'rgba(26,122,60,0.35)', background: 'rgba(26,122,60,0.04)' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,122,60,0.1)'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,122,60,0.04)'; }}>
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                      </svg>
-                      Student
-                    </Link>
                   )}
                 </div>
               )}

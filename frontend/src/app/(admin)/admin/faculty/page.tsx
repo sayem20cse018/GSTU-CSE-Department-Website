@@ -243,9 +243,14 @@ export default function PeoplePage() {
       payload.awards       = awardRows.filter(a => a.title.trim()).map(a => ({ title: a.title.trim(), awardedBy: a.awardedBy.trim(), year: Number(a.year), ...(a.description.trim() ? { description: a.description.trim() } : {}) }));
       payload.officeHours  = ohRows.filter(h => h.day).map(h => ({ day: h.day, startTime: h.startTime, endTime: h.endTime }));
 
-      // Leadership fields
-      if (form.leadershipRole) payload.leadershipRole = form.leadershipRole; else payload.leadershipRole = null;
-      payload.isCurrentChairman = form.isCurrentChairman;
+      // Leadership fields - isCurrentChairman derived from leadershipRole
+      if (form.leadershipRole) {
+        payload.leadershipRole = form.leadershipRole;
+        payload.isCurrentChairman = form.leadershipRole === 'running_chairman';
+      } else {
+        payload.leadershipRole = null;
+        payload.isCurrentChairman = false;
+      }
       if (form.chairmanFrom) payload.chairmanFrom = form.chairmanFrom;
       if (form.chairmanTo)   payload.chairmanTo   = form.chairmanTo;
 
@@ -513,35 +518,22 @@ export default function PeoplePage() {
                     Leadership Role &amp; Service Period
                   </p>
 
-                  {/* Show context-aware info based on current sub-filter */}
-                  {chairmanFilter === 'former' ? (
-                    <div className="rounded-xl border border-green-100 bg-green-50/50 px-4 py-2 text-xs text-green-700">
-                      This record will be saved as <strong>Former Chairman (Ex Chairman)</strong> and appear on the
-                      public <strong>Ex Chairman</strong> page.
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border border-blue-100 bg-blue-50/50 px-4 py-3 text-xs text-blue-700 leading-relaxed">
-                      Select <em>Former Chairman</em> for ex-chairmen or <em>Running Chairman</em> for the current serving head.
-                    </div>
-                  )}
-
-                  {/* Leadership role dropdown */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Leadership Role *</label>
-                    <select value={form.leadershipRole} onChange={e=>F('leadershipRole',e.target.value)} className={iCls}>
-                      <option value="">— Select Role —</option>
-                      <option value="running_chairman">Running Chairman (Current Head)</option>
-                      <option value="former_chairman">Former Chairman (Ex Chairman)</option>
-                      <option value="former_head">Former Head of the Department</option>
-                    </select>
+                  <div className="rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-2 text-xs text-amber-700">
+                    <strong>Running Chairman</strong> = currently serving Head of Department (only one allowed).<br/>
+                    <strong>Former Chairman</strong> = ex-chairman, appears on the Ex-Chairman public page only.
                   </div>
 
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form.isCurrentChairman}
-                      onChange={e=>{F('isCurrentChairman',e.target.checked); if(e.target.checked) F('leadershipRole','running_chairman');}}
-                      className="accent-green-500"/>
-                    <span className="text-sm font-medium text-slate-700">Currently Serving Chairman</span>
-                  </label>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Leadership Role *</label>
+                    <select value={form.leadershipRole} onChange={e=>{
+                      F('leadershipRole', e.target.value);
+                      F('isCurrentChairman', e.target.value === 'running_chairman');
+                    }} className={iCls}>
+                      <option value="">— Select Role —</option>
+                      <option value="running_chairman">Running Chairman (Current Head of Department)</option>
+                      <option value="former_chairman">Former Chairman (Ex-Chairman)</option>
+                    </select>
+                  </div>
 
                   <div>
                     <p className="text-xs font-semibold text-slate-600 mb-2">Service Period</p>
@@ -558,6 +550,17 @@ export default function PeoplePage() {
                       </div>
                     </div>
                   </div>
+
+                  {form.leadershipRole === 'running_chairman' && (
+                    <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-2 text-xs text-green-700">
+                      ✅ This person will be set as the <strong>current Head of Department</strong>. Any previous current chairman will be automatically unset.
+                    </div>
+                  )}
+                  {form.leadershipRole === 'former_chairman' && (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-600">
+                      📋 This person will appear <strong>only</strong> on the <em>Ex-Chairman</em> public page, not in Head of Department.
+                    </div>
+                  )}
                 </div>
               )}
             </div>

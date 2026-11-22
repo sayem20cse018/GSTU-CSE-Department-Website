@@ -49,8 +49,17 @@ export default async function ActiveFacultyPage() {
   const deans = all.filter(m => isValidFacultyRecord(m) && m.staffType === 'dean' && m.isActive !== false);
 
   const shownIds = new Set(deans.map(m => m.id));
+
+  // CRITICAL: Only show the CURRENTLY SERVING Head of Department.
+  // Former chairmen (leadershipRole='former_chairman') must NEVER appear here.
   const chairmen = all.filter(
-    m => isValidFacultyRecord(m) && m.staffType === 'chairman' && m.isActive !== false && !shownIds.has(m.id),
+    m =>
+      isValidFacultyRecord(m) &&
+      m.staffType === 'chairman' &&
+      m.isActive !== false &&
+      m.isCurrentChairman === true &&   // ← only the current one
+      m.leadershipRole !== 'former_chairman' && // ← never ex-chairmen
+      !shownIds.has(m.id),
   );
   chairmen.forEach(m => shownIds.add(m.id));
 
@@ -79,7 +88,7 @@ export default async function ActiveFacultyPage() {
             {deans.length > 0 && (
               <section>
                 <SectionHeading label="Dean" count={deans.length} accent={SECTION_ACCENT['Dean']} />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-7 px-2">
                   {deans.map((m, i) => <FacultyCard key={m.id} member={m} index={i} roleLabel="Dean" />)}
                 </div>
               </section>
@@ -88,7 +97,7 @@ export default async function ActiveFacultyPage() {
             {chairmen.length > 0 && (
               <section>
                 <SectionHeading label="Head of the Department" count={chairmen.length} accent={SECTION_ACCENT['Head of the Department']} />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-7 px-2">
                   {chairmen.map((m, i) => <FacultyCard key={m.id} member={m} index={i} roleLabel="Head of Dept." />)}
                 </div>
               </section>
@@ -97,7 +106,7 @@ export default async function ActiveFacultyPage() {
             {groups.map(({ designation, members }) => (
               <section key={designation} id={designation.replace(/\s+/g, '-').toLowerCase()}>
                 <SectionHeading label={designation} count={members.length} accent={SECTION_ACCENT[designation] ?? '#475569'} />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-7 px-2">
                   {members.map((m, i) => <FacultyCard key={m.id} member={m} index={i} />)}
                 </div>
               </section>

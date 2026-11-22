@@ -52,6 +52,7 @@ function SlideBackground({ slide, active }: { slide: Slide; active: boolean }) {
           loading={active ? 'eager' : 'lazy'}
           // @ts-expect-error fetchpriority is valid HTML but not yet in React types
           fetchpriority={active ? 'high' : 'low'}
+          style={{ objectPosition: 'center 20%' }}
         />
       ) : (
         /* Gradient fallback */
@@ -93,7 +94,7 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
       {/* Title */}
       <h1
         className={cn(
-          'text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.15] tracking-tight max-w-3xl',
+          'text-2xl sm:text-3xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-[1.15] tracking-tight max-w-3xl',
           active ? 'slide-text-2' : 'opacity-0',
         )}
       >
@@ -103,7 +104,7 @@ function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
       {/* Subtitle */}
       <p
         className={cn(
-          'mt-4 text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl',
+          'mt-3 sm:mt-4 text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl',
           active ? 'slide-text-3' : 'opacity-0',
         )}
       >
@@ -189,7 +190,7 @@ export default function HeroSlider({ initialSlides = [] }: { initialSlides?: Api
   return (
     <section
       className={cn('relative overflow-hidden z-0', slides.length === 0 ? 'bg-white' : 'bg-[#0b3d1f]')}
-      style={{ height: '520px', minHeight: '420px', maxHeight: '640px' }}
+      style={{ height: 'clamp(480px, 60vh, 680px)', minHeight: '480px' }}
       aria-label="Hero slider"
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}

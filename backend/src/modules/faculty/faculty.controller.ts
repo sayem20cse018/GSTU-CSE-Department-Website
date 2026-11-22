@@ -37,6 +37,20 @@ export class FacultyController {
   }
 
   @Public()
+  @Get('current-chairman')
+  @ApiOperation({ summary: 'Get the currently serving Chairman/Head' })
+  getCurrentChairman() {
+    return this.facultyService.getCurrentChairman();
+  }
+
+  @Public()
+  @Get('ex-chairmen')
+  @ApiOperation({ summary: 'Get all ex-chairmen / former chairmen' })
+  getExChairmen() {
+    return this.facultyService.getExChairmen();
+  }
+
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get a single faculty member by ID' })
   findOne(@Param('id') id: string) { return this.facultyService.findOne(id); }
@@ -89,6 +103,31 @@ export class FacultyController {
     const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
     void this.logger.log(admin.id, 'CLEANUP_FACULTY', ip);
     return result;
+  }
+
+  @Patch(':id/archive-chairman')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '[Admin] Archive a currently serving chairman as Former Chairman' })
+  async archiveChairman(
+    @Param('id') id: string,
+    @CurrentUser() admin: Admin,
+    @Req() req: Request,
+  ) {
+    const result = await this.facultyService.archiveChairman(id);
+    const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? '');
+    void this.logger.log(admin.id, 'ARCHIVE_CHAIRMAN', ip);
+    return result;
+  }
+
+  @Get('chairman/validate')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '[Admin] Validate chairman state — diagnostic only, no changes' })
+  validateChairmanState() {
+    return this.facultyService.validateChairmanState();
   }
 
   @Delete(':id')

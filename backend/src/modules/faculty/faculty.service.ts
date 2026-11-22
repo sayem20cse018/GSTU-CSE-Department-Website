@@ -47,6 +47,35 @@ export class FacultyService {
 
     const name = str(d.name);
 
+    // Enforce single current chairman + auto-archive displaced chairman
+    if (d.isCurrentChairman === true || d.leadershipRole === 'running_chairman') {
+      // Archive any currently-flagged chairman records
+      const displaced = await this.prisma.faculty.findMany({
+        where: { isCurrentChairman: true },
+        select: { id: true, chairmanTo: true },
+      });
+      const today = new Date();
+      for (const prev of displaced) {
+        await this.prisma.faculty.update({
+          where: { id: prev.id },
+          data: {
+            isCurrentChairman: false,
+            leadershipRole: 'former_chairman',
+            ...(prev.chairmanTo ? {} : { chairmanTo: today }),
+          },
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (d as any).leadershipRole = 'running_chairman';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (d as any).isCurrentChairman = true;
+    }
+    // Former chairman MUST NOT have isCurrentChairman=true
+    if (d.leadershipRole === 'former_chairman') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (d as any).isCurrentChairman = false;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.create({
       data: {
@@ -54,7 +83,9 @@ export class FacultyService {
         email:             optStr(d.email ?? dto.email),
         designation:       str(d.designation) || 'Lecturer',
         staffType:         str(d.staffType)   || 'faculty',
-        employmentStatus:  str(d.employmentStatus) || 'full_time',
+        // employmentStatus comes directly from admin — do NOT apply a default fallback
+        // that would silently convert on_leave → full_time
+        employmentStatus:  str(d.employmentStatus) !== '' ? str(d.employmentStatus) : 'full_time',
         isActive:          bool(d.isActive, true),
         sortOrder:         num(d.sortOrder, 0),
         researchInterests: arr(d.researchInterests) as string[],
@@ -101,6 +132,34 @@ export class FacultyService {
     const awards       = d.awards       !== undefined ? safeArr(d.awards)       : null;
     const officeHours  = d.officeHours  !== undefined ? safeArr(d.officeHours)  : null;
 
+    // Enforce single current chairman constraint + auto-archive displaced chairman
+    if (update.isCurrentChairman === true || update.leadershipRole === 'running_chairman') {
+      // Find all currently-active chairmen (excluding the record being updated)
+      const displaced = await this.prisma.faculty.findMany({
+        where: { isCurrentChairman: true, id: { not: id } },
+        select: { id: true, chairmanTo: true },
+      });
+      // Archive each displaced chairman: clear current flag, set role to former_chairman,
+      // and set their service end date to today if it was blank.
+      const today = new Date();
+      for (const prev of displaced) {
+        await this.prisma.faculty.update({
+          where: { id: prev.id },
+          data: {
+            isCurrentChairman: false,
+            leadershipRole: 'former_chairman',
+            // Only backfill chairmanTo if not already set
+            ...(prev.chairmanTo ? {} : { chairmanTo: today }),
+          },
+        });
+      }
+      update.leadershipRole = 'running_chairman';
+      update.isCurrentChairman = true;
+    }
+    if (update.leadershipRole === 'former_chairman') {
+      update.isCurrentChairman = false;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.prisma.faculty.update({
       where: { id },
@@ -121,6 +180,57 @@ export class FacultyService {
     return this.prisma.faculty.delete({ where: { id } });
   }
 
+  /**
+   * Explicitly archive a currently-serving chairman as a Former Chairman.
+   * Sets isCurrentChairman=false, leadershipRole=former_chairman, and backfills
+   * chairmanTo to today if not already set.  Safe to call even if the person
+   * is not the current chairman — it's a no-op in that case.
+   */
+  async archiveChairman(id: string) {
+    const f = await this.prisma.faculty.findUnique({ where: { id } });
+    if (!f) throw new NotFoundException(`Faculty #${id} not found`);
+    return this.prisma.faculty.update({
+      where: { id },
+      data: {
+        isCurrentChairman: false,
+        leadershipRole: 'former_chairman',
+        ...(f.chairmanTo ? {} : { chairmanTo: new Date() }),
+      },
+      include: FACULTY_INCLUDE,
+    });
+  }
+
+  /**
+   * Validate chairman consistency — returns a summary for admin diagnostics.
+   * Does NOT modify data.
+   */
+  async validateChairmanState() {
+    const current = await this.prisma.faculty.findMany({
+      where: { isCurrentChairman: true },
+      select: { id: true, name: true, staffType: true, leadershipRole: true },
+    });
+    const orphanedRunning = await this.prisma.faculty.findMany({
+      where: { leadershipRole: 'running_chairman', isCurrentChairman: false },
+      select: { id: true, name: true },
+    });
+    const orphanedFormer = await this.prisma.faculty.findMany({
+      where: {
+        isCurrentChairman: true,
+        leadershipRole: 'former_chairman',
+      },
+      select: { id: true, name: true },
+    });
+    return {
+      currentCount: current.length,
+      current,
+      issues: {
+        multipleCurrentChairmen: current.length > 1,
+        runningRoleWithoutFlag: orphanedRunning.length > 0 ? orphanedRunning : [],
+        formerRoleWithCurrentFlag: orphanedFormer.length > 0 ? orphanedFormer : [],
+      },
+    };
+  }
+
   // ─── Clean up bad records (empty names, auto-generated emails) ─────────────
   async cleanupBadRecords() {
     const all = await this.prisma.faculty.findMany({ select: { id: true, name: true, email: true } });
@@ -139,6 +249,27 @@ export class FacultyService {
     await this.prisma.facultyOfficeHours.deleteMany({ where: { facultyId: { in: ids } } });
     await this.prisma.faculty.deleteMany({ where: { id: { in: ids } } });
     return { deleted: bad.length, message: `Deleted ${bad.length} anonymous/invalid records.` };
+  }
+
+  // ─── Current chairman ─────────────────────────────────────────────────────
+  async getCurrentChairman() {
+    return this.prisma.faculty.findFirst({
+      where: { isCurrentChairman: true, staffType: 'chairman' },
+      include: FACULTY_INCLUDE,
+    });
+  }
+
+  // ─── Ex-chairmen only ─────────────────────────────────────────────────────
+  async getExChairmen() {
+    return this.prisma.faculty.findMany({
+      where: {
+        staffType: 'chairman',
+        isCurrentChairman: false,
+        leadershipRole: 'former_chairman',
+      },
+      orderBy: [{ chairmanFrom: 'asc' }],
+      include: FACULTY_INCLUDE,
+    });
   }
 
   // ─── Recent publications (dashboard widget) ──────────────────────────────
