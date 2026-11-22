@@ -189,11 +189,11 @@ export default function Navbar() {
     <>
       <nav
         ref={navRef}
-        className="sticky top-0 z-[9999] transition-all duration-300"
+        className="relative z-[9999] transition-all duration-300"
         style={{
           background: '#ffffff',
           backdropFilter: scrolled ? 'blur(12px)' : undefined,
-          borderBottom: scrolled ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(0,0,0,0.08)',
+          borderBottom: '1px solid rgba(0,0,0,0.08)',
           boxShadow: scrolled ? '0 2px 16px rgba(0,0,0,0.10)' : 'none',
         }}
         aria-label="Main navigation"

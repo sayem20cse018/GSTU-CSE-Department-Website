@@ -77,7 +77,7 @@ export default async function ActiveFacultyPage() {
   const hasAny = deans.length + chairmen.length + activeFaculty.length > 0;
 
   return (
-    <main className="bg-white min-h-screen pt-28 pb-16">
+    <main className="bg-white min-h-screen pt-6 pb-16">
       <div className="container-custom max-w-7xl px-6">
 
         {!hasAny ? (
