@@ -78,7 +78,7 @@ export default async function ActiveFacultyPage() {
 
   return (
     <main className="bg-white min-h-screen pt-28 pb-16">
-      <div className="container-custom max-w-7xl">
+      <div className="container-custom max-w-7xl px-6">
 
         {!hasAny ? (
           <p className="text-slate-400 text-center py-24">No active faculty members found.</p>
@@ -88,7 +88,7 @@ export default async function ActiveFacultyPage() {
             {deans.length > 0 && (
               <section>
                 <SectionHeading label="Dean" count={deans.length} accent={SECTION_ACCENT['Dean']} />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-7 px-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {deans.map((m, i) => <FacultyCard key={m.id} member={m} index={i} roleLabel="Dean" />)}
                 </div>
               </section>
@@ -97,7 +97,7 @@ export default async function ActiveFacultyPage() {
             {chairmen.length > 0 && (
               <section>
                 <SectionHeading label="Head of the Department" count={chairmen.length} accent={SECTION_ACCENT['Head of the Department']} />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-7 px-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {chairmen.map((m, i) => <FacultyCard key={m.id} member={m} index={i} roleLabel="Head of Dept." />)}
                 </div>
               </section>
@@ -106,7 +106,7 @@ export default async function ActiveFacultyPage() {
             {groups.map(({ designation, members }) => (
               <section key={designation} id={designation.replace(/\s+/g, '-').toLowerCase()}>
                 <SectionHeading label={designation} count={members.length} accent={SECTION_ACCENT[designation] ?? '#475569'} />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-7 px-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                   {members.map((m, i) => <FacultyCard key={m.id} member={m} index={i} />)}
                 </div>
               </section>
