@@ -31,7 +31,7 @@ export async function GET(
   try {
     const res = await fetch(url, {
       headers: { 'Content-Type': 'application/json' },
-      next:    { revalidate: 60 },   // cache 60 s
+      cache: 'no-store',   // settings is 5MB — exceeds Next.js 2MB cache limit
     });
 
     const data = await res.json().catch(() => null);

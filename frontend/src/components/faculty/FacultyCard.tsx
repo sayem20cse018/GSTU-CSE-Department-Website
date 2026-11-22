@@ -197,11 +197,10 @@ export default function FacultyCard({ member, index, badge, badgeColor, roleLabe
             </span>
           </div>
 
-          {/* Email row — single line, clickable */}
+          {/* Email row — plain anchor, no onClick (Server Component safe) */}
           {showEmail && (
             <a
               href={`mailto:${member.email}`}
-              onClick={e => e.stopPropagation()}
               style={{
                 display: 'flex', alignItems: 'center', gap: '7px',
                 textDecoration: 'none',
@@ -216,12 +215,7 @@ export default function FacultyCard({ member, index, badge, badgeColor, roleLabe
                 fontSize: '0.65rem', color: '#16a34a',
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                 flex: 1, minWidth: 0,
-                textDecoration: 'underline',
-                textDecorationColor: 'transparent',
-                transition: 'text-decoration-color 0.2s',
-              }}
-                className="hover:underline"
-              >{member.email}</span>
+              }}>{member.email}</span>
             </a>
           )}
 
