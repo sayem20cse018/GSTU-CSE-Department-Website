@@ -46,14 +46,15 @@ function AchievementCard({ item }: { item: Achievement }) {
   return (
     <article className="group flex flex-col rounded-2xl overflow-hidden border border-slate-200 bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
 
-      {/* ── IMAGE — fixed height, full cover, no clip ── */}
-      <Link href={`/achievements/${item.id}`} className="block relative overflow-hidden shrink-0" style={{ height: '200px' }}>
+      {/* ── IMAGE — taller, full image visible ── */}
+      <Link href={`/achievements/${item.id}`} className="block relative overflow-hidden shrink-0" style={{ height: '260px', background: '#f8fafc' }}>
         {item.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.image}
             alt={item.title}
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full transition-transform duration-500 group-hover:scale-105"
+            style={{ objectFit: 'contain', objectPosition: 'center center' }}
             loading="lazy"
           />
         ) : (
