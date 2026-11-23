@@ -47,7 +47,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     setLoading(true);
-    adminGet<SiteSettings>('/settings')
+    adminGet<SiteSettings>('/settings/admin')
       .then(d => setForm({ ...SETTINGS_FALLBACK, ...d }))
       .catch(() => {})
       .finally(() => setLoading(false));

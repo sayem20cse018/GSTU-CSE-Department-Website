@@ -49,6 +49,28 @@ export class UpdateSettingsDto {
 
 const SINGLETON_KEY = 'site_settings';
 
+/** Fields that may contain raw Base64-encoded images (multi-MB).
+ *  These are NEVER sent to the public endpoint — only the admin
+ *  endpoint that is used to update them needs them. */
+const BASE64_IMAGE_FIELDS = new Set([
+  'deptLogo', 'universityLogo', 'chairmanPhoto',
+  'aboutImage1', 'aboutImage2', 'aboutImage3', 'aboutImage4',
+]);
+
+/** Strip any field that contains a base64 data-URI and replace it
+ *  with an empty string. This keeps the shape intact so the frontend
+ *  falls back gracefully while reducing the payload from ~3.8 MB to ~3 KB. */
+function stripBase64Images(settings: Settings): Settings {
+  const cleaned = { ...settings } as Record<string, unknown>;
+  for (const field of BASE64_IMAGE_FIELDS) {
+    const val = cleaned[field];
+    if (typeof val === 'string' && val.startsWith('data:')) {
+      cleaned[field] = ''; // empty string → frontend uses fallback
+    }
+  }
+  return cleaned as Settings;
+}
+
 @Injectable()
 export class SettingsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -59,6 +81,12 @@ export class SettingsService {
       return this.prisma.settings.create({ data: { key: SINGLETON_KEY } });
     }
     return doc;
+  }
+
+  /** Public-safe settings — base64 image fields stripped to keep response ~3KB. */
+  async getPublic(): Promise<Settings> {
+    const doc = await this.get();
+    return stripBase64Images(doc);
   }
 
   async update(dto: UpdateSettingsDto): Promise<Settings> {

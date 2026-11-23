@@ -12,8 +12,15 @@ export class SettingsController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Get site settings (public)' })
-  get() { return this.svc.get(); }
+  @ApiOperation({ summary: 'Get site settings (public) — base64 images stripped' })
+  get() { return this.svc.getPublic(); }
+
+  @Get('admin')
+  @UseGuards(RolesGuard)
+  @Roles('super_admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '[Super Admin] Get full settings including images' })
+  getAdmin() { return this.svc.get(); }
 
   @Patch()
   @UseGuards(RolesGuard)
