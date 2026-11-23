@@ -250,19 +250,6 @@ export default async function FacultyDetailPage({
                   {f.designation}
                 </p>
 
-                {/* Email — one line */}
-                {showEmail && (
-                  <a href={`mailto:${f.email}`} style={{
-                    display: 'block',
-                    fontSize: '0.72rem', color: '#6b7280',
-                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    textDecoration: 'none',
-                    lineHeight: 1.4,
-                  }}>
-                    {f.email}
-                  </a>
-                )}
-
                 {onLeave && (
                   <span style={{
                     display: 'inline-block', marginTop: '6px',
