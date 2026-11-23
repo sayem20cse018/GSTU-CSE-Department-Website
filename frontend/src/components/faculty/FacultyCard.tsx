@@ -38,117 +38,155 @@ export default function FacultyCard({ member, index, badge, badgeColor, roleLabe
         display:'flex', flexDirection:'column', height:'100%',
       }}>
 
-        {/* ── PHOTO + 4-SIDE FRAME ── */}
+        {/* ══════════════════════════════════════
+            PHOTO WRAPPER — overflow:visible
+            so the frame borders show outside
+            the green gradient container
+        ══════════════════════════════════════ */}
         <div style={{
           position:'relative',
+          /* padding creates space for the outer frame */
+          padding:'10px',
           background:'linear-gradient(160deg,#16a34a 0%,#4ade80 60%,#86efac 100%)',
-          aspectRatio:'3/4',
-          overflow:'hidden',
           flexShrink:0,
         }}>
-          {/* dot top-left — z:1 behind photo */}
+
+          {/* dot pattern — top-left, behind photo */}
           <div aria-hidden="true" style={{
-            position:'absolute',top:0,left:0,width:48,height:48,zIndex:1,pointerEvents:'none',
+            position:'absolute', top:0, left:0,
+            width:52, height:52, zIndex:0, pointerEvents:'none',
             backgroundImage:'radial-gradient(circle,rgba(255,255,255,.65) 1.5px,transparent 1.5px)',
             backgroundSize:'7px 7px',
           }}/>
-          {/* dot bottom-right — z:1 behind photo */}
+
+          {/* dot pattern — bottom-right, behind photo */}
           <div aria-hidden="true" style={{
-            position:'absolute',bottom:0,right:0,width:48,height:48,zIndex:1,pointerEvents:'none',
+            position:'absolute', bottom:0, right:0,
+            width:52, height:52, zIndex:0, pointerEvents:'none',
             backgroundImage:'radial-gradient(circle,rgba(255,255,255,.65) 1.5px,transparent 1.5px)',
             backgroundSize:'7px 7px',
           }}/>
-          {/* outer dark green border — 4 sides, z:1 */}
+
+          {/* ── 4-SIDE FRAME ──
+              outer dark green → white → inner lighter green
+              These sit around the photo, all visible
+          */}
+          {/* Layer 1: outer dark green border */}
           <div aria-hidden="true" style={{
-            position:'absolute',inset:8,borderRadius:14,
-            border:'3px solid #15803d',zIndex:1,pointerEvents:'none',
+            position:'absolute', inset:4,
+            borderRadius:16,
+            border:'3px solid #166534',
+            zIndex:2, pointerEvents:'none',
           }}/>
-          {/* white gap border — 4 sides, z:1 */}
+          {/* Layer 2: white gap */}
           <div aria-hidden="true" style={{
-            position:'absolute',inset:12,borderRadius:11,
-            border:'3px solid #fff',zIndex:1,pointerEvents:'none',
+            position:'absolute', inset:8,
+            borderRadius:13,
+            border:'3px solid white',
+            zIndex:2, pointerEvents:'none',
           }}/>
-          {/* inner light green border — 4 sides, z:1 */}
+          {/* Layer 3: inner light green */}
           <div aria-hidden="true" style={{
-            position:'absolute',inset:16,borderRadius:8,
-            border:'2px solid rgba(74,222,128,.6)',zIndex:1,pointerEvents:'none',
+            position:'absolute', inset:12,
+            borderRadius:10,
+            border:'2px solid rgba(74,222,128,.8)',
+            zIndex:2, pointerEvents:'none',
           }}/>
-          {/* PHOTO — z:10, face clean */}
-          {member.photo ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={member.photo} alt={member.name} style={{
-              position:'absolute',inset:0,width:'100%',height:'100%',
-              objectFit:'cover',objectPosition:'center top',
-              zIndex:10,display:'block',
-              transform:hov?'scale(1.05)':'scale(1)',
-              transition:'transform .45s ease',
-            }}/>
-          ) : (
-            <div style={{
-              position:'absolute',inset:0,zIndex:10,
-              display:'flex',alignItems:'center',justifyContent:'center',
-              background:AVATAR_GRADIENTS[index%AVATAR_GRADIENTS.length],
-            }}>
-              <span style={{fontSize:'2.5rem',fontWeight:900,color:'#fff',userSelect:'none'}}>
-                {initials}
-              </span>
-            </div>
-          )}
-          {badge && (
-            <div style={{
-              position:'absolute',bottom:0,left:0,right:0,zIndex:20,
-              padding:'3px 0',textAlign:'center',fontSize:'8px',fontWeight:900,
-              color:'#fff',letterSpacing:'.08em',textTransform:'uppercase',
-              background:(badgeColor??'#d97706')+'ee',
-            }}>{badge}</div>
-          )}
+
+          {/* PHOTO container — aspect ratio */}
+          <div style={{
+            position:'relative',
+            aspectRatio:'3/4',
+            overflow:'hidden',
+            borderRadius:8,
+          }}>
+            {member.photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={member.photo}
+                alt={member.name}
+                style={{
+                  position:'absolute', inset:0,
+                  width:'100%', height:'100%',
+                  objectFit:'cover', objectPosition:'center top',
+                  display:'block',
+                  transform: hov ? 'scale(1.05)' : 'scale(1)',
+                  transition:'transform .45s ease',
+                }}
+              />
+            ) : (
+              <div style={{
+                position:'absolute', inset:0,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                background: AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length],
+              }}>
+                <span style={{ fontSize:'2.5rem', fontWeight:900, color:'#fff', userSelect:'none' }}>
+                  {initials}
+                </span>
+              </div>
+            )}
+
+            {badge && (
+              <div style={{
+                position:'absolute', bottom:0, left:0, right:0,
+                padding:'3px 0', textAlign:'center',
+                fontSize:'8px', fontWeight:900, color:'#fff',
+                letterSpacing:'.08em', textTransform:'uppercase',
+                background:(badgeColor??'#d97706')+'ee',
+              }}>{badge}</div>
+            )}
+          </div>
         </div>
 
-        {/* ── INFO — clean white, NO extra design ── */}
+        {/* ── INFO AREA — clean white ── */}
         <div style={{
-          padding:'11px 13px 13px',background:'#fff',
+          padding:'11px 13px 13px',
+          background:'#fff',
           borderTop:'2px solid #dcfce7',
-          display:'flex',flexDirection:'column',gap:5,flex:1,
+          display:'flex', flexDirection:'column', gap:5, flex:1,
         }}>
           {/* Name */}
-          <div style={{display:'flex',alignItems:'center',gap:7}}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#16a34a" style={{flexShrink:0}}>
+          <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#16a34a" style={{ flexShrink:0 }}>
               <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
             </svg>
             <span style={{
-              fontSize:'.78rem',fontWeight:800,
-              color:hov?'#15803d':'#14532d',
-              whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
-              flex:1,minWidth:0,lineHeight:1.3,transition:'color .2s',
+              fontSize:'.78rem', fontWeight:800,
+              color: hov ? '#15803d' : '#14532d',
+              whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
+              flex:1, minWidth:0, lineHeight:1.3, transition:'color .2s',
             }}>{displayName}</span>
           </div>
+
           {/* Designation */}
-          <div style={{display:'flex',alignItems:'center',gap:7}}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#16a34a" style={{flexShrink:0}}>
+          <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#16a34a" style={{ flexShrink:0 }}>
               <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
             </svg>
             <span style={{
-              fontSize:'.70rem',fontWeight:500,color:'#4b5563',
-              whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
-              flex:1,minWidth:0,lineHeight:1.3,
+              fontSize:'.70rem', fontWeight:500, color:'#4b5563',
+              whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
+              flex:1, minWidth:0, lineHeight:1.3,
             }}>{desigText}</span>
           </div>
-          {/* Email — plain anchor, no onClick handler */}
+
+          {/* Email */}
           {showEmail && (
-            <div style={{display:'flex',alignItems:'center',gap:7}}>
+            <div style={{ display:'flex', alignItems:'center', gap:7 }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                stroke="#16a34a" strokeWidth="2" style={{flexShrink:0}}>
+                stroke="#16a34a" strokeWidth="2" style={{ flexShrink:0 }}>
                 <path strokeLinecap="round" strokeLinejoin="round"
                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
               </svg>
               <span style={{
-                fontSize:'.66rem',color:'#6b7280',
-                whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
-                flex:1,minWidth:0,lineHeight:1.3,
+                fontSize:'.66rem', color:'#6b7280',
+                whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
+                flex:1, minWidth:0, lineHeight:1.3,
               }}>{member.email}</span>
             </div>
           )}
         </div>
+
       </article>
     </Link>
   );
