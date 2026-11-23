@@ -10,11 +10,8 @@ import ScrollToTop from '@/components/ui/ScrollToTop';
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {/* Sticky wrapper — header + navbar always visible on scroll */}
-      <div className="sticky top-0 z-[9999]">
-        <SiteHeader />
-        <Navbar />
-      </div>
+      <SiteHeader />
+      <Navbar />
       <main className="flex flex-col flex-1 min-h-0">{children}</main>
       <Footer />
       <ScrollToTop />

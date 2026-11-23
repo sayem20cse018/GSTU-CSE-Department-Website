@@ -15,7 +15,7 @@ import { cache } from 'react';
 import type { FacultyMember } from './shared';
 
 /** Abort a request after this many ms. See note above. */
-export const FACULTY_FETCH_TIMEOUT_MS = 9000;
+export const FACULTY_FETCH_TIMEOUT_MS = 25000;
 
 export function getApiBase(): string {
   return (

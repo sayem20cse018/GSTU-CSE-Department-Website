@@ -36,9 +36,9 @@ export default async function ActiveFacultyPage() {
 
   if (!result.ok) {
     return (
-      <main className="bg-white min-h-screen pt-28 pb-16">
-        <div className="container-custom max-w-7xl">
-          <FacultyLoadError title="Couldn't load faculty" />
+      <main className="bg-white min-h-screen pb-16">
+        <div className="container-custom max-w-7xl pt-10">
+          <FacultyLoadError title="Couldn't load faculty" message="The server is warming up. Please wait a moment and refresh the page." />
         </div>
       </main>
     );

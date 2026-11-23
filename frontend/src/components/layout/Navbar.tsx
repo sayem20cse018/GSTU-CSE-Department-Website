@@ -189,7 +189,7 @@ export default function Navbar() {
     <>
       <nav
         ref={navRef}
-        className="relative z-[9999] transition-all duration-300"
+        className="sticky top-0 z-[9999] transition-all duration-300"
         style={{
           background: '#ffffff',
           backdropFilter: scrolled ? 'blur(12px)' : undefined,
