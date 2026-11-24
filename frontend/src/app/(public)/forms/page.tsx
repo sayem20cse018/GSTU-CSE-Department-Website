@@ -37,7 +37,7 @@ export default async function FormsPage() {
                 return acc;
               }, {})
             ).map(([type, items]) => (
-              <section key={type} className="mb-10">
+              <section key={type} id={type} className="mb-10">
                 <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-200 capitalize">
                   {type.replace(/_/g, ' ')}
                 </h2>
@@ -82,6 +82,14 @@ export default async function FormsPage() {
             </Link>
           </div>
         )}
+
+        {/* Evaluation forms section — always visible for nav anchor */}
+        <section id="evaluation" className="mt-12 pt-10 border-t border-slate-100">
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Evaluation Forms</h2>
+          <p className="text-sm text-slate-500">
+            Course evaluation and feedback forms are distributed directly by the department. Contact the department office or your course instructor to obtain the relevant evaluation form.
+          </p>
+        </section>
       </div></div>
     </>
   );

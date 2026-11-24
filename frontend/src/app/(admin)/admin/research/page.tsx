@@ -47,7 +47,7 @@ export default function ResearchAreasPage() {
     setLoading(true);
     try {
       // Try API first, use defaults if not available
-      const data = await adminGet<ResearchArea[]>('/research/areas').catch(() => null);
+      const data = await adminGet<ResearchArea[]>('/research').catch(() => null);
       setList(data?.length ? data : DEFAULT_AREAS as ResearchArea[]);
     } finally { setLoading(false); }
   }, []);
@@ -66,17 +66,16 @@ export default function ResearchAreasPage() {
     if (!form.name.trim()) { setErr('Research area name is required.'); return; }
     setSaving(true); setErr('');
     try {
-      if (editing) await adminPatch(`/research/areas/${editing.id}`, form);
-      else await adminPost('/research/areas', form);
+      if (editing) await adminPatch(`/research/${editing.id}`, form);
+      else await adminPost('/research', form);
       setOpen(false); load();
     } catch (e) { setErr(e instanceof Error ? e.message : 'Save failed'); }
     finally { setSaving(false); }
   }
 
   async function del(id: string) {
-    
     setDelId(id);
-    try { await adminDelete(`/research/areas/${id}`); load(); }
+    try { await adminDelete(`/research/${id}`); load(); }
     catch (e) { console.error(e); }
     finally { setDelId(null); }
   }

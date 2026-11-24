@@ -129,8 +129,8 @@ export const NAV_LINKS = [
     children: [
       { label: "Photo Gallery", href: "/gallery" },
       { label: "Events",        href: "/gallery?cat=event" },
-      { label: "Academic",      href: "/gallery?cat=academic" },
-      { label: "Cultural",      href: "/gallery?cat=cultural" },
+      { label: "Labs",          href: "/gallery?cat=lab" },
+      { label: "Student Life",  href: "/gallery?cat=student_life" },
       { label: "Sports",        href: "/gallery?cat=sports" },
     ],
   },
